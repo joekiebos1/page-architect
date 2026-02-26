@@ -1,3 +1,15 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import {
+  Display,
+  Text,
+  Button,
+  SurfaceProvider,
+  useDsContext,
+} from '@marcelinodzn/ds-react'
+import { spacing } from '@marcelinodzn/ds-tokens'
+
 type HeroBlockProps = {
   headline?: string | null
   subheadline?: string | null
@@ -7,43 +19,78 @@ type HeroBlockProps = {
 }
 
 export function HeroBlock({ headline, subheadline, ctaText, ctaLink, image }: HeroBlockProps) {
+  const router = useRouter()
+  const { tokenContext } = useDsContext()
+  const hasImage = Boolean(image)
+  const isInternalLink = ctaLink?.startsWith('/') ?? false
+
+  const paddingY = tokenContext ? spacing.get('3XL', tokenContext) : 48
+  const paddingX = tokenContext ? spacing.get('L', tokenContext) : 32
+  const contentGap = tokenContext ? spacing.get('L', tokenContext) : 24
+
+  const handleCtaPress = () => {
+    if (!ctaLink) return
+    if (isInternalLink) {
+      router.push(ctaLink)
+    } else {
+      window.location.href = ctaLink
+    }
+  }
+
   return (
-    <section
+    <SurfaceProvider
+      level={0}
+      hasBoldBackground={hasImage}
       style={{
-        padding: '4rem 2rem',
+        padding: `${paddingY ?? 48}px ${paddingX ?? 32}px`,
         textAlign: 'center',
-        background: image ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${image}) center/cover` : '#f5f5f5',
-        color: image ? '#fff' : '#111',
+        background: hasImage
+          ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${image}) center/cover`
+          : undefined,
       }}
     >
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <div
+        style={{
+          maxWidth: 640,
+          margin: '0 auto',
+          display: 'grid',
+          gap: `${contentGap ?? 24}px`,
+          justifyItems: 'center',
+        }}
+      >
         {headline && (
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '1rem' }}>
+          <Display
+            size="L"
+            as="h1"
+            color={hasImage ? 'on-bold-high' : 'high'}
+            align="center"
+          >
             {headline}
-          </h1>
+          </Display>
         )}
         {subheadline && (
-          <p style={{ fontSize: '1.25rem', opacity: 0.9, marginBottom: '1.5rem', lineHeight: 1.5 }}>
+          <Text
+            size="L"
+            weight="medium"
+            color={hasImage ? 'on-bold-high' : 'medium'}
+            align="center"
+            as="p"
+            style={{ marginBottom: 0, lineHeight: 1.5 }}
+          >
             {subheadline}
-          </p>
+          </Text>
         )}
         {ctaText && ctaLink && (
-          <a
-            href={ctaLink}
-            style={{
-              display: 'inline-block',
-              padding: '0.75rem 1.5rem',
-              background: image ? '#fff' : '#111',
-              color: image ? '#111' : '#fff',
-              textDecoration: 'none',
-              fontWeight: 600,
-              borderRadius: 6,
-            }}
+          <Button
+            appearance={hasImage ? 'secondary' : 'primary'}
+            size="M"
+            attention="high"
+            onPress={handleCtaPress}
           >
             {ctaText}
-          </a>
+          </Button>
         )}
       </div>
-    </section>
+    </SurfaceProvider>
   )
 }

@@ -1,5 +1,13 @@
 'use client'
 
+import { DsProvider } from '@marcelinodzn/ds-react'
+import { DSFoundationsStyles } from './DSFoundationsStyles'
+
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <DsProvider platform="Desktop (1440)" colorMode="Light" density="Default">
+      <DSFoundationsStyles />
+      {children}
+    </DsProvider>
+  )
 }
