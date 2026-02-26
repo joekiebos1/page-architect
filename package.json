@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
-    "@marcelinodzn/ds-react": "file:../packages/marcelinodzn-ds-react-1.0.6.tgz",
+    "@marcelinodzn/ds-react": "^1.0.6",
     "@marcelinodzn/ds-tokens": "^1.0.1",
     "@sanity/client": "^7.16.0",
     "@sanity/icons": "^3.4.0",
