@@ -16,7 +16,7 @@ export default async function Home() {
 
   if (!pages?.length) {
     return (
-      <main style={{ padding: '2rem', fontFamily: 'system-ui', maxWidth: 720, margin: '0 auto' }}>
+        <main style={{ padding: '2rem', maxWidth: 720, margin: '0 auto' }}>
         <h1>Page Architect</h1>
         <p>No pages yet. Create a page in Sanity Studio.</p>
         <p>
@@ -77,7 +77,7 @@ export default async function Home() {
 
   if (!pageData) {
     return (
-      <main style={{ padding: '2rem', fontFamily: 'system-ui', maxWidth: 720, margin: '0 auto' }}>
+        <main style={{ padding: '2rem', maxWidth: 720, margin: '0 auto' }}>
         <h1>Page Architect</h1>
         <p>Could not load page. Check your Sanity project ID and dataset in .env</p>
       </main>
@@ -85,7 +85,7 @@ export default async function Home() {
   }
 
   return (
-    <main style={{ fontFamily: 'system-ui' }}>
+    <main>
       <header
         style={{
           padding: '1rem 2rem',

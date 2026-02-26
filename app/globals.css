@@ -1,0 +1,41 @@
+/* Jio Design System foundations - typography, grid, spacing */
+:root {
+  /* Primary font from DS typography (overridden by DSFoundationsStyles when tokens resolve) */
+  --ds-font-family: "JioType Var", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Code font */
+  --ds-font-family-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+    Consolas, "DejaVu Sans Mono", monospace;
+  /* Grid breakpoints (px) - overridden by DSFoundationsStyles */
+  --ds-breakpoint-mobile: 360;
+  --ds-breakpoint-tablet: 768;
+  --ds-breakpoint-desktop: 1440;
+  --ds-breakpoint-desktop-lg: 1920;
+  /* Spacing tokens (px) - overridden by DSFoundationsStyles */
+  --ds-spacing-3xs: 4;
+  --ds-spacing-2xs: 8;
+  --ds-spacing-xs: 12;
+  --ds-spacing-s: 16;
+  --ds-spacing-m: 24;
+  --ds-spacing-l: 32;
+  --ds-spacing-xl: 48;
+  --ds-spacing-2xl: 64;
+  --ds-spacing-3xl: 96;
+  --ds-spacing-4xl: 128;
+}
+
+html {
+  font-family: var(--ds-font-family);
+}
+
+body {
+  font-family: var(--ds-font-family);
+}
+
+/* DS grid container - max-width follows breakpoints */
+.ds-container {
+  width: 100%;
+  max-width: min(100%, calc(var(--ds-breakpoint-desktop, 1440) * 1px));
+  margin-inline: auto;
+  padding-inline: calc(var(--ds-spacing-l, 32) * 1px);
+}
