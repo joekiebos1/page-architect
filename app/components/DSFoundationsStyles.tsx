@@ -29,10 +29,10 @@ export function DSFoundationsStyles() {
 
     const root = document.documentElement
 
-    // Typography - font family
+    // Typography - font family from DS token (JioType Var; add @font-face if you have the font files)
     const fontFamily = typography.fontFamily(ctx)
     if (fontFamily) {
-      root.style.setProperty('--ds-font-family', String(fontFamily))
+      root.style.setProperty('--ds-font-family', `${String(fontFamily)}, system-ui, sans-serif`)
     }
 
     // Spacing tokens (for grid gaps, padding, margins)

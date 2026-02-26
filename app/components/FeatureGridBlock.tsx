@@ -1,3 +1,16 @@
+'use client'
+
+import {
+  Headline,
+  Text,
+  Card,
+  CardHeader,
+  CardBody,
+  SurfaceProvider,
+  useDsContext,
+} from '@marcelinodzn/ds-react'
+import { spacing } from '@marcelinodzn/ds-tokens'
+
 type FeatureItem = {
   title?: string | null
   description?: string | null
@@ -9,43 +22,59 @@ type FeatureGridBlockProps = {
 }
 
 export function FeatureGridBlock({ title, items }: FeatureGridBlockProps) {
+  const { tokenContext } = useDsContext()
+  const sectionPadding = tokenContext ? spacing.get('3XL', tokenContext) : 48
+  const sectionPaddingX = tokenContext ? spacing.get('L', tokenContext) : 32
+  const titleGap = tokenContext ? spacing.get('2XL', tokenContext) : 32
+  const gridGap = tokenContext ? spacing.get('2XL', tokenContext) : 32
+
   return (
-    <section style={{ padding: '4rem 2rem', maxWidth: 960, margin: '0 auto' }}>
-      {title && (
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '2rem', textAlign: 'center' }}>
-          {title}
-        </h2>
-      )}
-      <div
+    <SurfaceProvider level={0}>
+      <section
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '2rem',
+          padding: `${sectionPadding ?? 48}px ${sectionPaddingX ?? 32}px`,
+          maxWidth: 960,
+          margin: '0 auto',
         }}
       >
-        {items?.map((item, i) => (
-          <div
-            key={i}
-            style={{
-              padding: '1.5rem',
-              background: '#f9f9f9',
-              borderRadius: 8,
-              border: '1px solid #eee',
-            }}
+        {title && (
+          <Headline
+            size="M"
+            weight="high"
+            as="h2"
+            align="center"
+            style={{ marginBottom: `${titleGap ?? 32}px` }}
           >
-            {item.title && (
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                {item.title}
-              </h3>
-            )}
-            {item.description && (
-              <p style={{ fontSize: '0.9375rem', color: '#555', lineHeight: 1.5 }}>
-                {item.description}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+            {title}
+          </Headline>
+        )}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: `${gridGap ?? 32}px`,
+          }}
+        >
+          {items?.map((item, i) => (
+            <Card key={i} size="M" surface="minimal" appearance="neutral">
+              <CardHeader>
+                {item.title && (
+                  <Headline size="S" weight="high" as="h3">
+                    {item.title}
+                  </Headline>
+                )}
+              </CardHeader>
+              <CardBody>
+                {item.description && (
+                  <Text size="M" weight="medium" color="medium" as="p" style={{ lineHeight: 1.5 }}>
+                    {item.description}
+                  </Text>
+                )}
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </SurfaceProvider>
   )
 }

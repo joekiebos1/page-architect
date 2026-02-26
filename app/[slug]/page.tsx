@@ -25,7 +25,7 @@ export default async function PageBySlug({ params }: Props) {
   const pages = await client.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery)
 
   return (
-    <main style={{ fontFamily: 'system-ui' }}>
+    <main>
       <header
         style={{
           padding: '1rem 2rem',
