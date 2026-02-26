@@ -17,6 +17,17 @@ export const textImageBlock = defineType({
       rows: 4,
     }),
     defineField({
+      name: 'ctaText',
+      type: 'string',
+      title: 'CTA Text',
+      description: 'e.g. "Visit JioFinance"',
+    }),
+    defineField({
+      name: 'ctaLink',
+      type: 'string',
+      title: 'CTA Link',
+    }),
+    defineField({
       name: 'image',
       type: 'image',
       title: 'Image',

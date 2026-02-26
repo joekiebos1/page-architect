@@ -6,10 +6,13 @@ export const pageBySlugQuery = `*[_type == "page" && slug.current == $slug][0]{
     _type,
     _key,
     _type == "hero" => {
+      productName,
       headline,
       subheadline,
       ctaText,
       ctaLink,
+      cta2Text,
+      cta2Link,
       "image": image.asset->url
     },
     _type == "featureGrid" => {

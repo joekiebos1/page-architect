@@ -5,6 +5,7 @@ import { useDsContext } from '@marcelinodzn/ds-react'
 import {
   spacing,
   typography,
+  colors,
   getBreakpoints,
   createTokenContext,
   COLLECTION_NAMES,
@@ -29,11 +30,12 @@ export function DSFoundationsStyles() {
 
     const root = document.documentElement
 
-    // Typography - font family from DS token (JioType Var; add @font-face if you have the font files)
+    // Typography - JioType Var from DS token (loaded via @font-face in globals.css)
     const fontFamily = typography.fontFamily(ctx)
-    if (fontFamily) {
-      root.style.setProperty('--ds-font-family', `${String(fontFamily)}, system-ui, sans-serif`)
-    }
+    const fontStack = fontFamily
+      ? `${String(fontFamily)}, "Inter", system-ui, sans-serif`
+      : '"JioType Var", "Inter", system-ui, sans-serif'
+    root.style.setProperty('--ds-font-family', fontStack)
 
     // Spacing tokens (for grid gaps, padding, margins)
     const spacingSizes = ['3XS', '2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as const
@@ -50,6 +52,37 @@ export function DSFoundationsStyles() {
     root.style.setProperty('--ds-breakpoint-tablet', `${breakpoints.tablet}px`)
     root.style.setProperty('--ds-breakpoint-desktop', `${breakpoints.desktop}px`)
     root.style.setProperty('--ds-breakpoint-desktop-lg', `${breakpoints.desktopLarge}px`)
+
+    // Surface/background colors for placeholders and surfaces
+    const bgSubtle = colors.background('Subtle', ctx)
+    const textHigh = colors.text('High', ctx)
+    const textMedium = colors.text('Medium', ctx)
+    const primaryBold = colors.appearance('Primary', 'Background/Bold', ctx)
+    const strokeSubtle = colors.background('Ghost', ctx) ?? colors.background('Subtle', ctx)
+    const labelM = typography.fontSize('Label', 'M', ctx)
+    const labelWeightHigh = typography.fontWeight('Label', 'High', ctx)
+    const display2xl = typography.fontSize('Display', '2XL', ctx)
+    if (bgSubtle != null) root.style.setProperty('--ds-color-background-subtle', String(bgSubtle))
+    if (textHigh != null) root.style.setProperty('--ds-color-text-high', String(textHigh))
+    if (textMedium != null) root.style.setProperty('--ds-color-text-medium', String(textMedium))
+    if (primaryBold != null) root.style.setProperty('--ds-color-surface-bold', String(primaryBold))
+    if (strokeSubtle != null) root.style.setProperty('--ds-color-stroke-subtle', String(strokeSubtle))
+    if (labelM != null) root.style.setProperty('--ds-typography-label-m', `${labelM}px`)
+    if (labelWeightHigh != null) root.style.setProperty('--ds-typography-weight-high', String(labelWeightHigh))
+    if (display2xl != null) {
+      const base = Number(display2xl)
+      root.style.setProperty('--ds-typography-display-2xl', `${base}px`)
+      root.style.setProperty('--ds-typography-display-hero', `${Math.round(base * 1.75)}px`)
+    }
+
+    // Derived tokens from DS spacing
+    const spacing2xl = spacing.get('2XL', ctx)
+    const spacingS = spacing.get('S', ctx)
+    if (spacing2xl != null && spacingS != null) {
+      root.style.setProperty('--ds-spacing-hero-sides', `${Number(spacing2xl) + Number(spacingS)}px`)
+    }
+    root.style.setProperty('--ds-spacing-hero-overlap', '12.5vw')
+    root.style.setProperty('--ds-spacing-hero-panel-trim', '25vw')
   }, [tokenContext])
 
   return null

@@ -7,9 +7,7 @@ import {
   CardHeader,
   CardBody,
   SurfaceProvider,
-  useDsContext,
 } from '@marcelinodzn/ds-react'
-import { spacing } from '@marcelinodzn/ds-tokens'
 
 type FeatureItem = {
   title?: string | null
@@ -22,19 +20,12 @@ type FeatureGridBlockProps = {
 }
 
 export function FeatureGridBlock({ title, items }: FeatureGridBlockProps) {
-  const { tokenContext } = useDsContext()
-  const sectionPadding = tokenContext ? spacing.get('3XL', tokenContext) : 48
-  const sectionPaddingX = tokenContext ? spacing.get('L', tokenContext) : 32
-  const titleGap = tokenContext ? spacing.get('2XL', tokenContext) : 32
-  const gridGap = tokenContext ? spacing.get('2XL', tokenContext) : 32
-
   return (
     <SurfaceProvider level={0}>
       <section
+        className="ds-container"
         style={{
-          padding: `${sectionPadding ?? 48}px ${sectionPaddingX ?? 32}px`,
-          maxWidth: 960,
-          margin: '0 auto',
+          paddingBlock: 'var(--ds-spacing-2xl)',
         }}
       >
         {title && (
@@ -43,7 +34,9 @@ export function FeatureGridBlock({ title, items }: FeatureGridBlockProps) {
             weight="high"
             as="h2"
             align="center"
-            style={{ marginBottom: `${titleGap ?? 32}px` }}
+            style={{
+              marginBottom: 'var(--ds-spacing-xl)',
+            }}
           >
             {title}
           </Headline>
@@ -51,8 +44,8 @@ export function FeatureGridBlock({ title, items }: FeatureGridBlockProps) {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: `${gridGap ?? 32}px`,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(calc(var(--ds-spacing-s) * 15), 1fr))',
+            gap: 'var(--ds-spacing-xl)',
           }}
         >
           {items?.map((item, i) => (
@@ -66,7 +59,7 @@ export function FeatureGridBlock({ title, items }: FeatureGridBlockProps) {
               </CardHeader>
               <CardBody>
                 {item.description && (
-                  <Text size="M" weight="medium" color="medium" as="p" style={{ lineHeight: 1.5 }}>
+                  <Text size="M" weight="medium" color="medium" as="p">
                     {item.description}
                   </Text>
                 )}

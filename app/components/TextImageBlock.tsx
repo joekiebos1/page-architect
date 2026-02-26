@@ -1,67 +1,115 @@
 'use client'
 
+import Link from 'next/link'
+import Image from 'next/image'
 import {
-  Headline,
+  Display,
   Text,
-  Image,
   SurfaceProvider,
-  useDsContext,
 } from '@marcelinodzn/ds-react'
-import { spacing } from '@marcelinodzn/ds-tokens'
 
 type TextImageBlockProps = {
   title?: string | null
   body?: string | null
+  ctaText?: string | null
+  ctaLink?: string | null
   image?: string | null
   imagePosition?: 'left' | 'right' | null
 }
 
-export function TextImageBlock({ title, body, image, imagePosition }: TextImageBlockProps) {
-  const { tokenContext } = useDsContext()
-  const isImageLeft = imagePosition === 'left'
-
-  const sectionPadding = tokenContext ? spacing.get('3XL', tokenContext) : 48
-  const sectionPaddingX = tokenContext ? spacing.get('L', tokenContext) : 32
-  const gridGap = tokenContext ? spacing.get('2XL', tokenContext) : 32
-  const titleGap = tokenContext ? spacing.get('M', tokenContext) : 24
+export function TextImageBlock({ title, body, ctaText, ctaLink, image, imagePosition }: TextImageBlockProps) {
+  const isImageRight = imagePosition !== 'left'
 
   return (
     <SurfaceProvider level={0}>
       <section
+        className="ds-container"
         style={{
-          padding: `${sectionPadding ?? 48}px ${sectionPaddingX ?? 32}px`,
-          maxWidth: 960,
-          margin: '0 auto',
+          paddingBlock: 'var(--ds-spacing-2xl)',
         }}
       >
         <div
+          className="text-image-block-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: image ? '1fr 1fr' : '1fr',
-            gap: `${gridGap ?? 32}px`,
+            gap: 'var(--ds-spacing-3xl)',
             alignItems: 'center',
           }}
         >
-          {image && isImageLeft && (
+          {image && !isImageRight && (
             <div style={{ order: 1 }}>
-              <Image src={image} alt={title || ''} style={{ width: '100%', height: 'auto', borderRadius: 8 }} />
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '16 / 9',
+                  borderRadius: 'var(--ds-spacing-m)',
+                  overflow: 'hidden',
+                }}
+              >
+                <Image
+                  src={image}
+                  alt={title || ''}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
             </div>
           )}
-          <div style={{ order: isImageLeft ? 2 : 1 }}>
+          <div
+            style={{
+              order: isImageRight ? 1 : 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--ds-spacing-m)',
+            }}
+          >
             {title && (
-              <Headline size="M" weight="high" as="h2" style={{ marginBottom: `${titleGap ?? 24}px` }}>
+              <Display size="L" as="h2" color="high" style={{ lineHeight: 1.2 }}>
                 {title}
-              </Headline>
+              </Display>
             )}
             {body && (
-              <Text size="L" weight="medium" color="medium" as="p" style={{ lineHeight: 1.6 }}>
+              <Text size="L" weight="medium" color="medium" as="p" style={{ maxWidth: '32ch' }}>
                 {body}
               </Text>
             )}
+            {ctaText && ctaLink && (
+              <Link
+                href={ctaLink}
+                style={{
+                  color: 'var(--ds-color-surface-bold)',
+                  fontWeight: 'var(--ds-typography-weight-high)',
+                  textDecoration: 'none',
+                  fontSize: 'var(--ds-typography-label-m)',
+                  alignSelf: 'flex-start',
+                }}
+              >
+                {ctaText} →
+              </Link>
+            )}
           </div>
-          {image && !isImageLeft && (
+          {image && isImageRight && (
             <div style={{ order: 2 }}>
-              <Image src={image} alt={title || ''} style={{ width: '100%', height: 'auto', borderRadius: 8 }} />
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '16 / 9',
+                  borderRadius: 'var(--ds-spacing-m)',
+                  overflow: 'hidden',
+                }}
+              >
+                <Image
+                  src={image}
+                  alt={title || ''}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
             </div>
           )}
         </div>

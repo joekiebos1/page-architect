@@ -16,12 +16,14 @@ export default async function Home() {
 
   if (!pages?.length) {
     return (
-        <main style={{ padding: '2rem', maxWidth: 720, margin: '0 auto' }}>
+        <main>
+        <div className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
         <h1>Page Architect</h1>
         <p>No pages yet. Create a page in Sanity Studio.</p>
         <p>
           Run <code>npm run dev</code> for Sanity Studio, then add a page with blocks.
         </p>
+        </div>
       </main>
     )
   }
@@ -48,10 +50,13 @@ export default async function Home() {
       _type,
       _key,
       _type == "hero" => {
+        productName,
         headline,
         subheadline,
         ctaText,
         ctaLink,
+        cta2Text,
+        cta2Link,
         "image": image.asset->url
       },
       _type == "featureGrid" => {
@@ -64,8 +69,18 @@ export default async function Home() {
       _type == "textImageBlock" => {
         title,
         body,
+        ctaText,
+        ctaLink,
         "image": image.asset->url,
         imagePosition
+      },
+      _type == "fullBleedVerticalCarousel" => {
+        items[]{
+          title,
+          description,
+          "image": image.asset->url,
+          "video": video.asset->url
+        }
       }
     }
   }`,
@@ -77,9 +92,11 @@ export default async function Home() {
 
   if (!pageData) {
     return (
-        <main style={{ padding: '2rem', maxWidth: 720, margin: '0 auto' }}>
+        <main>
+        <div className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
         <h1>Page Architect</h1>
         <p>Could not load page. Check your Sanity project ID and dataset in .env</p>
+        </div>
       </main>
     )
   }
@@ -87,23 +104,24 @@ export default async function Home() {
   return (
     <main>
       <header
+        className="ds-container"
         style={{
-          padding: '1rem 2rem',
-          borderBottom: '1px solid #eee',
+          paddingBlock: 'var(--ds-spacing-s)',
+          borderBottom: '1px solid var(--ds-color-stroke-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
       >
-        <Link href="/" style={{ fontWeight: 600, color: '#111', textDecoration: 'none' }}>
+        <Link href="/" style={{ fontWeight: 'var(--ds-typography-weight-high)', color: 'var(--ds-color-text-high)', textDecoration: 'none' }}>
           Page Architect
         </Link>
-        <nav style={{ display: 'flex', gap: '1rem' }}>
+        <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
           {pages.map((p) => (
             <Link
               key={p._id}
               href={p.slug === 'home' ? '/' : `/${p.slug}`}
-              style={{ color: '#666', textDecoration: 'none', fontSize: '0.9375rem' }}
+              style={{ color: 'var(--ds-color-text-medium)', textDecoration: 'none', fontSize: 'var(--ds-typography-label-m)' }}
             >
               {p.title}
             </Link>

@@ -1,48 +1,55 @@
-/* Jio Design System foundations - typography, grid, spacing */
-/* To load JioType Var: add font files to public/fonts/ and uncomment @font-face below */
-/* @font-face {
+/* Design System tokens - generated from @marcelinodzn/ds-tokens (single source of truth) */
+@import './ds-tokens.generated.css';
+
+/* Fonts - Inter fallback, JioType Var from DS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@font-face {
   font-family: 'JioType Var';
-  src: url('/fonts/JioTypeVar.woff2') format('woff2');
+  src: url('/fonts/JioTypeVarW05-Regular.woff2') format('woff2');
   font-weight: 100 900;
+  font-style: normal;
   font-display: swap;
-} */
-:root {
-  /* Primary font from DS token (overridden by DSFoundationsStyles) */
-  --ds-font-family: "JioType Var", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  /* Code font */
-  --ds-font-family-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
-    Consolas, "DejaVu Sans Mono", monospace;
-  /* Grid breakpoints (px) - overridden by DSFoundationsStyles */
-  --ds-breakpoint-mobile: 360;
-  --ds-breakpoint-tablet: 768;
-  --ds-breakpoint-desktop: 1440;
-  --ds-breakpoint-desktop-lg: 1920;
-  /* Spacing tokens (px) - overridden by DSFoundationsStyles */
-  --ds-spacing-3xs: 4;
-  --ds-spacing-2xs: 8;
-  --ds-spacing-xs: 12;
-  --ds-spacing-s: 16;
-  --ds-spacing-m: 24;
-  --ds-spacing-l: 32;
-  --ds-spacing-xl: 48;
-  --ds-spacing-2xl: 64;
-  --ds-spacing-3xl: 96;
-  --ds-spacing-4xl: 128;
+}
+@font-face {
+  font-family: 'JioType Var';
+  src: url('/fonts/JioTypeVarW05-Italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
 }
 
 html {
   font-family: var(--ds-font-family);
+  scrollbar-gutter: stable;
 }
-
 body {
   font-family: var(--ds-font-family);
+  margin: 0;
 }
 
-/* DS grid container - max-width follows breakpoints */
+main {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+main * {
+  font-family: var(--ds-font-family) !important;
+}
+
+/* DS grid container - uses tokens from ds-tokens.generated.css */
 .ds-container {
   width: 100%;
-  max-width: min(100%, calc(var(--ds-breakpoint-desktop, 1440) * 1px));
+  max-width: min(100%, var(--ds-breakpoint-desktop));
   margin-inline: auto;
-  padding-inline: calc(var(--ds-spacing-l, 32) * 1px);
+  padding-inline: var(--ds-spacing-l);
+}
+
+/* Text Image Block - stack on mobile */
+@media (max-width: 767px) {
+  .text-image-block-grid {
+    grid-template-columns: 1fr !important;
+  }
 }

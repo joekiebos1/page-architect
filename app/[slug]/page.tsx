@@ -27,26 +27,27 @@ export default async function PageBySlug({ params }: Props) {
   return (
     <main>
       <header
+        className="ds-container"
         style={{
-          padding: '1rem 2rem',
-          borderBottom: '1px solid #eee',
+          paddingBlock: 'var(--ds-spacing-m)',
+          borderBottom: '1px solid var(--ds-color-stroke-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
       >
-        <Link href="/" style={{ fontWeight: 600, color: '#111', textDecoration: 'none' }}>
+        <Link href="/" style={{ fontWeight: 'var(--ds-typography-weight-high)', color: 'var(--ds-color-text-high)', textDecoration: 'none' }}>
           Page Architect
         </Link>
-        <nav style={{ display: 'flex', gap: '1rem' }}>
+        <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
           {pages?.map((p) => (
             <Link
               key={p._id}
               href={p.slug === 'home' ? '/' : `/${p.slug}`}
               style={{
-                color: p.slug === slug ? '#111' : '#666',
+                color: p.slug === slug ? 'var(--ds-color-text-high)' : 'var(--ds-color-text-medium)',
                 textDecoration: 'none',
-                fontSize: '0.9375rem',
+                fontSize: 'var(--ds-typography-label-m)',
                 fontWeight: p.slug === slug ? 600 : 400,
               }}
             >

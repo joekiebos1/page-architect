@@ -26,5 +26,11 @@ export const pageBuilderType = defineType({
         input: FillWithSampleBlock,
       },
     }),
+    defineArrayMember({
+      type: 'fullBleedVerticalCarousel',
+      components: {
+        input: FillWithSampleBlock,
+      },
+    }),
   ],
 })

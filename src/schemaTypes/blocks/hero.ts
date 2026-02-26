@@ -6,6 +6,12 @@ export const heroBlock = defineType({
   title: 'Hero',
   fields: [
     defineField({
+      name: 'productName',
+      type: 'string',
+      title: 'Product name',
+      description: 'e.g. JioProduct - shown above headline with icon',
+    }),
+    defineField({
       name: 'headline',
       type: 'string',
       title: 'Headline',
@@ -13,23 +19,35 @@ export const heroBlock = defineType({
     defineField({
       name: 'subheadline',
       type: 'text',
-      title: 'Subheadline',
+      title: 'Description',
+      description: 'Body text below headline (in hero section)',
       rows: 3,
     }),
     defineField({
       name: 'ctaText',
       type: 'string',
-      title: 'CTA Text',
+      title: 'Primary CTA Text',
     }),
     defineField({
       name: 'ctaLink',
       type: 'string',
-      title: 'CTA Link',
+      title: 'Primary CTA Link',
+    }),
+    defineField({
+      name: 'cta2Text',
+      type: 'string',
+      title: 'Secondary CTA Text',
+    }),
+    defineField({
+      name: 'cta2Link',
+      type: 'string',
+      title: 'Secondary CTA Link',
     }),
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Background Image',
+      title: 'Key visual',
+      description: '2:1 aspect ratio recommended',
       options: {
         hotspot: true,
       },
