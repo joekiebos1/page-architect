@@ -1,23 +1,8 @@
 /* Design System tokens - generated from @marcelinodzn/ds-tokens (single source of truth) */
 @import './ds-tokens.generated.css';
 
-/* Fonts - Inter fallback, JioType Var from DS */
+/* Fonts - Inter fallback, JioType Var via next/font (--font-jiotype) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-@font-face {
-  font-family: 'JioType Var';
-  src: url('/fonts/JioTypeVarW05-Regular.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'JioType Var';
-  src: url('/fonts/JioTypeVarW05-Italic.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
 
 html {
   font-family: var(--ds-font-family);
