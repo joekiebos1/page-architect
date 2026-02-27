@@ -32,5 +32,17 @@ export const pageBuilderType = defineType({
         input: FillWithSampleBlock,
       },
     }),
+    defineArrayMember({
+      type: 'carousel',
+      components: {
+        input: FillWithSampleBlock,
+      },
+    }),
+    defineArrayMember({
+      type: 'proofPoints',
+      components: {
+        input: FillWithSampleBlock,
+      },
+    }),
   ],
 })

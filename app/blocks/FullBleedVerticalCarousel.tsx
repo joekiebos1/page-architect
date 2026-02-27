@@ -83,14 +83,12 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
       const { top, bottom } = el.getBoundingClientRect()
       const vh = window.innerHeight
 
-      // Before carousel: not sticky, reset image
       if (top > 0) {
         setIsSticky(false)
         setImageIndex(0)
         return
       }
 
-      // Past carousel: not sticky, reset
       if (bottom <= 0) {
         setIsSticky(false)
         prevImageIndexRef.current = 0
@@ -98,7 +96,6 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
         return
       }
 
-      // Inside carousel: compute which image to show
       const scrollIntoCarousel = -top
       const itemIndex = Math.min(Math.floor(scrollIntoCarousel / vh), n - 1)
       const textEl = textRefs.current[itemIndex]
@@ -112,7 +109,6 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
       }
       setImageIndex(imageIndexNew)
 
-      // Unstick when last item's text center reaches viewport center
       const lastText = textRefs.current[n - 1]
       const lastTextRect = lastText?.getBoundingClientRect()
       const lastItemReachedCenter =
@@ -156,7 +152,15 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
         }}
       >
         {showOverlay && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1,
+              pointerEvents: 'none',
+              isolation: 'isolate',
+            }}
+          >
             <div style={{ position: 'absolute', inset: 0 }}>
               <MediaLayer item={items_[prevImageIndex]} />
             </div>

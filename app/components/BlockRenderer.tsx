@@ -1,7 +1,11 @@
-import { HeroBlock } from './HeroBlock'
-import { FeatureGridBlock } from './FeatureGridBlock'
-import { TextImageBlock } from './TextImageBlock'
-import { FullBleedVerticalCarousel } from './FullBleedVerticalCarousel'
+import {
+  HeroBlock,
+  FeatureGridBlock,
+  TextImageBlock,
+  FullBleedVerticalCarousel,
+  CarouselBlock,
+  ProofPointsBlock,
+} from '../blocks'
 
 type Block = {
   _type: string
@@ -51,7 +55,12 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                 ctaText={block.ctaText as string}
                 ctaLink={block.ctaLink as string}
                 image={block.image as string}
-                imagePosition={block.imagePosition as 'left' | 'right'}
+                template={(block.template as 'SideBySide' | 'SideBySideNarrow' | 'SideBySideWide' | 'HeroOverlay' | 'Stacked') ?? 'SideBySide'}
+                imagePosition={(block.imagePosition as 'left' | 'right') ?? 'right'}
+                overlayAlignment={(block.overlayAlignment as 'left' | 'center' | 'right') ?? 'left'}
+                stackImagePosition={(block.stackImagePosition as 'top' | 'bottom') ?? 'top'}
+                stackAlignment={(block.stackAlignment as 'left' | 'center') ?? 'left'}
+                imageAspectRatio={(block.imageAspectRatio as '16:7' | '16:9' | '4:3' | '3:4' | '1:1' | '21:9') ?? undefined}
               />
             )
           case 'fullBleedVerticalCarousel':
@@ -59,6 +68,22 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
               <FullBleedVerticalCarousel
                 key={block._key || block._type}
                 items={block.items as { title?: string; description?: string; image?: string; video?: string }[]}
+              />
+            )
+          case 'carousel':
+            return (
+              <CarouselBlock
+                key={block._key || block._type}
+                title={block.title as string}
+                items={block.items as { title?: string; description?: string; image?: string; link?: string; ctaText?: string; aspectRatio?: '4:5' | '8:5' }[]}
+              />
+            )
+          case 'proofPoints':
+            return (
+              <ProofPointsBlock
+                key={block._key || block._type}
+                title={block.title as string}
+                items={block.items as { title?: string; description?: string; icon?: string }[]}
               />
             )
           default:

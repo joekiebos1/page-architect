@@ -7,6 +7,8 @@
     "dev:app": "next dev",
     "dev:api": "next dev -p 3001",
     "generate:tokens": "node scripts/generate-ds-tokens-css.mjs",
+    "seed:sanity": "node --env-file=.env scripts/seed-sanity.mjs",
+    "generate:icons": "node -e \"const icons=require('@marcelinodzn/ds-react/icons');const fs=require('fs');const names=icons.getAvailableIcons();fs.mkdirSync('src/lib',{recursive:true});fs.writeFileSync('src/lib/ds-icon-names.json',JSON.stringify(names));console.log('Wrote',names.length,'icon names');\"",
     "prebuild": "npm run generate:tokens",
     "build": "next build",
     "start": "next start",

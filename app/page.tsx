@@ -72,7 +72,12 @@ export default async function Home() {
         ctaText,
         ctaLink,
         "image": image.asset->url,
-        imagePosition
+        template,
+        imagePosition,
+        overlayAlignment,
+        stackImagePosition,
+        stackAlignment,
+        imageAspectRatio
       },
       _type == "fullBleedVerticalCarousel" => {
         items[]{
@@ -80,6 +85,25 @@ export default async function Home() {
           description,
           "image": image.asset->url,
           "video": video.asset->url
+        }
+      },
+      _type == "carousel" => {
+        title,
+        items[]{
+          title,
+          description,
+          "image": image.asset->url,
+          link,
+          ctaText,
+          aspectRatio
+        }
+      },
+      _type == "proofPoints" => {
+        title,
+        items[]{
+          title,
+          description,
+          icon
         }
       }
     }
@@ -106,11 +130,15 @@ export default async function Home() {
       <header
         className="ds-container"
         style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
           paddingBlock: 'var(--ds-spacing-s)',
           borderBottom: '1px solid var(--ds-color-stroke-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          background: 'var(--ds-color-background-subtle)',
         }}
       >
         <Link href="/" style={{ fontWeight: 'var(--ds-typography-weight-high)', color: 'var(--ds-color-text-high)', textDecoration: 'none' }}>

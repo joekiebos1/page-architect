@@ -33,6 +33,7 @@ main {
   padding: 0;
   width: 100%;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 main * {
@@ -45,9 +46,38 @@ main * {
   max-width: min(100%, var(--ds-breakpoint-desktop));
   margin-inline: auto;
   padding-inline: var(--ds-spacing-l);
+  overflow: visible;
 }
 
-/* Text Image Block - stack on mobile */
+/* Card block carousel - overflow visible so cards are always visible outside viewport */
+.card-block-carousel {
+  overflow: visible !important;
+}
+
+/* Carousel card - rounded corners from DS Shape/XL token (35px) */
+.carousel-card {
+  border-radius: var(--ds-radius-card, 35px) !important;
+  overflow: hidden !important;
+}
+.carousel-card-inner {
+  border-radius: var(--ds-radius-card, 35px) !important;
+  overflow: hidden !important;
+}
+.carousel-card-inner img {
+  border-radius: var(--ds-radius-card, 35px) !important;
+}
+
+/* Card block grid - responsive: stack on mobile */
+@media (max-width: 767px) {
+  .card-block-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .card-block-grid .card-block-cell {
+    grid-column: span 1 !important;
+  }
+}
+
+/* Text Image Block - stack grid on mobile */
 @media (max-width: 767px) {
   .text-image-block-grid {
     grid-template-columns: 1fr !important;

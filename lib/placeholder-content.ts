@@ -34,7 +34,9 @@ export const PLACEHOLDER_CONTENT = {
   textImageBlock: {
     title: 'Designed for real teams',
     body: 'We built this with feedback from hundreds of teams. Every feature exists because someone asked for it. No bloat, no complexity—just what you need to get work done.',
+    template: 'SideBySide',
     imagePosition: 'left',
+    imageAspectRatio: '4:3',
   },
   fullBleedVerticalCarousel: {
     items: [
@@ -48,6 +50,14 @@ export const PLACEHOLDER_CONTENT = {
         description:
           'Each item gets its own full-bleed media and text overlay. The stepper on the right shows your progress.',
       },
+    ],
+  },
+  proofPoints: {
+    title: 'Why believe us',
+    items: [
+      { title: 'Trusted by millions', description: 'Join 10M+ satisfied customers', icon: 'IcCheckboxOn' },
+      { title: 'Award-winning', description: 'Industry recognition for excellence', icon: 'IcAward' },
+      { title: '24/7 support', description: 'We\'re here when you need us', icon: 'IcProtection' },
     ],
   },
 } as const

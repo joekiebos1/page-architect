@@ -25,11 +25,45 @@ export const pageBySlugQuery = `*[_type == "page" && slug.current == $slug][0]{
     _type == "textImageBlock" => {
       title,
       body,
+      ctaText,
+      ctaLink,
       "image": image.asset->url,
-      imagePosition
+      template,
+      imagePosition,
+      overlayAlignment,
+      stackImagePosition,
+      stackAlignment,
+      imageAspectRatio
+    },
+    _type == "fullBleedVerticalCarousel" => {
+      items[]{
+        title,
+        description,
+        "image": image.asset->url,
+        "video": video.asset->url
+      }
+    },
+      _type == "carousel" => {
+        title,
+        items[]{
+          title,
+          description,
+          "image": image.asset->url,
+          link,
+          ctaText,
+          aspectRatio
+        }
+      },
+      _type == "proofPoints" => {
+        title,
+        items[]{
+          title,
+          description,
+          icon
+        }
+      }
     }
-  }
-}`
+  }`
 
 export const allPagesQuery = `*[_type == "page"]{
   _id,

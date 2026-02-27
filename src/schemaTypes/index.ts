@@ -7,6 +7,9 @@ import {
   fullBleedVerticalCarouselBlock,
   fullBleedVerticalCarouselItem,
 } from './blocks/fullBleedVerticalCarousel'
+import { cardBlock, cardItem } from './blocks/cardBlock'
+import { carouselBlock } from './blocks/carousel'
+import { proofPointsBlock } from './blocks/proofPoints'
 
 export const schemaTypes = [
   pageType,
@@ -16,4 +19,8 @@ export const schemaTypes = [
   textImageBlock,
   fullBleedVerticalCarouselItem,
   fullBleedVerticalCarouselBlock,
+  cardItem,
+  cardBlock,
+  carouselBlock,
+  proofPointsBlock,
 ]
