@@ -3,7 +3,7 @@
  * Do not edit. Run: node scripts/generate-ds-tokens-css.mjs
  */
 :root {
-  --ds-font-family: JioType Var, "Inter", system-ui, sans-serif;
+  --ds-font-family: var(--font-jiotype), "Inter", system-ui, sans-serif;
   --ds-spacing-3xs: 4px;
   --ds-spacing-2xs: 7px;
   --ds-spacing-xs: 9px;

@@ -33,12 +33,8 @@ export function DSFoundationsStyles() {
 
     const root = document.documentElement
 
-    // Typography - JioType Var via next/font (var(--font-jiotype)), fallback to DS token
-    const fontFamily = typography.fontFamily(ctx)
-    const fontStack = fontFamily
-      ? `${String(fontFamily)}, "Inter", system-ui, sans-serif`
-      : 'var(--font-jiotype), "Inter", system-ui, sans-serif'
-    root.style.setProperty('--ds-font-family', fontStack)
+    // Typography - always use next/font variable (DS token may return "JioType Var" which is undefined without @font-face)
+    root.style.setProperty('--ds-font-family', 'var(--font-jiotype), "Inter", system-ui, sans-serif')
 
     // Spacing tokens (for grid gaps, padding, margins)
     const spacingSizes = ['3XS', '2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as const

@@ -35,12 +35,8 @@ const ctx = createTokenContext({
 
 const vars = []
 
-// Font family
-const fontFamily = typography.fontFamily(ctx)
-const fontStack = fontFamily
-  ? `${String(fontFamily)}, "Inter", system-ui, sans-serif`
-  : '"JioType Var", "Inter", system-ui, sans-serif'
-vars.push(`  --ds-font-family: ${fontStack};`)
+// Font family - use next/font variable (JioType Var loaded via app/layout.tsx)
+vars.push(`  --ds-font-family: var(--font-jiotype), "Inter", system-ui, sans-serif;`)
 
 // Spacing
 const spacingSizes = ['3XS', '2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
