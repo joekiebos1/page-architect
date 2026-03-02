@@ -1,4 +1,6 @@
 import localFont from 'next/font/local'
+import { draftMode } from 'next/headers'
+import { VisualEditing } from 'next-sanity/visual-editing'
 import './globals.css'
 import { Providers } from './components/Providers'
 
@@ -12,15 +14,19 @@ const jioTypeVar = localFont({
   preload: true,
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { isEnabled: draft } = await draftMode()
   return (
     <html lang="en" className={jioTypeVar.variable}>
       <body className={jioTypeVar.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          {draft && <VisualEditing />}
+        </Providers>
       </body>
     </html>
   )

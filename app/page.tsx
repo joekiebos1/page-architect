@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { client } from '../lib/sanity/client'
+import { draftMode } from 'next/headers'
+import { getClient } from '../lib/sanity/client'
 import { allPagesQuery } from '../lib/sanity/queries'
 import { BlockRenderer } from './components/BlockRenderer'
 
@@ -7,9 +8,11 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function Home() {
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
   let pages: { _id: string; title: string; slug: string }[] = []
   try {
-    pages = await client.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery) ?? []
+    pages = await sanity.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery) ?? []
   } catch {
     // No Sanity project configured or fetch failed
   }
@@ -36,7 +39,7 @@ export default async function Home() {
     sections: unknown[]
   } | null = null
   try {
-    pageData = await client.fetch<{
+    pageData = await sanity.fetch<{
     _id: string
     title: string
     slug: string
@@ -50,6 +53,8 @@ export default async function Home() {
       _type,
       _key,
       _type == "hero" => {
+        variant,
+        spacing,
         productName,
         headline,
         subheadline,
@@ -57,22 +62,34 @@ export default async function Home() {
         ctaLink,
         cta2Text,
         cta2Link,
-        "image": image.asset->url
+        "image": coalesce(imageUrl, image.asset->url)
       },
       _type == "featureGrid" => {
+        spacing,
         title,
+        titleLevel,
         items[]{
           title,
           description
         }
       },
-      _type == "textImageBlock" => {
+      _type == "mediaTextBlock" => {
+        spacing,
+        eyebrow,
+        subhead,
         title,
+        titleLevel,
         body,
+        bulletList,
         ctaText,
         ctaLink,
-        "image": image.asset->url,
+        cta2Text,
+        cta2Link,
+        "image": coalesce(imageUrl, image.asset->url),
+        "video": coalesce(videoUrl, video.asset->url),
+        size,
         template,
+        contentWidth,
         imagePosition,
         overlayAlignment,
         stackImagePosition,
@@ -80,26 +97,33 @@ export default async function Home() {
         imageAspectRatio
       },
       _type == "fullBleedVerticalCarousel" => {
+        spacing,
         items[]{
           title,
           description,
-          "image": image.asset->url,
-          "video": video.asset->url
+          "image": coalesce(imageUrl, image.asset->url),
+          "video": coalesce(videoUrl, video.asset->url)
         }
       },
       _type == "carousel" => {
+        spacing,
         title,
+        titleLevel,
+        cardSize,
         items[]{
           title,
           description,
-          "image": image.asset->url,
+          "image": coalesce(imageUrl, image.asset->url),
+          "video": coalesce(videoUrl, video.asset->url),
           link,
           ctaText,
           aspectRatio
         }
       },
       _type == "proofPoints" => {
+        spacing,
         title,
+        titleLevel,
         items[]{
           title,
           description,
@@ -144,7 +168,10 @@ export default async function Home() {
         <Link href="/" style={{ fontWeight: 'var(--ds-typography-weight-high)', color: 'var(--ds-color-text-high)', textDecoration: 'none' }}>
           Page Architect
         </Link>
-        <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
+        <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)', alignItems: 'center' }}>
+          <Link href="/jiokarna" style={{ color: 'var(--ds-color-text-medium)', textDecoration: 'none', fontSize: 'var(--ds-typography-label-m)' }}>
+            JioKarna
+          </Link>
           {pages.map((p) => (
             <Link
               key={p._id}

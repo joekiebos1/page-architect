@@ -1,0 +1,30 @@
+{
+  "_comment": "Extracted from store.google.com/gb/product/pixel_10_pro?hl=en-GB (UK page) - Use =s1200 for 1200px width images",
+  "images": {
+    "hero": "https://lh3.googleusercontent.com/9EB5TlJd0HySceMnILIKLuw6-p1ttfyRo1o3poX6yU1YUuUvYXmMU8a0_AM2ccFQoOaq7t8ud5ildnBt09MIQAaw3sHaFwdTAOax=s1200",
+    "pixelProduct1": "https://lh3.googleusercontent.com/-87SuOyWxeEu56zbyGVz4n5Ew0k83nAUYRFFKrq_xowyNeUKgbbVukMTBRt6Sjausb4vXg_NKnzzJLTgB2JTVO2_u1-uTMF7Zg=s1200",
+    "pixelProduct2": "https://lh3.googleusercontent.com/0I5u7vSAG5MuGvZTRB3bCBr__qM5n3dZedpRyWFckxwQn2lZeN68utDA00drQe7jPGgFKgIZIvXRv21gZjMztaMBPwhMrBHqlFE=s1200",
+    "pixelProduct3": "https://lh3.googleusercontent.com/2Vg1iI0kOA5QkpG20fisNjNrXJfPj4hh45wUypykOy-rlymd28eq17BtTvqIAOPP3OXmBpJ4ywa8LLVqWkTb--jCbMXbEbYYEB0=s1200",
+    "pixelProduct4": "https://lh3.googleusercontent.com/2x3zvEDFKReoIuBOpNPjy_3_v2LD-bt08E7Zvj146-2esk0k20kTvngF5QBxG2HBV-bff2bVuPe03fNT-_9LbZor7oKG7nAJUSHy=s1200",
+    "pixelProduct5": "https://lh3.googleusercontent.com/31cx6g1WWOvcoNciQCszRU0IbH9LySL0-qZNzk7y_y3H4KsC914EjpC8Zl5B4_iVkhGQkpriuJ10CNT--lK_5zcq37AaFJh1sHIy=s1200",
+    "pixelProduct6": "https://lh3.googleusercontent.com/4AL81JdP_vOuUoI2jPhPA1JPMtNizgX1ZBt_SOktL82gzkl2QcaI5V7q48dYEVmlJWbYlUIySHteU4YQBxYotQIcfyTeE_dVqw=s1200",
+    "pixelProduct7": "https://lh3.googleusercontent.com/2zq_PLuDxs1tIrmC3d2J7yySZ2rYzxkJVsY_dZkbu9OVAaA5l8V34WtEZW_SgXDTSDFnCpbbm3pvVJlCPacIZessW8q1I47-bxg=s1200",
+    "pixelProduct8": "https://lh3.googleusercontent.com/3LR_J1CZ98DsUtIh8rWIN6BGD10zpL2Y1EtcTFcPleonexZrPjUPJ89gSmT6Cd7h9sIyl9T5GlykeWhDklVmvBVxKX23UU7mBwER=s1200",
+    "gemini": "https://lh3.googleusercontent.com/EYTAbmiX9YBYCI2szDiFxpe9pngmc5FXenW6xkp-eE2aKql77pgQ9Oe6BfagExu81CFDQ3mjaslB9orbYnvR1zgzo5mJXPkZgbs=s1200",
+    "camera": "https://lh3.googleusercontent.com/1kI1np67VLpqtS2EaR8se56N3gFf_XTrra8PDdQBlZsaJMxyKMWIX931uezRMAUEfq77vU5qhpYFqM-pp7FDRSYVpeArkBYAO6tS=s1200",
+    "switchToPixel": "https://lh3.googleusercontent.com/A1-hNuPEvij_UU-B4SLYm-8SAg-buXpnaeHYAN5s4YRf1tvcpLBz4CXJmviXE1t28EXHnsS_XeldTdvnDY6p1KiA2ZTS_AKZ_ecY=s1200",
+    "pixelDrops": "https://lh3.googleusercontent.com/WGosaQfH5pOQONUALtPBk0KaCR8pxCu-D7cVS2V7hvLBaDk2iVZKOovfxMlIYATsyvn9R6Doo1tqk2DSmLQZryydjhHo33iv7CY=s1200"
+  },
+  "videos": {
+    "_comment": "Document order from UK page - first 7 are New on Pixel 10 Pro carousel",
+    "newOnPixel": [
+      "https://storage.googleapis.com/mannequin/blobs/4627df29-fe27-4e9c-b58f-8077848e265f.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/2163532b-3e1f-4546-84f8-616b5c522551.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/ce39e986-d883-498b-9f9c-0c44bb8a4c55.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/e6e09600-03e3-4f81-84d3-bd53216fb3bd.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/aac37598-7ca8-4ef6-8ad4-f26da4d0c54a.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/0139315d-c017-4f97-b45d-c441ea2ef2ac.mp4",
+      "https://storage.googleapis.com/mannequin/blobs/d5a36d23-74be-45af-8937-f14ad449b169.mp4"
+    ]
+  }
+}

@@ -1,8 +1,67 @@
 /* Design System tokens - generated from @marcelinodzn/ds-tokens (single source of truth) */
 @import './ds-tokens.generated.css';
-
 /* Fonts - Inter fallback, JioType Var via next/font (--font-jiotype) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Project-level DS tokens – extend generated tokens */
+:root {
+  --ds-color-background: rgb(255, 255, 255);
+  --ds-color-overlay-dark: rgba(0, 0, 0, 0.7);
+  --ds-color-text-on-overlay: rgba(255, 255, 255, 0.9);
+  --ds-color-text-on-overlay-subtle: rgba(255, 255, 255, 0.95);
+  --ds-color-shadow-overlay: rgba(0, 0, 0, 0.5);
+  --ds-color-shadow-elevation: rgba(0, 0, 0, 0.08);
+  --ds-max-width-body: 65ch;
+  --ds-max-width-text-block: 52ch;
+  --ds-max-width-headline: 65ch;
+  --ds-breakpoint-tablet-max: calc(var(--ds-breakpoint-tablet) - 1px);
+  --ds-color-surface-secondary-dark: rgb(63, 0, 127);
+  --ds-height-header: 44px;
+}
+
+/* Block spacing – Apple/Google/Wise style storytelling rhythm */
+:root {
+  --ds-spacing-block-gap: clamp(var(--ds-spacing-2xl), 8vw, var(--ds-spacing-4xl));
+  --ds-spacing-block-gap-tight: clamp(var(--ds-spacing-xl), 5vw, var(--ds-spacing-2xl));
+  --ds-spacing-block-gap-chapter: clamp(var(--ds-spacing-3xl), 12vw, calc(var(--ds-spacing-4xl) + var(--ds-spacing-xl)));
+  --ds-spacing-block-gap-huge: calc(var(--ds-spacing-4xl) + var(--ds-spacing-3xl));
+}
+
+/* 50/50 block – de-emphasized eyebrow (derived from text-low) */
+:root {
+  --ds-color-text-ghost: color-mix(in srgb, var(--ds-color-text-low) 50%, transparent);
+}
+
+/* 50/50 block – grid proportions: image 50%, title 40%, body 30%, gap 1 col. 8 cols only. */
+:root {
+  --ds-typography-headline-50-50: 32px;
+  --ds-grid-50-50-col-narrow: 12.5%;
+  --ds-grid-50-50-gap-narrow: 12.5%;
+  --ds-grid-50-50-image: 50%;
+  --ds-grid-50-50-title: 40%;
+  --ds-grid-50-50-body: 30%;
+}
+
+/* 50/50 block – apply gap based on content width (8 cols only) */
+:root {
+  --ds-grid-50-50-gap: var(--ds-grid-50-50-gap-narrow);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --ds-grid-50-50-image: 100%;
+    --ds-grid-50-50-title: 100%;
+    --ds-grid-50-50-body: 100%;
+    --ds-grid-50-50-gap: var(--ds-spacing-m);
+  }
+}
+
+/* Block stack – spacing via marginBottom on each block (per-block spacing) */
+.block-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
 html {
   font-family: var(--ds-font-family);
@@ -11,6 +70,8 @@ html {
 body {
   font-family: var(--ds-font-family);
   margin: 0;
+  /* Page background at layout level so BlockContainer inset reads as breathing room */
+  background: var(--ds-color-background-subtle, var(--ds-color-background));
 }
 
 main {
@@ -25,31 +86,173 @@ main * {
   font-family: var(--ds-font-family) !important;
 }
 
-/* DS grid container - uses tokens from ds-tokens.generated.css */
+/* Content width – 7 cols (narrow), 8 cols (default), or full. Responsive per breakpoint.
+   Desktop (12 cols): narrow=7, default=8, full=12
+   Tablet (8 cols): narrow=4, default=5, full=8
+   Mobile (4 cols): narrow=3, default=4, full=4 */
+:root {
+  --ds-content-span-narrow: 3;
+  --ds-content-span-default: 4;
+  --ds-content-span-full: 4;
+  --ds-content-max-narrow: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-mobile) - 2 * var(--ds-grid-margin)) * 3 / 4);
+  --ds-content-max-default: min(100%, var(--ds-breakpoint-mobile));
+  --ds-content-max-full: min(100%, var(--ds-breakpoint-mobile));
+}
+@media (min-width: 768px) {
+  :root {
+    --ds-content-span-narrow: 4;
+    --ds-content-span-default: 5;
+    --ds-content-span-full: 8;
+    --ds-content-max-narrow: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-tablet) - 2 * var(--ds-grid-margin)) * 4 / 8);
+    --ds-content-max-default: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-tablet) - 2 * var(--ds-grid-margin)) * 5 / 8);
+    --ds-content-max-full: min(100%, var(--ds-breakpoint-tablet));
+  }
+}
+@media (min-width: 1440px) {
+  :root {
+    --ds-content-span-narrow: 7;
+    --ds-content-span-default: 8;
+    --ds-content-span-full: 12;
+    --ds-content-max-narrow: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-desktop) - 2 * var(--ds-grid-margin)) * 7 / 12);
+    --ds-content-max-default: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-desktop) - 2 * var(--ds-grid-margin)) * 8 / 12);
+    --ds-content-max-full: min(100%, var(--ds-breakpoint-desktop));
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+    --ds-content-max-narrow: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-desktop-lg) - 2 * var(--ds-grid-margin)) * 7 / 12);
+    --ds-content-max-default: calc(2 * var(--ds-grid-margin) + (var(--ds-breakpoint-desktop-lg) - 2 * var(--ds-grid-margin)) * 8 / 12);
+    --ds-content-max-full: min(100%, var(--ds-breakpoint-desktop-lg));
+  }
+}
+
+/* DS grid container – uses DS grid margin (from ds-tokens) */
 .ds-container {
   width: 100%;
-  max-width: min(100%, var(--ds-breakpoint-desktop));
+  max-width: 100%;
   margin-inline: auto;
-  padding-inline: var(--ds-spacing-l);
+  padding-inline: var(--ds-grid-margin);
   overflow: visible;
 }
+
+/* Foundation grid – use when content needs column layout (DS grid from ds-tokens) */
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-grid-columns), 1fr);
+  gap: var(--ds-grid-gutter);
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Grid cell span – use with .ds-grid children, e.g. [data-span="6"] */
+.ds-grid [data-span="1"] { grid-column: span 1; }
+.ds-grid [data-span="2"] { grid-column: span 2; }
+.ds-grid [data-span="3"] { grid-column: span 3; }
+.ds-grid [data-span="4"] { grid-column: span 4; }
+.ds-grid [data-span="5"] { grid-column: span 5; }
+.ds-grid [data-span="6"] { grid-column: span 6; }
+.ds-grid [data-span="7"] { grid-column: span 7; }
+.ds-grid [data-span="8"] { grid-column: span 8; }
+.ds-grid [data-span="9"] { grid-column: span 9; }
+.ds-grid [data-span="10"] { grid-column: span 10; }
+.ds-grid [data-span="11"] { grid-column: span 11; }
+.ds-grid [data-span="12"] { grid-column: span 12; }
 
 /* Card block carousel - overflow visible so cards are always visible outside viewport */
 .card-block-carousel {
   overflow: visible !important;
 }
 
-/* Carousel card - rounded corners from DS Shape/XL token (35px) */
+/* Carousel – Apple-style fixed widths per breakpoint (apple.com/mac inspired) */
+:root {
+  --carousel-card-width: 280px;
+  --carousel-card-width-8-5: calc(280px * 2 + var(--ds-spacing-l));
+}
+@media (min-width: 768px) {
+  :root {
+    --carousel-card-width: 360px;
+    --carousel-card-width-8-5: calc(360px * 2 + var(--ds-spacing-l));
+  }
+}
+@media (min-width: 1440px) {
+  :root {
+    --carousel-card-width: 440px;
+    --carousel-card-width-8-5: calc(440px * 2 + var(--ds-spacing-l));
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+    --carousel-card-width: 520px;
+    --carousel-card-width-8-5: calc(520px * 2 + var(--ds-spacing-l));
+  }
+}
+
+/* Carousel card - rounded corners from DS Shape/M token (19px), one step down from L */
 .carousel-card {
-  border-radius: var(--ds-radius-card, 35px) !important;
+  border-radius: var(--ds-radius-card-m) !important;
   overflow: hidden !important;
 }
 .carousel-card-inner {
-  border-radius: var(--ds-radius-card, 35px) !important;
+  border-radius: var(--ds-radius-card-m) !important;
   overflow: hidden !important;
 }
 .carousel-card-inner img {
-  border-radius: var(--ds-radius-card, 35px) !important;
+  border-radius: var(--ds-radius-card-m) !important;
+}
+
+/* Feature grid – aligned to DS foundation grid, horizontal layout by item count */
+.feature-grid-block-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-grid-columns), 1fr);
+  gap: var(--ds-grid-gutter);
+}
+.feature-grid-block-grid > * {
+  border-radius: var(--ds-radius-card);
+}
+/* 2 items: 6 cols each, one row */
+.feature-grid-block-grid[data-item-count="2"] > * {
+  grid-column: span 6;
+}
+/* 3 items: 8+4, 8 – row1: 8+4, row2: 8 */
+.feature-grid-block-grid[data-item-count="3"] > *:nth-child(1),
+.feature-grid-block-grid[data-item-count="3"] > *:nth-child(3) {
+  grid-column: span 8;
+}
+.feature-grid-block-grid[data-item-count="3"] > *:nth-child(2) {
+  grid-column: span 4;
+}
+/* 4 items: 10+2, 10+2 – two rows of 10+2 */
+.feature-grid-block-grid[data-item-count="4"] > *:nth-child(odd) {
+  grid-column: span 10;
+}
+.feature-grid-block-grid[data-item-count="4"] > *:nth-child(even) {
+  grid-column: span 2;
+}
+/* Fallback: stack on mobile */
+@media (max-width: 767px) {
+  .feature-grid-block-grid > * {
+    grid-column: span 4 !important;
+  }
+}
+
+/* Proof points grid – aligned to DS foundation grid per breakpoint */
+.proof-points-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-grid-columns), 1fr);
+  gap: var(--ds-grid-gutter);
+}
+.proof-points-grid > * {
+  grid-column: span 4;
+}
+@media (min-width: 768px) {
+  .proof-points-grid > * {
+    grid-column: span 2;
+  }
+}
+@media (min-width: 1440px) {
+  .proof-points-grid > * {
+    grid-column: span 4;
+  }
 }
 
 /* Card block grid - responsive: stack on mobile */
@@ -62,9 +265,64 @@ main * {
   }
 }
 
-/* Text Image Block - stack grid on mobile */
+/* Text Image Block – flexbox 50/50 side-by-side on tablet+, stacked on mobile */
+.media-text-block-grid.media-text-block-grid--text-only > * {
+  flex: 1 1 100% !important; /* Text-only: full width */
+}
 @media (max-width: 767px) {
-  .text-image-block-grid {
-    grid-template-columns: 1fr !important;
+  .media-text-block-grid {
+    flex-direction: column !important;
+  }
+  .media-text-block-grid > * {
+    flex: 1 1 100% !important;
   }
 }
+
+/* Text Image Narrow/Wide – 2:1 or 1:2 aligned to foundation grid */
+.media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__text {
+  grid-column: span 2;
+}
+.media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__image {
+  grid-column: span 2;
+}
+.media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__text {
+  grid-column: span 2;
+}
+.media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__image {
+  grid-column: span 2;
+}
+@media (min-width: 768px) {
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__text {
+    grid-column: span 4;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__image {
+    grid-column: span 2;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__text {
+    grid-column: span 2;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__image {
+    grid-column: span 4;
+  }
+}
+@media (min-width: 1440px) {
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__text {
+    grid-column: span 8;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--narrow .media-text-narrow-wide-grid__image {
+    grid-column: span 4;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__text {
+    grid-column: span 4;
+  }
+  .media-text-narrow-wide-grid.media-text-narrow-wide-grid--wide .media-text-narrow-wide-grid__image {
+    grid-column: span 8;
+  }
+}
+@media (max-width: 767px) {
+  .media-text-narrow-wide-grid .media-text-narrow-wide-grid__text,
+  .media-text-narrow-wide-grid .media-text-narrow-wide-grid__image {
+    grid-column: span 4;
+  }
+}
+

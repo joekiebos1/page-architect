@@ -2,7 +2,7 @@ import { pageType } from './page'
 import { pageBuilderType } from './pageBuilder'
 import { heroBlock } from './blocks/hero'
 import { featureGridBlock } from './blocks/featureGrid'
-import { textImageBlock } from './blocks/textImageBlock'
+import { mediaTextBlock } from './blocks/mediaTextBlock'
 import {
   fullBleedVerticalCarouselBlock,
   fullBleedVerticalCarouselItem,
@@ -16,7 +16,7 @@ export const schemaTypes = [
   pageBuilderType,
   heroBlock,
   featureGridBlock,
-  textImageBlock,
+  mediaTextBlock,
   fullBleedVerticalCarouselItem,
   fullBleedVerticalCarouselBlock,
   cardItem,

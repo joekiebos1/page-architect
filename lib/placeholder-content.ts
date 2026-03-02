@@ -31,10 +31,16 @@ export const PLACEHOLDER_CONTENT = {
       },
     ],
   },
-  textImageBlock: {
-    title: 'Designed for real teams',
-    body: 'We built this with feedback from hundreds of teams. Every feature exists because someone asked for it. No bloat, no complexity—just what you need to get work done.',
+  mediaTextBlock: {
+    eyebrow: 'MOBILE GAMES',
+    title: 'Free to play and install in the JioGames app.',
+    titleLevel: 'h2',
+    body: 'The Home tab is your all-in-one destination for getting back into the games you love. Browse trending titles, pick up where you left off, and discover new favorites—all in one place.',
+    ctaText: 'Visit JioGames',
+    ctaLink: '/games',
     template: 'SideBySide',
+    spacing: 'medium',
+    contentWidth: 'default',
     imagePosition: 'left',
     imageAspectRatio: '4:3',
   },
@@ -58,6 +64,14 @@ export const PLACEHOLDER_CONTENT = {
       { title: 'Trusted by millions', description: 'Join 10M+ satisfied customers', icon: 'IcCheckboxOn' },
       { title: 'Award-winning', description: 'Industry recognition for excellence', icon: 'IcAward' },
       { title: '24/7 support', description: 'We\'re here when you need us', icon: 'IcProtection' },
+    ],
+  },
+  carousel: {
+    title: 'Featured',
+    items: [
+      { title: 'Card one', description: 'Add an image in Sanity Studio.', aspectRatio: '4:5' },
+      { title: 'Card two', description: 'Edit content in the properties panel.', aspectRatio: '4:5' },
+      { title: 'Card three', description: 'Or use the chat to generate blocks.', aspectRatio: '4:5' },
     ],
   },
 } as const

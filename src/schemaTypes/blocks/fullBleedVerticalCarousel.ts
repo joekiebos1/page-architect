@@ -19,20 +19,32 @@ export const fullBleedVerticalCarouselItem = defineType({
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Image',
-      description: 'Use image or video (not both)',
+      title: 'Image (upload)',
+      description: 'Upload or use Image URL / Video URL below',
       options: { hotspot: true },
-      hidden: ({ parent }) => Boolean(parent?.video?.asset),
+      hidden: ({ parent }) => Boolean(parent?.video?.asset || parent?.videoUrl),
+    }),
+    defineField({
+      name: 'imageUrl',
+      type: 'string',
+      title: 'Image URL',
+      description: 'External image URL. Used when no image is uploaded.',
+      hidden: ({ parent }) => Boolean(parent?.video?.asset || parent?.videoUrl),
     }),
     defineField({
       name: 'video',
       type: 'file',
-      title: 'Video',
-      description: 'Use image or video (not both)',
-      options: {
-        accept: 'video/*',
-      },
-      hidden: ({ parent }) => Boolean(parent?.image?.asset),
+      title: 'Video (upload)',
+      description: 'Upload or use Video URL below',
+      options: { accept: 'video/*' },
+      hidden: ({ parent }) => Boolean(parent?.image?.asset || parent?.imageUrl),
+    }),
+    defineField({
+      name: 'videoUrl',
+      type: 'string',
+      title: 'Video URL',
+      description: 'External video URL (e.g. storage.googleapis.com). Used when no video is uploaded.',
+      hidden: ({ parent }) => Boolean(parent?.image?.asset || parent?.imageUrl),
     }),
   ],
   preview: {
@@ -49,6 +61,21 @@ export const fullBleedVerticalCarouselBlock = defineType({
   title: 'Full bleed vertical carousel',
   fields: [
     defineField({
+      name: 'spacing',
+      type: 'string',
+      title: 'Spacing',
+      description: 'Space below this block.',
+      options: {
+        list: [
+          { value: 'small', title: 'Small' },
+          { value: 'medium', title: 'Medium' },
+          { value: 'large', title: 'Large' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'medium',
+    }),
+    defineField({
       name: 'items',
       type: 'array',
       title: 'Items',
@@ -56,8 +83,8 @@ export const fullBleedVerticalCarouselBlock = defineType({
       validation: (Rule) =>
         Rule.required()
           .min(1)
-          .max(5)
-          .error('Add 1 to 5 items'),
+          .max(7)
+          .error('Add 1 to 7 items'),
       of: [{ type: 'fullBleedVerticalCarouselItem' }],
     }),
   ],

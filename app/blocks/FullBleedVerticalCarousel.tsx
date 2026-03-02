@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { getMotionDurationCSS, getMotionEasing, createTransition } from '@marcelinodzn/ds-tokens'
 import { Headline, Text } from '@marcelinodzn/ds-react'
+import { useCarouselReveal } from '../lib/use-carousel-reveal'
 
 type CarouselItem = {
   title?: string | null
@@ -18,7 +20,7 @@ type FullBleedVerticalCarouselProps = {
 const ITEM_VH = 100
 
 function MediaLayer({ item }: { item: CarouselItem }) {
-  if (item?.video) {
+  if (item?.video && typeof item.video === 'string' && item.video.trim() !== '') {
     return (
       <video
         src={item.video}
@@ -30,7 +32,7 @@ function MediaLayer({ item }: { item: CarouselItem }) {
       />
     )
   }
-  if (item?.image) {
+  if (item?.image && typeof item.image === 'string' && item.image.trim() !== '') {
     return (
       <Image
         src={item.image}
@@ -62,9 +64,18 @@ function MediaLayer({ item }: { item: CarouselItem }) {
 export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselProps) {
   const items_ = items?.filter((i) => i?.title || i?.description) ?? []
   const n = items_.length
-
+  const { ref: revealRef, isVisible: isItemVisible, containerVisible } = useCarouselReveal(n)
   const containerRef = useRef<HTMLDivElement>(null)
   const textRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mq.matches)
+    const handler = () => setPrefersReducedMotion(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const [imageIndex, setImageIndex] = useState(0)
   const [prevImageIndex, setPrevImageIndex] = useState(0)
@@ -130,12 +141,20 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
 
   const showOverlay = isSticky
 
-  const textColor = showOverlay ? 'white' : 'var(--ds-color-text-high)'
-  const descColor = showOverlay ? 'rgba(255,255,255,0.95)' : 'var(--ds-color-text-medium)'
-  const textShadow = showOverlay ? '0 1px 2px rgba(0,0,0,0.5)' : 'none'
+  const textColor = showOverlay ? 'var(--ds-color-background)' : 'var(--ds-color-text-high)'
+  const descColor = showOverlay ? 'var(--ds-color-text-on-overlay-subtle)' : 'var(--ds-color-text-medium)'
+  const textShadow = showOverlay ? '0 1px 2px var(--ds-color-shadow-overlay)' : 'none'
+
+  const level = prefersReducedMotion ? 'subtle' : 'moderate'
+  const titleTransition = prefersReducedMotion
+    ? undefined
+    : createTransition(['opacity', 'transform'], 'xl', 'entrance', level)
+  const itemTransition = prefersReducedMotion
+    ? undefined
+    : createTransition(['opacity', 'transform'], 'xl', 'entrance', level)
 
   return (
-    <section style={{ marginTop: 'var(--ds-spacing-2xl)' }}>
+    <section ref={revealRef} style={{ marginTop: 'var(--ds-spacing-2xl)' }}>
       <style>{`
         @keyframes carouselFade {
           from { opacity: 0; }
@@ -169,7 +188,8 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
               style={{
                 position: 'absolute',
                 inset: 0,
-                animation: 'carouselFade 0.5s ease-out',
+                animation: prefersReducedMotion ? 'none' : `carouselFade ${getMotionDurationCSS('l', level)} ${getMotionEasing('entrance', level)}`,
+                transition: prefersReducedMotion ? 'none' : undefined,
               }}
             >
               <MediaLayer item={items_[imageIndex]} />
@@ -177,75 +197,88 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
           </div>
         )}
 
-        {items_.map((item, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              height: `${ITEM_VH}vh`,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              overflow: 'hidden',
-            }}
-          >
+        {items_.map((item, i) => {
+          const itemVisible = isItemVisible(i)
+          return (
             <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                zIndex: 0,
-                visibility: showOverlay ? 'hidden' : 'visible',
-                pointerEvents: showOverlay ? 'none' : 'auto',
-              }}
-            >
-              <MediaLayer item={item} />
-            </div>
-            <div
-              ref={(el) => { textRefs.current[i] = el }}
+              key={i}
               style={{
                 position: 'relative',
                 zIndex: 1,
-                padding: 'var(--ds-spacing-4xl) var(--ds-spacing-l)',
-                textAlign: 'center',
-                maxWidth: 'calc(var(--ds-breakpoint-desktop) - var(--ds-spacing-l) * 2)',
-                width: '100%',
+                height: `${ITEM_VH}vh`,
                 display: 'flex',
                 flexDirection: 'column',
+                justifyContent: 'center',
                 alignItems: 'center',
+                overflow: 'visible',
+                opacity: itemVisible ? 1 : 0,
+                transform: itemVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+                transition: itemTransition,
               }}
             >
-              {item.title && (
-                <Headline
-                  size="L"
-                  weight="high"
-                  as="h2"
-                  style={{ color: textColor, textShadow, marginBottom: 'var(--ds-spacing-s)' }}
-                >
-                  {item.title}
-                </Headline>
-              )}
-              {item.description && (
-                <Text
-                  size="M"
-                  weight="low"
-                  as="p"
-                  style={{
-                    color: descColor,
-                    textShadow,
-                    margin: 0,
-                    maxWidth: 'calc(var(--ds-breakpoint-desktop) / 2 + var(--ds-spacing-2xl))',
-                    marginInline: 'auto',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {item.description}
-                </Text>
-              )}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 0,
+                  visibility: showOverlay ? 'hidden' : 'visible',
+                  pointerEvents: showOverlay ? 'none' : 'auto',
+                }}
+              >
+                <MediaLayer item={item} />
+              </div>
+              <div
+                ref={(el) => { textRefs.current[i] = el }}
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  padding: 'var(--ds-spacing-4xl) var(--ds-grid-margin)',
+                  textAlign: 'center',
+                  maxWidth: 'calc(var(--ds-breakpoint-desktop) - var(--local-grid-margin) * 2)',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                {item.title && (
+                  <Headline
+                    size="L"
+                    weight="high"
+                    as="h2"
+                    style={{
+                      color: textColor,
+                      textShadow,
+                      marginBottom: 'var(--ds-spacing-s)',
+                      opacity: containerVisible ? 1 : 0,
+                      transform: containerVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+                      transition: titleTransition,
+                    }}
+                  >
+                    {item.title}
+                  </Headline>
+                )}
+                {item.description && (
+                  <Text
+                    size="M"
+                    weight="low"
+                    as="p"
+                    style={{
+                      color: descColor,
+                      textShadow,
+                      margin: 0,
+                      maxWidth: 'calc(var(--ds-breakpoint-desktop) / 2 + var(--ds-grid-margin))',
+                      marginInline: 'auto',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.description}
+                  </Text>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

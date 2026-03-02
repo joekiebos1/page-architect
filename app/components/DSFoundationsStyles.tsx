@@ -66,25 +66,33 @@ export function DSFoundationsStyles() {
     const labelWeightHigh = typography.fontWeight('Label', 'High', ctx)
     const labelWeightLow = typography.fontWeight('Label', 'Low', ctx)
     const bodyWeightMedium = typography.fontWeight('Body', 'Medium', ctx)
-    const display2xl = typography.fontSize('Display', '2XL', ctx)
+    const displayL = typography.fontSize('Display', 'L', ctx)
+    const displayM = typography.fontSize('Display', 'M', ctx)
+    const headlineL = typography.fontSize('Headline', 'L', ctx)
     if (bgSubtle != null) root.style.setProperty('--ds-color-background-subtle', String(bgSubtle))
     if (textHigh != null) root.style.setProperty('--ds-color-text-high', String(textHigh))
     if (textMedium != null) root.style.setProperty('--ds-color-text-medium', String(textMedium))
     if (textLow != null) root.style.setProperty('--ds-color-text-low', String(textLow))
     if (primaryBold != null) root.style.setProperty('--ds-color-surface-bold', String(primaryBold))
     if (secondaryBold != null) root.style.setProperty('--ds-color-surface-secondary', String(secondaryBold))
+    const neutralBold = colors.appearance('Neutral', 'Background/Bold', ctx)
+    const neutralSubtle = colors.appearance('Neutral', 'Background/Subtle', ctx)
+    if (neutralBold != null) root.style.setProperty('--ds-color-neutral-bold', String(neutralBold))
+    if (neutralSubtle != null) root.style.setProperty('--ds-color-neutral-subtle', String(neutralSubtle))
     if (strokeSubtle != null) root.style.setProperty('--ds-color-stroke-subtle', String(strokeSubtle))
+    root.style.setProperty('--ds-color-stroke-divider', 'rgba(0, 0, 0, 0.08)')
     if (labelM != null) root.style.setProperty('--ds-typography-label-m', `${labelM}px`)
     if (headlineM != null) root.style.setProperty('--ds-typography-headline-m', `${headlineM}px`)
     if (bodyXs != null) root.style.setProperty('--ds-typography-body-xs', `${bodyXs}px`)
     if (labelWeightHigh != null) root.style.setProperty('--ds-typography-weight-high', String(labelWeightHigh))
     if (labelWeightLow != null) root.style.setProperty('--ds-typography-weight-low', String(labelWeightLow))
     if (bodyWeightMedium != null) root.style.setProperty('--ds-typography-weight-medium', String(bodyWeightMedium))
-    if (display2xl != null) {
-      const base = Number(display2xl)
-      root.style.setProperty('--ds-typography-display-2xl', `${base}px`)
-      root.style.setProperty('--ds-typography-display-hero', `${Math.round(base * 1.75)}px`)
-    }
+    if (displayL != null) root.style.setProperty('--ds-typography-h1', `${displayL}px`)
+    if (displayM != null) root.style.setProperty('--ds-typography-h2', `${displayM}px`)
+    if (headlineL != null) root.style.setProperty('--ds-typography-h3', `${headlineL}px`)
+    if (headlineM != null) root.style.setProperty('--ds-typography-h4', `${headlineM}px`)
+    if (displayL != null) root.style.setProperty('--ds-typography-display-hero', `${displayL}px`)
+    if (displayM != null) root.style.setProperty('--ds-typography-display-2xl', `${displayM}px`)
 
     // Derived tokens from DS spacing
     const spacing2xl = spacing.get('2XL', ctx)
@@ -95,11 +103,16 @@ export function DSFoundationsStyles() {
     root.style.setProperty('--ds-spacing-hero-overlap', '12.5vw')
     root.style.setProperty('--ds-spacing-hero-panel-trim', '25vw')
 
-    // Card radius from DS Shape/XL token
+    // Card radius from DS Shape tokens (XL=35, L=26, M=19, S=14)
     const radiusCard = getVariableByName('Shape/XL', ctx)
-    if (radiusCard != null) {
-      root.style.setProperty('--ds-radius-card', `${Number(radiusCard)}px`)
-    }
+    const radiusCardL = getVariableByName('Shape/L', ctx)
+    const radiusCardM = getVariableByName('Shape/M', ctx)
+    const radiusCardS = getVariableByName('Shape/S', ctx)
+    if (radiusCard != null) root.style.setProperty('--ds-radius-card', `${Number(radiusCard)}px`)
+    if (radiusCardL != null) root.style.setProperty('--ds-radius-card-l', `${Number(radiusCardL)}px`)
+    if (radiusCardM != null) root.style.setProperty('--ds-radius-card-m', `${Number(radiusCardM)}px`)
+    if (radiusCardS != null) root.style.setProperty('--ds-radius-card-s', `${Number(radiusCardS)}px`)
+
   }, [tokenContext])
 
   return null

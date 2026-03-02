@@ -8,7 +8,9 @@
     "dev:api": "next dev -p 3001",
     "generate:tokens": "node scripts/generate-ds-tokens-css.mjs",
     "seed:sanity": "node --env-file=.env scripts/seed-sanity.mjs",
+    "seed:google-store": "node --env-file=.env scripts/seed-google-store.mjs",
     "generate:icons": "node -e \"const icons=require('@marcelinodzn/ds-react/icons');const fs=require('fs');const names=icons.getAvailableIcons();fs.mkdirSync('src/lib',{recursive:true});fs.writeFileSync('src/lib/ds-icon-names.json',JSON.stringify(names));console.log('Wrote',names.length,'icon names');\"",
+    "postinstall": "patch-package",
     "prebuild": "npm run generate:tokens",
     "build": "next build",
     "start": "next start",
@@ -16,12 +18,14 @@
     "deploy:studio": "sanity deploy"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@base-ui/react": "^1.2.0",
     "@marcelinodzn/ds-react": "^1.0.6",
     "@marcelinodzn/ds-tokens": "^1.0.1",
     "@sanity/client": "^7.16.0",
     "@sanity/icons": "^3.4.0",
     "next": "^16.1.6",
+    "next-sanity": "^12.1.0",
     "react": "^19.2.4",
     "react-compiler-runtime": "^1.0.0",
     "react-dom": "^19.2.4",
@@ -35,6 +39,8 @@
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "chromatic": "^15.2.0",
+    "patch-package": "^8.0.1",
     "typescript": "^5.6.0"
   }
 }

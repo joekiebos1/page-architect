@@ -6,6 +6,8 @@ export const pageBySlugQuery = `*[_type == "page" && slug.current == $slug][0]{
     _type,
     _key,
     _type == "hero" => {
+      variant,
+      spacing,
       productName,
       headline,
       subheadline,
@@ -13,49 +15,69 @@ export const pageBySlugQuery = `*[_type == "page" && slug.current == $slug][0]{
       ctaLink,
       cta2Text,
       cta2Link,
-      "image": image.asset->url
+      "image": coalesce(imageUrl, image.asset->url)
     },
     _type == "featureGrid" => {
+      spacing,
       title,
+      titleLevel,
       items[]{
         title,
         description
       }
     },
-    _type == "textImageBlock" => {
+      _type == "mediaTextBlock" => {
+      spacing,
+      eyebrow,
+      subhead,
       title,
+      titleLevel,
       body,
+      bulletList,
       ctaText,
       ctaLink,
-      "image": image.asset->url,
+      cta2Text,
+      cta2Link,
+      "image": coalesce(imageUrl, image.asset->url),
+      "video": coalesce(videoUrl, video.asset->url),
+      size,
       template,
+      contentWidth,
       imagePosition,
+      align,
       overlayAlignment,
       stackImagePosition,
       stackAlignment,
       imageAspectRatio
     },
     _type == "fullBleedVerticalCarousel" => {
+      spacing,
       items[]{
         title,
         description,
-        "image": image.asset->url,
-        "video": video.asset->url
+        "image": coalesce(imageUrl, image.asset->url),
+        "video": coalesce(videoUrl, video.asset->url)
       }
     },
-      _type == "carousel" => {
+    _type == "carousel" => {
+      spacing,
+      title,
+      titleLevel,
+      cardSize,
+      items[]{
         title,
-        items[]{
-          title,
-          description,
-          "image": image.asset->url,
-          link,
-          ctaText,
-          aspectRatio
-        }
-      },
-      _type == "proofPoints" => {
-        title,
+        description,
+        "image": coalesce(imageUrl, image.asset->url),
+        "video": coalesce(videoUrl, video.asset->url),
+        link,
+        ctaText,
+        aspectRatio
+      }
+    },
+    _type == "proofPoints" => {
+      spacing,
+      title,
+        titleLevel,
         items[]{
           title,
           description,

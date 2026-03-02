@@ -9,7 +9,15 @@ export const cardItem = defineType({
       name: 'title',
       type: 'string',
       title: 'Title',
-      validation: (Rule) => Rule.required(),
+      description: 'Required for text-only cards. Optional for media-only cards.',
+      validation: (Rule) =>
+        Rule.custom((title, ctx) => {
+          const parent = (ctx as { parent?: { imageUrl?: string; image?: unknown; video?: unknown; videoUrl?: string } })?.parent
+          const hasMedia = !!(parent?.imageUrl || parent?.image || parent?.video || parent?.videoUrl)
+          if (hasMedia) return true
+          if (title && String(title).trim()) return true
+          return 'Title is required for text-only cards.'
+        }),
     }),
     defineField({
       name: 'description',
@@ -20,9 +28,36 @@ export const cardItem = defineType({
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Image',
+      title: 'Image (upload)',
+      description: 'Upload or use Image URL below. Optional when video is set.',
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((image, ctx) => {
+          const parent = (ctx as { parent?: { imageUrl?: string; video?: unknown; videoUrl?: string } })?.parent
+          if (image || parent?.imageUrl) return true
+          if (parent?.video || parent?.videoUrl) return true
+          // Allow text-only cards (e.g. when source has no media)
+          return true
+        }),
+    }),
+    defineField({
+      name: 'imageUrl',
+      type: 'string',
+      title: 'Image URL',
+      description: 'External image URL. Used when no image is uploaded. Also used as poster for video.',
+    }),
+    defineField({
+      name: 'video',
+      type: 'file',
+      title: 'Video (upload)',
+      description: 'Optional video. When set, video is shown instead of image. Autoplay with mute/play controls.',
+      options: { accept: 'video/*' },
+    }),
+    defineField({
+      name: 'videoUrl',
+      type: 'string',
+      title: 'Video URL',
+      description: 'External video URL. Used when no video is uploaded.',
     }),
     defineField({
       name: 'aspectRatio',
@@ -33,6 +68,7 @@ export const cardItem = defineType({
         list: [
           { value: '4:5', title: '4:5 (1 slot)' },
           { value: '8:5', title: '8:5 (2 slots)' },
+          { value: '2:1', title: '2:1 (wider)' },
         ],
         layout: 'radio',
       },

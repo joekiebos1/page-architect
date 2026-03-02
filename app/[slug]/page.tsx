@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { client } from '../../lib/sanity/client'
+import { draftMode } from 'next/headers'
+import { getClient } from '../../lib/sanity/client'
 import { pageBySlugQuery, allPagesQuery } from '../../lib/sanity/queries'
 import { BlockRenderer } from '../components/BlockRenderer'
 
@@ -13,7 +14,9 @@ type Props = {
 
 export default async function PageBySlug({ params }: Props) {
   const { slug } = await params
-  const pageData = await client.fetch<{
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
+  const pageData = await sanity.fetch<{
     _id: string
     title: string
     slug: string
@@ -22,7 +25,7 @@ export default async function PageBySlug({ params }: Props) {
 
   if (!pageData) notFound()
 
-  const pages = await client.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery)
+  const pages = await sanity.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery)
 
   return (
     <main>

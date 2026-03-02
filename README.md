@@ -25,7 +25,10 @@ SANITY_STUDIO_PROJECT_ID=your-project-id
 SANITY_STUDIO_DATASET=production
 NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
 NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_TOKEN=your-token-with-editor-permissions
 ```
+
+> **Presentation mode:** Create a token at [sanity.io/manage](https://sanity.io/manage) → API → Tokens with **Editor** permissions. Required for draft preview and JioKarna.
 
 ### 3. Run locally
 
@@ -43,6 +46,13 @@ npm run dev:app
 
 - Open [http://localhost:3333](http://localhost:3333) to use the Studio
 - Open [http://localhost:3000](http://localhost:3000) to view the rendered pages
+
+### Presentation mode ("Unable to connect")
+
+1. **Both servers must run** – Studio (`npm run dev`) and Next.js (`npm run dev:app`)
+2. **SANITY_API_TOKEN** – Set in `.env` (Editor permissions)
+3. **CORS** – Add `http://localhost:3000` at [sanity.io/manage](https://sanity.io/manage) → API → CORS origins
+4. **Continue anyway** – Click the button in the error overlay to view the preview without overlays
 
 ## Usage
 

@@ -16,6 +16,7 @@
   --ds-spacing-4xl: 88px;
   --ds-breakpoint-mobile: 360px;
   --ds-breakpoint-tablet: 768px;
+  --ds-breakpoint-tablet-landscape: 1024px;
   --ds-breakpoint-desktop: 1440px;
   --ds-breakpoint-desktop-lg: 1920px;
   --ds-color-background-subtle: rgb(237, 237, 240);
@@ -24,18 +25,56 @@
   --ds-color-text-low: rgb(26, 28, 31);
   --ds-color-surface-bold: rgb(0, 120, 173);
   --ds-color-surface-secondary: rgb(110, 23, 207);
+  --ds-color-neutral-bold: rgb(13, 13, 15);
+  --ds-color-neutral-subtle: rgb(237, 237, 240);
   --ds-color-stroke-subtle: rgba(255, 255, 255, 0.01);
+  --ds-color-stroke-divider: rgba(0, 0, 0, 0.08);
   --ds-typography-label-s: 16px;
-  --ds-typography-headline-m: 26px;
   --ds-typography-label-m: 19px;
   --ds-typography-body-xs: 14px;
+  --ds-typography-h1: 64px;
+  --ds-typography-h2: 47px;
+  --ds-typography-h3: 35px;
+  --ds-typography-h4: 26px;
+  --ds-typography-h5: 19px;
+  --ds-typography-headline-m: 26px;
+  --ds-typography-headline-s: 19px;
+  --ds-typography-headline-xs: 18px;
   --ds-typography-weight-high: 700;
   --ds-typography-weight-low: 400;
   --ds-typography-weight-medium: 500;
-  --ds-typography-display-2xl: 48px;
-  --ds-typography-display-hero: 84px;
+  --ds-typography-display-hero: 64px;
+  --ds-typography-display-2xl: 47px;
   --ds-spacing-hero-sides: 61px;
   --ds-spacing-hero-overlap: 12.5vw;
   --ds-spacing-hero-panel-trim: 25vw;
   --ds-radius-card: 35px;
+  --ds-radius-card-l: 26px;
+  --ds-radius-card-m: 19px;
+  --ds-radius-card-s: 14px;
+  --ds-grid-columns: 4;
+  --ds-grid-margin: 16px;
+  --ds-grid-gutter: 8px;
 }
+@media (min-width: 768px) {
+  :root {
+  --ds-grid-columns: 8;
+  --ds-grid-margin: 37px;
+  --ds-grid-gutter: 17px;
+  }
+}
+@media (min-width: 1440px) {
+  :root {
+  --ds-grid-columns: 12;
+  --ds-grid-margin: 47px;
+  --ds-grid-gutter: 19px;
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+  --ds-grid-columns: 12;
+  --ds-grid-margin: 47px;
+  --ds-grid-gutter: 19px;
+  }
+}
+

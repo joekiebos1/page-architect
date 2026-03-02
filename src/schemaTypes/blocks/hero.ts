@@ -6,6 +6,35 @@ export const heroBlock = defineType({
   title: 'Hero',
   fields: [
     defineField({
+      name: 'variant',
+      type: 'string',
+      title: 'Variant',
+      description: 'Category: full-width hero for category/landing pages. Product: compact layout for product pages.',
+      options: {
+        list: [
+          { value: 'category', title: 'Category' },
+          { value: 'product', title: 'Product' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'category',
+    }),
+    defineField({
+      name: 'spacing',
+      type: 'string',
+      title: 'Spacing',
+      description: 'Space below this block.',
+      options: {
+        list: [
+          { value: 'small', title: 'Small' },
+          { value: 'medium', title: 'Medium' },
+          { value: 'large', title: 'Large' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'medium',
+    }),
+    defineField({
       name: 'productName',
       type: 'string',
       title: 'Product name',
@@ -46,18 +75,24 @@ export const heroBlock = defineType({
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Key visual',
-      description: '2:1 aspect ratio recommended',
+      title: 'Key visual (upload)',
+      description: 'Upload or use Image URL below',
       options: {
         hotspot: true,
       },
     }),
+    defineField({
+      name: 'imageUrl',
+      type: 'string',
+      title: 'Image URL',
+      description: 'External image URL (e.g. from store.google.com). Used when no image is uploaded.',
+    }),
   ],
   preview: {
-    select: { headline: 'headline' },
-    prepare: ({ headline }) => ({
+    select: { headline: 'headline', variant: 'variant' },
+    prepare: ({ headline, variant }) => ({
       title: headline || 'Hero',
-      subtitle: 'Hero block',
+      subtitle: variant === 'product' ? 'Hero (Product)' : 'Hero (Category)',
     }),
   },
 })

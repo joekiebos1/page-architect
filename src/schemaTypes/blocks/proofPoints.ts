@@ -8,10 +8,41 @@ export const proofPointsBlock = defineType({
   description: 'Text + icon strip for top reasons to believe. Often used at the top of a page.',
   fields: [
     defineField({
+      name: 'spacing',
+      type: 'string',
+      title: 'Spacing',
+      description: 'Space below this block.',
+      options: {
+        list: [
+          { value: 'small', title: 'Small' },
+          { value: 'medium', title: 'Medium' },
+          { value: 'large', title: 'Large' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'medium',
+    }),
+    defineField({
       name: 'title',
       type: 'string',
       title: 'Section Title',
       description: 'Optional heading above the proof points',
+    }),
+    defineField({
+      name: 'titleLevel',
+      type: 'string',
+      title: 'Heading level',
+      description: 'Semantic level for accessibility and size.',
+      options: {
+        list: [
+          { value: 'h2', title: 'H2' },
+          { value: 'h3', title: 'H3' },
+          { value: 'h4', title: 'H4' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'h2',
+      hidden: ({ parent }) => !parent?.title,
     }),
     defineField({
       name: 'items',

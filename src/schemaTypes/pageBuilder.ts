@@ -21,7 +21,7 @@ export const pageBuilderType = defineType({
       },
     }),
     defineArrayMember({
-      type: 'textImageBlock',
+      type: 'mediaTextBlock',
       components: {
         input: FillWithSampleBlock,
       },
