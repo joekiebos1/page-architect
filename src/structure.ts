@@ -1,4 +1,4 @@
-import { DocumentIcon, ImageIcon, UploadIcon, FlaskConicalIcon } from '@sanity/icons'
+import { DocumentIcon, ImageIcon, UploadIcon, BulbOutlineIcon } from '@sanity/icons'
 import type { StructureResolver } from 'sanity/structure'
 import { ImageLibraryUpload } from './components/ImageLibraryUpload'
 
@@ -12,7 +12,7 @@ export const structure: StructureResolver = (S) =>
         .child(S.documentTypeList('page').title('Pages')),
       S.listItem()
         .title('Lab')
-        .icon(FlaskConicalIcon)
+        .icon(BulbOutlineIcon)
         .child(
           S.document()
             .documentId('labPage')
