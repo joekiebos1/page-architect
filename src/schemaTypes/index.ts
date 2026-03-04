@@ -13,10 +13,10 @@ import { carouselBlock } from './blocks/carousel'
 import { proofPointsBlock } from './blocks/proofPoints'
 import { rotatingMediaBlock, rotatingMediaItem } from './blocks/rotatingMedia'
 
+/** Block types must be registered before pageBuilder (which references them in its of array) */
 export const schemaTypes = [
   pageType,
   labPageType,
-  pageBuilderType,
   heroBlock,
   mediaTextBlock,
   cardGridItem,
@@ -29,4 +29,5 @@ export const schemaTypes = [
   proofPointsBlock,
   rotatingMediaItem,
   rotatingMediaBlock,
+  pageBuilderType,
 ]
