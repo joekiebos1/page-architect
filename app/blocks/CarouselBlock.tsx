@@ -19,9 +19,11 @@
 import { useRef, useState, useEffect } from 'react'
 import type { CSSProperties } from 'react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
-import { Headline, Button, Icon, SurfaceProvider, IcChevronLeft, IcChevronRight } from '@marcelinodzn/ds-react'
+import { Headline, Button, Icon, IcChevronLeft, IcChevronRight, CarouselIndicator } from '@marcelinodzn/ds-react'
 import { getHeadlineSize, getHeadlineFontSize, normalizeHeadingLevel } from '../lib/semantic-headline'
+import { BlockSurfaceProvider } from '../lib/block-surface'
 import { GridBlock, useGridCell } from '../components/GridBlock'
+import { useGridBreakpoint } from '../lib/use-grid-breakpoint'
 import { BlockContainer } from './BlockContainer'
 import { useCarouselReveal } from '../lib/use-carousel-reveal'
 import { MediaCard, TextOnColourCard } from '../components/Cards'
@@ -37,15 +39,17 @@ type CarouselItem = {
   aspectRatio?: '4:5' | '8:5' | '2:1'
 }
 
-type CarouselCardSize = 'compact' | 'large' | 'large-4x5'
+type CarouselCardSize = 'compact' | 'medium' | 'large'
 
-type CarouselVariant = 'featured' | 'informative'
+type CarouselSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+
+type CarouselBlockAccent = 'primary' | 'secondary' | 'neutral'
 
 type CarouselBlockProps = {
   title?: string | null
-  titleLevel?: 'h2' | 'h3' | 'h4'
-  variant?: CarouselVariant
   cardSize?: CarouselCardSize
+  surface?: CarouselSurface
+  blockAccent?: CarouselBlockAccent
   items?: CarouselItem[] | null
 }
 
@@ -69,17 +73,17 @@ const CARD_SIZE_CONFIG = {
     getScrollAmount: (viewportW: number, gapPx: number) =>
       (viewportW - 2 * gapPx) / 3 + gapPx,
   },
-  /** Large 2:1: 1 card per view, Default width. 2:1 only. */
+  /** Large 2:1: 1 card per view, Wide width for prominent single card. 2:1 only. */
   large: {
     cols: 1,
-    contentWidth: 'Default' as const,
+    contentWidth: 'Wide' as const,
     getSlots: () => 1,
     getSlotWidthCss: () => '100cqw',
     getImageHeight4_5: () => 'auto',
     getScrollAmount: (viewportW: number, gapPx: number) => viewportW + gapPx,
   },
-  /** Large 4:5: 2 cards per view, S width each (Wide container). 4:5 only — 8:5 would be too large. */
-  'large-4x5': {
+  /** Medium: 2 cards per view, S width each (Wide container). 4:5 only. */
+  medium: {
     cols: 2,
     contentWidth: 'Wide' as const,
     getSlots: () => 1,
@@ -90,33 +94,34 @@ const CARD_SIZE_CONFIG = {
   },
 } as const
 
-const MOBILE_BREAKPOINT = 768
-
 function NavButton({
   direction,
   disabled,
   onPress,
-  size = 'XS',
+  size = 'S',
+  surface = 'ghost',
 }: {
   direction: 'left' | 'right'
   disabled: boolean
   onPress: () => void
-  size?: 'XS' | 'S'
+  size?: 'XS' | 'S' | 'M'
+  surface?: 'ghost' | 'minimal' | 'subtle' | 'bold'
 }) {
-  const iconSize = size === 'XS' ? 'S' : 'M'
+  const iconSize = size === 'XS' ? 'S' : size === 'S' ? 'M' : 'L'
+  const hasBackground = surface === 'minimal' || surface === 'subtle' || surface === 'bold'
   return (
     <Button
       single
       appearance="primary"
-      attention="medium"
+      attention={hasBackground ? 'high' : undefined}
       size={size}
       aria-label={direction === 'left' ? 'Previous cards' : 'Next cards'}
       onPress={onPress}
       isDisabled={disabled}
       content={
         direction === 'left'
-          ? <Icon asset={<IcChevronLeft />} size={iconSize} />
-          : <Icon asset={<IcChevronRight />} size={iconSize} />
+          ? <Icon asset={<IcChevronLeft />} size={iconSize} appearance="secondary" tinted />
+          : <Icon asset={<IcChevronRight />} size={iconSize} appearance="secondary" tinted />
       }
     />
   )
@@ -124,19 +129,19 @@ function NavButton({
 
 export function CarouselBlock({
   title,
-  titleLevel = 'h2',
-  variant = 'informative',
   cardSize = 'compact',
+  surface = 'ghost',
+  blockAccent = 'primary',
   items,
 }: CarouselBlockProps) {
-  const level = normalizeHeadingLevel(titleLevel)
-  const cellContainer = useGridCell('Default')
-  const config = CARD_SIZE_CONFIG[cardSize] ?? CARD_SIZE_CONFIG.compact
+  const level = normalizeHeadingLevel('h2')
+  const { contentMaxDefault } = useGridBreakpoint()
+  const cellContainer = useGridCell(cardSize === 'large' ? 'Wide' : 'Default')
+  const config = CARD_SIZE_CONFIG[cardSize]
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [scrollPosition, setScrollPosition] = useState(0)
   const [maxScroll, setMaxScroll] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
   const [isJumping, setIsJumping] = useState(false)
   const infiniteInitializedRef = useRef(false)
 
@@ -149,18 +154,11 @@ export function CarouselBlock({
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  useEffect(() => {
-    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
-
   const items_ = items?.filter((i) => i?.title || i?.image || i?.video) ?? []
-  const isLargeCarousel = cardSize === 'large' || cardSize === 'large-4x5'
-  const isLargeFeatured = isLargeCarousel && variant === 'featured' && !isMobile
+  const isLargeFeatured = cardSize === 'large' || cardSize === 'medium'
+  const isLargeLayout = cardSize === 'large'
 
-  /** Reset infinite init when switching away from large featured (e.g. mobile) */
+  /** Reset infinite init when switching away from large featured */
   useEffect(() => {
     if (!isLargeFeatured) infiniteInitializedRef.current = false
   }, [isLargeFeatured])
@@ -272,12 +270,28 @@ export function CarouselBlock({
       ? Math.min(displayItems.length - 1, Math.max(0, Math.round(scrollPosition / cardStepPx)))
       : 0
 
-  /** Clip overflow: compact = finite scroll stops at boundaries; large featured = one card visible, centered. */
+  /** For medium: 2 cards in view, both should be full opacity. Only cards outside viewport fade. */
+  const isCardInView = (i: number) =>
+    isLargeFeatured && i >= centerIndex && i < centerIndex + config.cols
+
+  /** Stepper active index (0-based, for display in items_) */
+  const stepperActiveIndex =
+    n <= 1
+      ? 0
+      : isLargeFeatured
+        ? centerIndex <= 0
+          ? n - 1
+          : centerIndex > n
+            ? 0
+            : centerIndex - 1
+        : Math.min(n - 1, Math.max(0, Math.round(scrollPosition / (cardStepPx || 1))))
+
+  const viewportOverflow = cardSize === 'large' ? 'hidden' : 'visible'
   const viewportStyle: CSSProperties = {
     width: '100%',
     minWidth: 0,
-    overflow: 'hidden',
     containerType: 'inline-size',
+    overflow: viewportOverflow,
   }
 
   const titleTransition = prefersReducedMotion
@@ -287,8 +301,107 @@ export function CarouselBlock({
     ? undefined
     : createTransition(['opacity', 'transform'], 'xl', 'entrance', motionLevel)
 
+  const hasSurfaceBg = surface === 'minimal' || surface === 'subtle' || surface === 'bold'
+  /** Stepper always uses primary minimal background. */
+  const stepperBg = 'var(--ds-color-block-background-subtle)'
+
+  const handleDotClick = (idx: number) => {
+    if (isLargeFeatured && n > 1 && cardStepPx > 0) {
+      const targetScroll = (idx + 1) * cardStepPx
+      setIsJumping(true)
+      setScrollPosition(targetScroll)
+      infiniteInitializedRef.current = true
+      requestAnimationFrame(() => requestAnimationFrame(() => setIsJumping(false)))
+    } else if (cardStepPx > 0) {
+      setScrollPosition(Math.min(maxScroll, Math.max(0, idx * cardStepPx)))
+    }
+  }
+
+  /** Stepper height matches DS Button size S (padding XS + content M + padding XS). */
+  const stepperHeight = 'calc(var(--ds-spacing-xs) + var(--ds-spacing-m) + var(--ds-spacing-xs))'
+
+  /** Custom stepper for Compact/Medium: pill capsule, elongated active dot, small circular inactive dots */
+  const renderCompactMediumStepper = () => {
+    if (n <= 1) return null
+    return (
+      <div
+        role="tablist"
+        aria-label="Carousel pagination"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'var(--ds-spacing-xs)',
+          paddingInline: 'var(--ds-spacing-m)',
+          height: stepperHeight,
+          boxSizing: 'border-box',
+          borderRadius: 'var(--ds-radius-full)',
+          backgroundColor: stepperBg,
+        }}
+      >
+        {Array.from({ length: n }, (_, i) => {
+          const isActive = i === stepperActiveIndex
+          return (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-label={`Go to slide ${i + 1}`}
+              onClick={() => handleDotClick(i)}
+              style={{
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                background: isActive
+                  ? 'var(--ds-color-block-background-bold)'
+                  : hasSurfaceBg
+                    ? 'rgba(255, 255, 255, 0.65)'
+                    : 'rgba(0, 0, 0, 0.15)',
+                borderRadius: 'var(--ds-radius-full)',
+                width: isActive ? 14 : 6,
+                height: 6,
+                minWidth: isActive ? 14 : 6,
+                transition: 'background 0.2s ease, width 0.2s ease',
+              }}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  /** DS CarouselIndicator for Large (center-aligned below carousel) */
+  const renderLargeStepper = () => {
+    if (n <= 1) return null
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingInline: 'var(--ds-spacing-m)',
+          height: stepperHeight,
+          boxSizing: 'border-box',
+          borderRadius: 'var(--ds-radius-full)',
+          backgroundColor: stepperBg,
+        }}
+        aria-hidden
+      >
+        <CarouselIndicator
+          type={hasSurfaceBg ? 'media' : 'below-media'}
+          items={n}
+          activeIndex={stepperActiveIndex}
+          onDotClick={handleDotClick}
+        />
+      </div>
+    )
+  }
+
+  const stepperEl = n > 1 ? (isLargeLayout ? renderLargeStepper() : renderCompactMediumStepper()) : null
+
   return (
-    <SurfaceProvider level={0}>
+    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} fullWidth>
       <GridBlock as="section">
         <div
           ref={revealRef}
@@ -320,108 +433,136 @@ export function CarouselBlock({
             </BlockContainer>
           )}
           <BlockContainer contentWidth={config.contentWidth ?? 'Default'} className="card-block-carousel" style={{ width: '100%', overflow: 'visible' }}>
-            {variant === 'featured' && !isMobile ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 'var(--ds-spacing-m)',
-                  }}
-                >
-                  <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                    <NavButton
-                      direction="left"
-                      disabled={!canScrollLeft}
-                      onPress={() => scroll('left')}
-                      size="S"
-                    />
-                  </div>
-                  <div ref={viewportRef} style={{ ...viewportStyle, flex: 1, minWidth: 0 }}>
-                    <div ref={trackRef} style={trackStyle}>
-                      {displayItems.map((item, i) => {
-                        const slots = (cardSize === 'large' || cardSize === 'large-4x5') ? 1 : config.getSlots(item.aspectRatio)
-                        const cardVisible = isCardVisible(i)
-                        const useTextOnColour = item.cardType === 'text-on-colour'
-                        const textCardAspectRatio = cardSize === 'large-4x5' ? '4:5' : cardSize === 'large' ? '2:1' : (item.aspectRatio === '8:5' || item.aspectRatio === '2:1') ? '8:5' : '4:5'
-                        const isCenter = isLargeFeatured && i === centerIndex
-                        const cardOpacity = isLargeFeatured
-                          ? (isCenter ? 1 : LARGE_CAROUSEL_FADED_OPACITY)
-                          : (cardVisible ? 1 : 0)
-                        const wrapperTransition = isLargeFeatured
-                          ? (prefersReducedMotion ? undefined : createTransition(['opacity', 'transform'], 'l', 'transition', motionLevel))
-                          : cardTransition
-                        const wrapperStyle: CSSProperties = {
-                          flex: `0 0 ${config.getSlotWidthCss(slots)}`,
-                          minWidth: 0,
-                          minHeight: 0,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          overflow: 'hidden',
-                          opacity: cardOpacity,
-                          transform: cardVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
-                          transition: wrapperTransition ?? undefined,
-                        }
-                        return (
-                          <div
-                            key={i}
-                            className="carousel-card"
-                            style={wrapperStyle}
-                          >
-                            {useTextOnColour ? (
-                              <TextOnColourCard
-                                title={item.title}
-                                description={item.description}
-                                surface="subtle"
-                                size={cardSize === 'compact' ? 'compact' : 'large'}
-                                aspectRatio={textCardAspectRatio}
-                              />
-                            ) : (
-                              <MediaCard
-                                title={item.title}
-                                description={item.description}
-                                image={item.image}
-                                video={item.video}
-                                link={item.link}
-                                ctaText={item.ctaText}
-                                aspectRatio={cardSize === 'large-4x5' ? '4:5' : cardSize === 'large' ? '2:1' : item.aspectRatio}
-                                prefersReducedMotion={prefersReducedMotion}
-                                config={{
-                                  layout: cardSize,
-                                  imageHeight4_5: config.getImageHeight4_5(),
-                                }}
-                              />
-                            )}
-                          </div>
-                        )
-                      })}
+            {isLargeLayout ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: 'var(--ds-spacing-m)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: `calc(${contentMaxDefault} / 4)`,
+                      }}
+                    >
+                      <NavButton
+                        direction="left"
+                        disabled={!canScrollLeft}
+                        onPress={() => scroll('left')}
+                        size="M"
+                        surface={surface}
+                      />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'stretch', minWidth: 0 }}>
+                      <div
+                        ref={viewportRef}
+                        style={{
+                          ...viewportStyle,
+                          width: contentMaxDefault,
+                          maxWidth: '100%',
+                          marginInline: 'auto',
+                        }}
+                      >
+                        <div ref={trackRef} style={trackStyle}>
+                          {displayItems.map((item, i) => {
+                            const slots = 1
+                            const cardVisible = isCardVisible(i)
+                            const useTextOnColour = false
+                            const textCardAspectRatio = '2:1'
+                            const isInView = isCardInView(i)
+                            const cardOpacity = isInView ? 1 : LARGE_CAROUSEL_FADED_OPACITY
+                            const wrapperTransition = prefersReducedMotion ? undefined : createTransition(['opacity', 'transform'], 'l', 'transition', motionLevel)
+                            const cardOverflow = 'hidden' as const
+                            const wrapperStyle: CSSProperties = {
+                              flex: `0 0 ${config.getSlotWidthCss(slots)}`,
+                              minWidth: 0,
+                              minHeight: 0,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              overflow: cardOverflow,
+                              opacity: cardOpacity,
+                              transform: cardVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+                              transition: wrapperTransition ?? undefined,
+                            }
+                            return (
+                              <div
+                                key={i}
+                                className="carousel-card"
+                                style={wrapperStyle}
+                              >
+                                {useTextOnColour ? (
+                                  <TextOnColourCard
+                                    title={item.title}
+                                    description={item.description}
+                                    surface="subtle"
+                                    size="large"
+                                    aspectRatio={textCardAspectRatio}
+                                  />
+                                ) : (
+                                  <MediaCard
+                                    title={item.title}
+                                    description={item.description}
+                                    image={item.image}
+                                    video={item.video}
+                                    link={item.link}
+                                    ctaText={item.ctaText}
+                                    aspectRatio="2:1"
+                                    prefersReducedMotion={prefersReducedMotion}
+                                    config={{
+                                      layout: cardSize,
+                                      imageHeight4_5: config.getImageHeight4_5(),
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: `calc(${contentMaxDefault} / 4)`,
+                      }}
+                    >
+                      <NavButton
+                        direction="right"
+                        disabled={!canScrollRight}
+                        onPress={() => scroll('right')}
+                        size="M"
+                        surface={surface}
+                      />
                     </div>
                   </div>
-                  <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                    <NavButton
-                      direction="right"
-                      disabled={!canScrollRight}
-                      onPress={() => scroll('right')}
-                      size="S"
-                    />
-                  </div>
+                  {stepperEl && (
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>{stepperEl}</div>
+                  )}
                 </div>
               ) : (
                 <>
-                  <div ref={viewportRef} style={viewportStyle}>
+                  <div ref={viewportRef} style={{ ...viewportStyle, width: '100%' }}>
                     <div ref={trackRef} style={trackStyle}>
                       {displayItems.map((item, i) => {
-                        const slots = (cardSize === 'large' || cardSize === 'large-4x5') ? 1 : config.getSlots(item.aspectRatio)
+                        const slots = config.getSlots(item.aspectRatio)
                         const cardVisible = isCardVisible(i)
                         const useTextOnColour = item.cardType === 'text-on-colour'
-                        const textCardAspectRatio = cardSize === 'large-4x5' ? '4:5' : cardSize === 'large' ? '2:1' : (item.aspectRatio === '8:5' || item.aspectRatio === '2:1') ? '8:5' : '4:5'
+                        const textCardAspectRatio = (item.aspectRatio === '8:5' || item.aspectRatio === '2:1') ? '8:5' : '4:5'
                         const wrapperStyle: CSSProperties = {
                           flex: `0 0 ${config.getSlotWidthCss(slots)}`,
                           minWidth: 0,
                           minHeight: 0,
                           display: 'flex',
                           flexDirection: 'column',
-                          overflow: 'hidden',
+                          overflow: 'visible',
                           opacity: cardVisible ? 1 : 0,
                           transform: cardVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
                           transition: cardTransition,
@@ -437,7 +578,7 @@ export function CarouselBlock({
                                 title={item.title}
                                 description={item.description}
                                 surface="subtle"
-                                size={cardSize === 'compact' ? 'compact' : 'large'}
+                                size="compact"
                                 aspectRatio={textCardAspectRatio}
                               />
                             ) : (
@@ -448,10 +589,10 @@ export function CarouselBlock({
                                 video={item.video}
                                 link={item.link}
                                 ctaText={item.ctaText}
-                                aspectRatio={cardSize === 'large-4x5' ? '4:5' : cardSize === 'large' ? '2:1' : item.aspectRatio}
+                                aspectRatio={item.aspectRatio}
                                 prefersReducedMotion={prefersReducedMotion}
                                 config={{
-                                  layout: cardSize,
+                                  layout: 'compact',
                                   imageHeight4_5: config.getImageHeight4_5(),
                                 }}
                               />
@@ -465,29 +606,40 @@ export function CarouselBlock({
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'flex-end',
+                      justifyContent: 'space-between',
                       gap: 'var(--ds-spacing-m)',
                       marginTop: 'var(--ds-spacing-l)',
                     }}
                   >
-                    <NavButton
-                      direction="left"
-                      disabled={!canScrollLeft}
-                      onPress={() => scroll('left')}
-                      size="XS"
-                    />
-                    <NavButton
-                      direction="right"
-                      disabled={!canScrollRight}
-                      onPress={() => scroll('right')}
-                      size="XS"
-                    />
+                    {stepperEl ? (
+                      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                        {stepperEl}
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-m)' }}>
+                      <NavButton
+                        direction="left"
+                        disabled={!canScrollLeft}
+                        onPress={() => scroll('left')}
+                        size="S"
+                        surface={surface}
+                      />
+                      <NavButton
+                        direction="right"
+                        disabled={!canScrollRight}
+                        onPress={() => scroll('right')}
+                        size="S"
+                        surface={surface}
+                      />
+                    </div>
                   </div>
                 </>
               )}
           </BlockContainer>
         </div>
       </GridBlock>
-    </SurfaceProvider>
+    </BlockSurfaceProvider>
   )
 }

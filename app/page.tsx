@@ -1,12 +1,35 @@
 import Link from 'next/link'
 import { draftMode } from 'next/headers'
+import type { Metadata } from 'next'
 import { getClient } from '../lib/sanity/client'
-import { allPagesQuery } from '../lib/sanity/queries'
+import { allPagesQuery, pageByIdQuery } from '../lib/sanity/queries'
 import { BlockRenderer } from './components/BlockRenderer'
 import { StickyNav } from './components/StickyNav'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
+  let pages: { _id: string; title: string; slug: string }[] = []
+  try {
+    pages = (await sanity.fetch<{ _id: string; title: string; slug: string }[]>(allPagesQuery)) ?? []
+  } catch {
+    // No Sanity project configured or fetch failed
+  }
+  const firstPage = pages[0]
+  if (!firstPage) return { title: 'Home' }
+  try {
+    const pageData = await sanity.fetch<{ title: string } | null>(
+      `*[_type == "page" && _id == $id][0]{ title }`,
+      { id: firstPage._id }
+    )
+    return { title: pageData?.title ?? 'Home' }
+  } catch {
+    return { title: 'Home' }
+  }
+}
 
 export default async function Home() {
   const { isEnabled: draft } = await draftMode()
@@ -41,107 +64,11 @@ export default async function Home() {
   } | null = null
   try {
     pageData = await sanity.fetch<{
-    _id: string
-    title: string
-    slug: string
-    sections: unknown[]
-  }>(
-    `*[_type == "page" && _id == $id][0]{
-    _id,
-    title,
-    "slug": slug.current,
-    sections[]{
-      _type,
-      _key,
-      _type == "hero" => {
-        variant,
-        spacing,
-        productName,
-        headline,
-        subheadline,
-        ctaText,
-        ctaLink,
-        cta2Text,
-        cta2Link,
-        "image": coalesce(imageUrl, image.asset->url)
-      },
-      _type == "cardGrid" => {
-        spacing,
-        columns,
-        title,
-        titleLevel,
-        items[]{
-          cardStyle,
-          title,
-          description,
-          "image": coalesce(imageUrl, image.asset->url),
-          surface
-        }
-      },
-      _type == "mediaTextBlock" => {
-        spacing,
-        eyebrow,
-        subhead,
-        title,
-        titleLevel,
-        body,
-        bulletList,
-        ctaText,
-        ctaLink,
-        cta2Text,
-        cta2Link,
-        "image": coalesce(imageUrl, image.asset->url),
-        "video": coalesce(videoUrl, video.asset->url),
-        size,
-        template,
-        contentWidth,
-        imagePosition,
-        overlayAlignment,
-        stackImagePosition,
-        stackAlignment,
-        imageAspectRatio,
-        mediaStyle,
-        blockBackground
-      },
-      _type == "fullBleedVerticalCarousel" => {
-        spacing,
-        items[]{
-          title,
-          description,
-          "image": coalesce(imageUrl, image.asset->url),
-          "video": coalesce(videoUrl, video.asset->url)
-        }
-      },
-      _type == "carousel" => {
-        spacing,
-        variant,
-        title,
-        titleLevel,
-        cardSize,
-        items[]{
-          title,
-          description,
-          "image": coalesce(imageUrl, image.asset->url),
-          "video": coalesce(videoUrl, video.asset->url),
-          link,
-          ctaText,
-          aspectRatio
-        }
-      },
-      _type == "proofPoints" => {
-        spacing,
-        title,
-        titleLevel,
-        items[]{
-          title,
-          description,
-          icon
-        }
-      }
-    }
-  }`,
-      { id: firstPage._id }
-    )
+      _id: string
+      title: string
+      slug: string
+      sections: unknown[]
+    }>(pageByIdQuery, { id: firstPage._id })
   } catch {
     pageData = null
   }

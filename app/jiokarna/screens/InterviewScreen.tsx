@@ -21,6 +21,7 @@ export function InterviewScreen({
   onReady,
 }: InterviewScreenProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -108,6 +109,7 @@ export function InterviewScreen({
             </div>
           ) : (
             <form
+              ref={formRef}
               onSubmit={handleSubmit}
               style={{
                 padding: 'var(--ds-spacing-m)',
@@ -131,7 +133,13 @@ export function InterviewScreen({
                   marginBottom: 'var(--ds-spacing-s)',
                 }}
               />
-              <Button type="submit" isDisabled={isThinking} appearance="neutral" size="M" attention="high">
+              <Button
+                onPress={() => formRef.current?.requestSubmit()}
+                isDisabled={isThinking}
+                appearance="neutral"
+                size="M"
+                attention="high"
+              >
                 {isThinking ? 'Sending...' : 'Send'}
               </Button>
             </form>

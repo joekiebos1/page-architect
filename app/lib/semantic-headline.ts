@@ -62,3 +62,9 @@ export function getHeadlineFontSizeOneStepDown(level: HeadingLevel): string {
 export function getChildLevel(level: HeadingLevel): HeadingLevel {
   return level === 'h2' ? 'h3' : level === 'h3' ? 'h4' : 'h4'
 }
+
+/** Subhead typography: standardised across HeroBlock, MediaTextBlock, lab variants */
+export const SUBHEAD_STYLE = {
+  fontSize: 'var(--ds-typography-h5)',
+  fontWeight: 'var(--ds-typography-weight-medium)',
+} as const

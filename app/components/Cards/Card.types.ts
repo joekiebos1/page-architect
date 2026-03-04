@@ -12,8 +12,8 @@ export type CardSurface = 'subtle' | 'bold'
 
 /** Block-derived config for MediaCard. Block sets these values. */
 export type MediaCardConfig = {
-  layout: 'compact' | 'large' | 'large-4x5'
-  /** For compact 4:5 and large-4x5: computed height from carousel viewport (cqw-based). Set by CarouselBlock. */
+  layout: 'compact' | 'medium' | 'large'
+  /** For compact 4:5 and medium: computed height from carousel viewport (cqw-based). Set by CarouselBlock. */
   imageHeight4_5?: string
 }
 

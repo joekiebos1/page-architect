@@ -5,12 +5,25 @@
  */
 
 import { draftMode } from 'next/headers'
+import type { Metadata } from 'next'
 import { getClient } from '../../lib/sanity/client'
 import { labPageQuery } from '../../lib/sanity/queries'
 import { LabPageClient } from './LabPageClient'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
+  let labData: { title?: string | null } | null = null
+  try {
+    labData = await sanity.fetch(labPageQuery)
+  } catch {
+    // Sanity not configured or fetch failed
+  }
+  return { title: labData?.title ?? 'Lab' }
+}
 
 export default async function LabPage() {
   const { isEnabled: draft } = await draftMode()

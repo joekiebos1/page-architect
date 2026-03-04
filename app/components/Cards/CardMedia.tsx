@@ -4,6 +4,13 @@ import Image from 'next/image'
 import { VideoWithControls } from '../VideoWithControls'
 import type { CardMediaAspectRatio } from './Card.types'
 
+/** Valid image src: full URL or path starting with /. Rejects filenames like "laptop-design.jpg". */
+function isValidImageSrc(s: string | null | undefined): boolean {
+  if (!s || typeof s !== 'string' || !s.trim()) return false
+  const t = s.trim()
+  return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/')
+}
+
 type CardMediaProps = {
   image?: string | null
   video?: string | null
@@ -21,8 +28,9 @@ export function CardMedia({
   heightCss,
 }: CardMediaProps) {
   const hasVideo = video && typeof video === 'string' && video.trim() !== ''
-  const hasImage = image && typeof image === 'string' && image.trim() !== ''
-  if (!hasVideo && !hasImage) return null
+  const hasValidImage = image && isValidImageSrc(image)
+  const hasInvalidImage = image && typeof image === 'string' && image.trim() !== '' && !isValidImageSrc(image)
+  if (!hasVideo && !hasValidImage && !hasInvalidImage) return null
 
   const aspectMap: Record<CardMediaAspectRatio, string> = {
     '4/5': '4/5',
@@ -44,17 +52,32 @@ export function CardMedia({
       {hasVideo ? (
         <VideoWithControls
           src={video!}
-          poster={hasImage ? image : undefined}
+          poster={hasValidImage ? image : undefined}
           prefersReducedMotion={prefersReducedMotion}
         />
-      ) : (
+      ) : hasValidImage ? (
         <Image
-          src={image!}
+          src={image!.trim()}
           alt=""
           fill
           style={{ objectFit: 'cover' }}
           sizes="(max-width: 768px) 100vw, 33vw"
         />
+      ) : (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            background: 'var(--ds-color-background-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 'var(--ds-typography-body-xs)',
+            color: 'var(--ds-color-text-medium)',
+          }}
+        >
+          Preview
+        </div>
       )}
     </div>
   )

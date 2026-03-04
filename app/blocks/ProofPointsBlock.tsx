@@ -1,10 +1,11 @@
 'use client'
 
-import { Headline, Text, Icon, SurfaceProvider } from '@marcelinodzn/ds-react'
+import { Headline, Text, Icon } from '@marcelinodzn/ds-react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
 import { GridBlock, useGridCell } from '../components/GridBlock'
 import { BlockContainer } from './BlockContainer'
 import { useCarouselReveal } from '../lib/use-carousel-reveal'
+import { BlockSurfaceProvider } from '../lib/block-surface'
 import { getProofPointIcon } from '@/lib/proof-point-icons'
 import { getHeadlineSize, getHeadlineFontSizeOneStepDown, getChildLevel, normalizeHeadingLevel, type HeadingLevel } from '../lib/semantic-headline'
 
@@ -17,9 +18,13 @@ type ProofPointItem = {
   icon?: string | null
 }
 
+type ProofPointsBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+type ProofPointsBlockAccent = 'primary' | 'secondary' | 'neutral'
+
 type ProofPointsBlockProps = {
   title?: string | null
-  titleLevel?: HeadingLevel
+  blockSurface?: ProofPointsBlockSurface
+  blockAccent?: ProofPointsBlockAccent
   items?: ProofPointItem[] | null
 }
 
@@ -40,7 +45,7 @@ function ProofPointCard({ item, itemLevel }: { item: ProofPointItem; itemLevel: 
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--ds-spacing-xs)' }}>
-        <Icon asset={<IconAsset />} size="L" appearance="secondary" attention="high" tinted />
+        <Icon asset={<IconAsset />} size="L" appearance="secondary" tinted />
         {item.title && (
           <Headline size={getHeadlineSize(getChildLevel(itemLevel))} weight="high" as={itemLevel} align="center" style={{ margin: 0, fontSize: getHeadlineFontSizeOneStepDown(itemLevel) }}>
             {item.title}
@@ -56,8 +61,8 @@ function ProofPointCard({ item, itemLevel }: { item: ProofPointItem; itemLevel: 
   )
 }
 
-export function ProofPointsBlock({ title, titleLevel = 'h2', items }: ProofPointsBlockProps) {
-  const level = normalizeHeadingLevel(titleLevel)
+export function ProofPointsBlock({ title, blockSurface = 'ghost', blockAccent = 'primary', items }: ProofPointsBlockProps) {
+  const level = normalizeHeadingLevel('h2')
   const items_ = (items?.filter((i) => i?.title) ?? []).slice(0, MAX_ITEMS)
   const itemLevel = getChildLevel(level)
   const cell = useGridCell('Wide')
@@ -70,7 +75,7 @@ export function ProofPointsBlock({ title, titleLevel = 'h2', items }: ProofPoint
   if (items_.length === 0) return null
 
   return (
-    <SurfaceProvider level={0}>
+    <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent} fullWidth>
       <GridBlock as="section">
         <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)' }}>
           {title && (
@@ -116,6 +121,6 @@ export function ProofPointsBlock({ title, titleLevel = 'h2', items }: ProofPoint
           </BlockContainer>
         </div>
       </GridBlock>
-    </SurfaceProvider>
+    </BlockSurfaceProvider>
   )
 }

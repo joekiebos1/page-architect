@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { Display, Text, Button, SurfaceProvider } from '@marcelinodzn/ds-react'
 import { GridBlock, useGridCell } from '../../../components/GridBlock'
 import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
+import { SUBHEAD_STYLE } from '../../../lib/semantic-headline'
 import type { HeroLabProps } from './HeroLab.types'
 
 export function HeroSplit50({
@@ -56,7 +57,7 @@ export function HeroSplit50({
         </Display>
       )}
       {subheadline && (
-        <Text size="M" weight="low" color="medium" as="p" style={{ margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+        <Text color="medium" as="p" style={{ margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line', ...SUBHEAD_STYLE }}>
           {subheadline}
         </Text>
       )}

@@ -9,6 +9,22 @@ export const mediaTextBlock = defineType({
     spacingTopField,
     spacingBottomField,
     defineField({
+      name: 'template',
+      type: 'string',
+      title: 'Layout',
+      description: '50/50: text and image side by side (choose image left or right). HeroOverlay: full bleed image with overlay. Stacked: large image with text above or below. TextOnly: no media.',
+      options: {
+        list: [
+          { value: 'SideBySide', title: '50/50 – Image left or right' },
+          { value: 'HeroOverlay', title: 'HeroOverlay – Full bleed image with text overlay' },
+          { value: 'Stacked', title: 'Stacked – Large image with text (above or below)' },
+          { value: 'TextOnly', title: 'TextOnly – No media, text only' },
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'SideBySide',
+    }),
+    defineField({
       name: 'eyebrow',
       type: 'string',
       title: 'Eyebrow',
@@ -25,22 +41,6 @@ export const mediaTextBlock = defineType({
       name: 'title',
       type: 'string',
       title: 'Title',
-    }),
-    defineField({
-      name: 'titleLevel',
-      type: 'string',
-      title: 'Heading level',
-      description: 'Semantic level for accessibility and size. AI can assign based on document structure.',
-      options: {
-        list: [
-          { value: 'h2', title: 'H2' },
-          { value: 'h3', title: 'H3' },
-          { value: 'h4', title: 'H4' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'h2',
-      hidden: ({ parent }) => !parent?.title,
     }),
     defineField({
       name: 'body',
@@ -107,71 +107,6 @@ export const mediaTextBlock = defineType({
       description: 'External video URL. Used when no video is uploaded.',
     }),
     defineField({
-      name: 'size',
-      type: 'string',
-      title: 'Size',
-      description: 'Narrative weight: hero (largest), feature (standard), editorial (compact).',
-      options: {
-        list: [
-          { value: 'hero', title: 'Hero' },
-          { value: 'feature', title: 'Feature' },
-          { value: 'editorial', title: 'Editorial' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'feature',
-    }),
-    defineField({
-      name: 'contentWidth',
-      type: 'string',
-      title: 'Content width',
-      description: 'XS (4 cols), S (6), M (8), Default (10), Wide (12). Edge to edge = full viewport width. For Stacked/HeroOverlay, Default = contained.',
-      options: {
-        list: [
-          { value: 'XS', title: 'XS (4 cols)' },
-          { value: 'S', title: 'S (6 cols)' },
-          { value: 'M', title: 'M (8 cols)' },
-          { value: 'Default', title: 'Default (10 cols)' },
-          { value: 'Wide', title: 'Wide (12 cols)' },
-          { value: 'edgeToEdge', title: 'Edge to edge (full width)' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'Default',
-      hidden: ({ parent }) => parent?.template === 'TextOnly',
-    }),
-    defineField({
-      name: 'template',
-      type: 'string',
-      title: 'Layout',
-      description: '50/50: text and image side by side (choose image left or right). HeroOverlay: full bleed image with overlay. Stacked: large image with text above or below. TextOnly: no media.',
-      options: {
-        list: [
-          { value: 'SideBySide', title: '50/50 – Image left or right' },
-          { value: 'HeroOverlay', title: 'HeroOverlay – Full bleed image with text overlay' },
-          { value: 'Stacked', title: 'Stacked – Large image with text (above or below)' },
-          { value: 'TextOnly', title: 'TextOnly – No media, text only' },
-        ],
-        layout: 'dropdown',
-      },
-      initialValue: 'SideBySide',
-    }),
-    defineField({
-      name: 'align',
-      type: 'string',
-      title: 'Text alignment',
-      description: 'Left or center aligned. Applies to all text in this block.',
-      options: {
-        list: [
-          { value: 'left', title: 'Left' },
-          { value: 'center', title: 'Center' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'left',
-      hidden: ({ parent }) => parent?.template === 'HeroOverlay' || parent?.template === 'Stacked',
-    }),
-    defineField({
       name: 'imagePosition',
       type: 'string',
       title: 'Image position',
@@ -220,7 +155,7 @@ export const mediaTextBlock = defineType({
       name: 'stackAlignment',
       type: 'string',
       title: 'Text alignment',
-      description: 'Left or center aligned. Use one alignment per block.',
+      description: 'Left or center. Only shown when media is Default width (edge-to-edge is always center).',
       options: {
         list: [
           { value: 'left', title: 'Left' },
@@ -229,56 +164,70 @@ export const mediaTextBlock = defineType({
         layout: 'radio',
       },
       initialValue: 'left',
-      hidden: ({ parent }) => parent?.template !== 'Stacked',
+      hidden: ({ parent }) =>
+        parent?.template !== 'Stacked' || parent?.mediaSize === 'edgeToEdge',
+    }),
+    defineField({
+      name: 'mediaSize',
+      type: 'string',
+      title: 'Media size',
+      description: 'Edge to edge: full viewport, text always center. Default: contained width, choose left or center alignment.',
+      options: {
+        list: [
+          { value: 'edgeToEdge', title: 'Edge to edge' },
+          { value: 'default', title: 'Default width' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'default',
+      hidden: ({ parent }) => parent?.template !== 'Stacked' && parent?.template !== 'HeroOverlay',
+    }),
+    defineField({
+      name: 'blockAccent',
+      type: 'string',
+      title: 'Theming',
+      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
+      options: {
+        list: [
+          { value: 'primary', title: 'Primary (brand)' },
+          { value: 'secondary', title: 'Secondary' },
+          { value: 'neutral', title: 'Neutral (grey)' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'primary',
     }),
     defineField({
       name: 'blockBackground',
       type: 'string',
-      title: 'Block background',
-      description: 'Full-width background. Uses DS surface tokens. Ghost = none, Minimal = neutral grey, Subtle = primary tint, Bold = brand colour.',
+      title: 'Emphasis',
+      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint. Colour comes from Theming.',
       options: {
         list: [
           { value: 'ghost', title: 'Ghost (no background)' },
-          { value: 'minimal', title: 'Minimal (neutral gray)' },
-          { value: 'subtle', title: 'Subtle (primary tint)' },
-          { value: 'bold', title: 'Bold (brand colour)' },
+          { value: 'minimal', title: 'Minimal' },
+          { value: 'subtle', title: 'Subtle' },
+          { value: 'bold', title: 'Bold' },
         ],
         layout: 'radio',
       },
       initialValue: 'ghost',
     }),
     defineField({
-      name: 'mediaStyle',
-      type: 'string',
-      title: 'Media style',
-      description: 'Contained: image inside block with padding and border radius. Overflow: bottom-aligned image, top-aligned with text, bleeds below; with background colour, uses specific spacing rules.',
-      options: {
-        list: [
-          { value: 'contained', title: 'Contained' },
-          { value: 'overflow', title: 'Overflow (bottom aligned)' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'contained',
-      hidden: ({ parent }) => ['HeroOverlay', 'TextOnly'].includes(parent?.template ?? ''),
-    }),
-    defineField({
       name: 'imageAspectRatio',
       type: 'string',
       title: 'Image aspect ratio',
-      description: '50/50 (contained): 4:3, 3:4, 1:1. Full-width layouts: 16:7, 16:9, 21:9.',
+      description: 'For 50/50 layout only. 4:3, 3:4, or 1:1.',
       options: {
         list: [
           { value: '4:3', title: '4:3' },
           { value: '3:4', title: '3:4' },
           { value: '1:1', title: '1:1 (square)' },
-          { value: '16:7', title: '16:7 (1440×630)' },
-          { value: '16:9', title: '16:9 (widescreen)' },
-          { value: '21:9', title: '21:9 (cinematic)' },
         ],
-        layout: 'dropdown',
+        layout: 'radio',
       },
       initialValue: '4:3',
+      hidden: ({ parent }) => parent?.template !== 'SideBySide',
     }),
   ],
   preview: {

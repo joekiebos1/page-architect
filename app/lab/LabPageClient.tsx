@@ -4,6 +4,7 @@
  * Lab – Block experiments
  *
  * Content from Sanity (Lab page). Uses DS components and tokens.
+ * FullBleedVerticalCarousel and RotatingMedia are experimental blocks (not in production page builder).
  */
 
 import { Text, DsProvider } from '@marcelinodzn/ds-react'
@@ -14,6 +15,8 @@ import {
   HeroColourImage,
   HeroColourEdge,
 } from './blocks'
+import { FullBleedVerticalCarousel, RotatingMediaBlock } from '../blocks'
+import { mockFullBleedVerticalCarousel, mockRotatingMedia } from './mock-data'
 import type { HeroLabProps } from './blocks/HeroVariants/HeroLab.types'
 
 const FALLBACK_HERO: HeroLabProps = {
@@ -97,6 +100,33 @@ export function LabPageClient({ title = 'Lab', description, hero }: LabPageClien
             Image fills the hero. Soft gradient from one edge holds the text.
           </Text>
           <HeroColourEdge {...heroProps} />
+        </section>
+
+        <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
+          <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
+            5. FullBleedVerticalCarousel – Experimental
+          </h2>
+          <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
+            Full-bleed vertical carousel. Sticky images, scrolling text. Moved to Lab for experimentation.
+          </Text>
+          <FullBleedVerticalCarousel
+            surface={mockFullBleedVerticalCarousel.surface}
+            items={mockFullBleedVerticalCarousel.items}
+          />
+        </section>
+
+        <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
+          <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
+            6. RotatingMedia – Experimental
+          </h2>
+          <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
+            Auto-rotating media carousel. Small: 2×4 grid. Large: single full-width card. Moved to Lab for experimentation.
+          </Text>
+          <RotatingMediaBlock
+            variant={mockRotatingMedia.variant}
+            surface={mockRotatingMedia.surface}
+            items={mockRotatingMedia.items}
+          />
         </section>
       </main>
     </>

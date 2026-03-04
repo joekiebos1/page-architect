@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { getMotionDurationCSS, getMotionEasing, createTransition } from '@marcelinodzn/ds-tokens'
-import { Headline, Text } from '@marcelinodzn/ds-react'
+import { Headline, Text, SurfaceProvider } from '@marcelinodzn/ds-react'
 import { useCarouselReveal } from '../lib/use-carousel-reveal'
 import { BlockContainer } from './BlockContainer'
+import { BlockSurfaceProvider } from '../lib/block-surface'
 
 type CarouselItem = {
   title?: string | null
@@ -15,6 +16,7 @@ type CarouselItem = {
 }
 
 type FullBleedVerticalCarouselProps = {
+  surface?: 'ghost' | 'minimal' | 'subtle' | 'bold'
   items?: CarouselItem[] | null
 }
 
@@ -141,9 +143,6 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
   }, [n])
 
   const showOverlay = isSticky
-
-  const textColor = showOverlay ? 'var(--local-color-text-on-overlay)' : 'var(--ds-color-text-high)'
-  const descColor = showOverlay ? 'var(--local-color-text-on-overlay-subtle)' : 'var(--ds-color-text-medium)'
   const textShadow = showOverlay ? '0 1px 2px var(--local-color-shadow-overlay)' : 'none'
 
   const level = prefersReducedMotion ? 'subtle' : 'moderate'
@@ -155,6 +154,7 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
     : createTransition(['opacity', 'transform'], 'xl', 'entrance', level)
 
   return (
+    <BlockSurfaceProvider blockSurface={surface} fullWidth>
     <section ref={revealRef} style={{ marginTop: 'var(--ds-spacing-2xl)' }}>
       <style>{`
         @keyframes carouselFade {
@@ -242,48 +242,49 @@ export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselPr
                   alignItems: 'center',
                 }}
               >
-                {item.title && (
-                  <BlockContainer contentWidth="Default" style={{ width: '100%', marginBottom: 'var(--ds-spacing-s)' }}>
-                    <Headline
-                      size="L"
-                      weight="high"
-                      as="h2"
-                      style={{
-                        color: textColor,
-                        textShadow,
-                        opacity: containerVisible ? 1 : 0,
-                        transform: containerVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
-                        transition: titleTransition,
-                      }}
-                    >
-                      {item.title}
-                    </Headline>
-                  </BlockContainer>
-                )}
-                {item.description && (
-                  <BlockContainer contentWidth="XS" style={{ width: '100%' }}>
-                    <Text
-                      size="M"
-                      weight="low"
-                      as="p"
-                      style={{
-                        color: descColor,
-                        textShadow,
-                        margin: 0,
-                        lineHeight: 1.5,
-                        textAlign: 'center',
-                        whiteSpace: 'pre-line',
-                      }}
-                    >
-                      {item.description}
-                    </Text>
-                  </BlockContainer>
-                )}
+                <SurfaceProvider level={1} hasBoldBackground={showOverlay}>
+                  {item.title && (
+                    <BlockContainer contentWidth="Default" style={{ width: '100%', marginBottom: 'var(--ds-spacing-s)' }}>
+                      <Headline
+                        size="L"
+                        weight="high"
+                        as="h2"
+                        style={{
+                          textShadow,
+                          opacity: containerVisible ? 1 : 0,
+                          transform: containerVisible ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+                          transition: titleTransition,
+                        }}
+                      >
+                        {item.title}
+                      </Headline>
+                    </BlockContainer>
+                  )}
+                  {item.description && (
+                    <BlockContainer contentWidth="XS" style={{ width: '100%' }}>
+                      <Text
+                        size="M"
+                        weight="low"
+                        as="p"
+                        style={{
+                          textShadow,
+                          margin: 0,
+                          lineHeight: 1.5,
+                          textAlign: 'center',
+                          whiteSpace: 'pre-line',
+                        }}
+                      >
+                        {item.description}
+                      </Text>
+                    </BlockContainer>
+                  )}
+                </SurfaceProvider>
               </div>
             </div>
           )
         })}
       </div>
     </section>
+    </BlockSurfaceProvider>
   )
 }

@@ -32,6 +32,18 @@ export type ContentSlots = {
   items: unknown[] | null
 }
 
+/** Block-level options content managers can set per block. */
+export type BlockOptions = {
+  blockSurface?: 'ghost' | 'minimal' | 'subtle' | 'bold' | null
+  blockAccent?: 'primary' | 'secondary' | 'neutral' | null
+  variant?: string | null
+  size?: 'hero' | 'feature' | 'editorial' | null
+  template?: 'SideBySide' | 'HeroOverlay' | 'Stacked' | 'TextOnly' | null
+  imagePosition?: 'left' | 'right' | null
+  cardSize?: 'compact' | 'medium' | 'large' | null
+  columns?: 2 | 3 | 4 | null
+}
+
 export type Section = {
   order: number
   sectionName: string
@@ -39,6 +51,7 @@ export type Section = {
   rationale: string
   narrativeRole: string
   contentSlots: ContentSlots
+  blockOptions?: BlockOptions | null
   crossLinks?: SectionCrossLink[] | null
   flags: string[]
 }

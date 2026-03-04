@@ -8,20 +8,20 @@
 export { HeroBlock } from './HeroBlock'
 export { MediaTextBlock } from './MediaTextBlock'
 export { CardGridBlock } from './CardGridBlock/CardGridBlock'
-export { RotatingMediaBlock } from './RotatingMediaBlock/RotatingMediaBlock'
 export type { MediaTextBlockProps } from './MediaTextBlock'
 export { CarouselBlock } from './CarouselBlock'
-export { FullBleedVerticalCarousel } from './FullBleedVerticalCarousel'
 export { ProofPointsBlock } from './ProofPointsBlock'
 export { BlockContainer } from './BlockContainer'
+
+/** Lab blocks – experimental, not in production page builder */
+export { RotatingMediaBlock } from './RotatingMediaBlock/RotatingMediaBlock'
+export { FullBleedVerticalCarousel } from './FullBleedVerticalCarousel'
 
 export const BLOCK_REGISTRY = {
   hero: 'HeroBlock',
   mediaTextBlock: 'MediaTextBlock',
   cardGrid: 'CardGridBlock',
-  rotatingMedia: 'RotatingMediaBlock',
   carousel: 'CarouselBlock',
-  fullBleedVerticalCarousel: 'FullBleedVerticalCarousel',
   proofPoints: 'ProofPointsBlock',
 } as const
 

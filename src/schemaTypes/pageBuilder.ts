@@ -1,53 +1,41 @@
 import { defineArrayMember, defineType } from 'sanity'
-import { FillWithSampleBlock } from '../components/FillWithSampleBlock'
+import { BlockWithAIAssist } from '../components/BlockWithAIAssist'
 
 export const pageBuilderType = defineType({
   name: 'pageBuilder',
   type: 'array',
   title: 'Page sections',
   description:
-    'Add new block with dropdown. Use "Fill with sample" to populate placeholder content.',
+    'Add new block with dropdown. Use "Fill with sample" or "Configure with Claude" to populate and refine content.',
   of: [
     defineArrayMember({
       type: 'hero',
       components: {
-        input: FillWithSampleBlock,
+        input: BlockWithAIAssist,
       },
     }),
     defineArrayMember({
       type: 'mediaTextBlock',
       components: {
-        input: FillWithSampleBlock,
+        input: BlockWithAIAssist,
       },
     }),
     defineArrayMember({
       type: 'cardGrid',
       components: {
-        input: FillWithSampleBlock,
-      },
-    }),
-    defineArrayMember({
-      type: 'fullBleedVerticalCarousel',
-      components: {
-        input: FillWithSampleBlock,
+        input: BlockWithAIAssist,
       },
     }),
     defineArrayMember({
       type: 'carousel',
       components: {
-        input: FillWithSampleBlock,
+        input: BlockWithAIAssist,
       },
     }),
     defineArrayMember({
       type: 'proofPoints',
       components: {
-        input: FillWithSampleBlock,
-      },
-    }),
-    defineArrayMember({
-      type: 'rotatingMedia',
-      components: {
-        input: FillWithSampleBlock,
+        input: BlockWithAIAssist,
       },
     }),
   ],

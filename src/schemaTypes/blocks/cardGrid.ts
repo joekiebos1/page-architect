@@ -122,19 +122,35 @@ export const cardGridBlock = defineType({
       title: 'Section title',
     }),
     defineField({
-      name: 'titleLevel',
+      name: 'blockAccent',
       type: 'string',
-      title: 'Heading level',
+      title: 'Theming',
+      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
       options: {
         list: [
-          { value: 'h2', title: 'H2' },
-          { value: 'h3', title: 'H3' },
-          { value: 'h4', title: 'H4' },
+          { value: 'primary', title: 'Primary (brand)' },
+          { value: 'secondary', title: 'Secondary' },
+          { value: 'neutral', title: 'Neutral (grey)' },
         ],
         layout: 'radio',
       },
-      initialValue: 'h2',
-      hidden: ({ parent }) => !parent?.title,
+      initialValue: 'primary',
+    }),
+    defineField({
+      name: 'surface',
+      type: 'string',
+      title: 'Emphasis',
+      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint. Colour comes from Theming.',
+      options: {
+        list: [
+          { value: 'ghost', title: 'Ghost (no background)' },
+          { value: 'minimal', title: 'Minimal' },
+          { value: 'subtle', title: 'Subtle' },
+          { value: 'bold', title: 'Bold' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'ghost',
     }),
     defineField({
       name: 'items',

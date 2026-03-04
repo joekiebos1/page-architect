@@ -13,6 +13,7 @@ import { Display, Text, Button, SurfaceProvider } from '@marcelinodzn/ds-react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
 import { GridBlock, useGridCell } from '../../../components/GridBlock'
 import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
+import { SUBHEAD_STYLE } from '../../../lib/semantic-headline'
 import type { HeroLabProps } from './HeroLab.types'
 
 export function HeroSplit50Reveal({
@@ -83,7 +84,7 @@ export function HeroSplit50Reveal({
         </Display>
       )}
       {subheadline && (
-        <Text size="M" weight="low" color="medium" as="p" style={{ margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+        <Text color="medium" as="p" style={{ margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line', ...SUBHEAD_STYLE }}>
           {subheadline}
         </Text>
       )}

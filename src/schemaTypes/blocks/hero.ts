@@ -1,12 +1,12 @@
 import { defineField, defineType } from 'sanity'
-import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
+import { spacingBottomField } from '../shared/spacingFields'
 
 export const heroBlock = defineType({
   name: 'hero',
   type: 'object',
   title: 'Hero',
+  description: 'Hero at top of page. No top padding — always flush with top.',
   fields: [
-    spacingTopField,
     spacingBottomField,
     defineField({
       name: 'variant',
@@ -65,17 +65,21 @@ export const heroBlock = defineType({
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Key visual (upload)',
-      description: 'Upload or use Image URL below',
-      options: {
-        hotspot: true,
-      },
+      title: 'Image (upload)',
+      description: 'Upload or use Image URL below. Use image or video, not both.',
+      options: { hotspot: true },
     }),
     defineField({
       name: 'imageUrl',
       type: 'string',
       title: 'Image URL',
       description: 'External image URL. Used when no image is uploaded.',
+    }),
+    defineField({
+      name: 'videoUrl',
+      type: 'string',
+      title: 'Video URL',
+      description: 'External video URL. When set, video is shown instead of image.',
     }),
   ],
   preview: {

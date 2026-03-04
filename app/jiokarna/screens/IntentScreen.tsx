@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { Headline, Text, SurfaceProvider, Card, CardBody, Button } from '@marcelinodzn/ds-react'
 import type { IntentFormData, PageType } from '../types'
 
@@ -18,6 +19,8 @@ type IntentScreenProps = {
 }
 
 export function IntentScreen({ data, onChange, onSubmit }: IntentScreenProps) {
+  const formRef = useRef<HTMLFormElement>(null)
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit()
@@ -25,7 +28,7 @@ export function IntentScreen({ data, onChange, onSubmit }: IntentScreenProps) {
 
   return (
     <SurfaceProvider level={0}>
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div style={{ maxWidth: 560, margin: '0 auto', paddingBlock: 'var(--ds-spacing-2xl)' }}>
           <Headline level={1} style={{ marginBottom: 'var(--ds-spacing-l)' }}>
             Page intent
@@ -179,7 +182,12 @@ export function IntentScreen({ data, onChange, onSubmit }: IntentScreenProps) {
             </CardBody>
           </Card>
 
-          <Button type="submit" appearance="neutral" size="M" attention="high">
+          <Button
+            onPress={() => formRef.current?.requestSubmit()}
+            appearance="neutral"
+            size="M"
+            attention="high"
+          >
             Continue to interview
           </Button>
         </div>

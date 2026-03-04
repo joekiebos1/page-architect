@@ -1,8 +1,8 @@
-import type { HeadingLevel } from '../../lib/semantic-headline'
-
 export type CardGridCardStyle = 'image-above' | 'text-on-colour' | 'text-on-image'
 export type CardGridColumns = 2 | 3 | 4
 export type CardGridSurface = 'subtle' | 'bold'
+export type CardGridBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+export type CardGridBlockAccent = 'primary' | 'secondary' | 'neutral'
 
 export type CardGridItem = {
   cardStyle: CardGridCardStyle
@@ -18,6 +18,7 @@ export type CardGridItem = {
 export type CardGridBlockProps = {
   columns?: CardGridColumns
   title?: string | null
-  titleLevel?: HeadingLevel
+  blockSurface?: CardGridBlockSurface
+  blockAccent?: CardGridBlockAccent
   items?: CardGridItem[] | null
 }

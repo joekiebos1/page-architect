@@ -10,28 +10,6 @@ export const carouselBlock = defineType({
     spacingTopField,
     spacingBottomField,
     defineField({
-      name: 'variant',
-      type: 'string',
-      title: 'Carousel variant',
-      description: `Variant A — Featured (buttons on sides): Feature product highlights in a large, rich way. Use short videos or striking images for key features at a glance. Placement: top or body of page only, never at bottom. Constraints: large cards only, default width.
-
-Variant B — Informative (buttons below): Inform, educate, showcase detailed functionality, or create an overview of items that link to other sections. Content is more detailed, less impactful, more informative. Placement: anywhere on page, including bottom. Constraints: card shapes 4:5 and 8:5.`,
-      options: {
-        list: [
-          {
-            value: 'featured',
-            title: 'Featured (buttons on sides)',
-          },
-          {
-            value: 'informative',
-            title: 'Informative (buttons below)',
-          },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'informative',
-    }),
-    defineField({
       name: 'title',
       type: 'string',
       title: 'Section title',
@@ -41,32 +19,47 @@ Variant B — Informative (buttons below): Inform, educate, showcase detailed fu
       name: 'cardSize',
       type: 'string',
       title: 'Card size',
-      description: 'Compact: 3 cards per row, 4:5 and 8:5 interchangeable. Large 2:1: 1 card spanning Default width, 2:1 only. Large 4:5: 2 cards per row (S width each), 4:5 only.',
+      description: 'Compact: 3 cards per row. Medium: 2 cards per row (4:5). Large: 1 card per row (2:1).',
       options: {
         list: [
-          { value: 'compact', title: 'Compact (3 per row, 4:5 and 8:5)' },
-          { value: 'large', title: 'Large 2:1 (1 per row, Default width)' },
-          { value: 'large-4x5', title: 'Large 4:5 (2 per row, S width each)' },
+          { value: 'compact', title: 'Compact' },
+          { value: 'medium', title: 'Medium' },
+          { value: 'large', title: 'Large' },
         ],
         layout: 'radio',
       },
       initialValue: 'compact',
     }),
     defineField({
-      name: 'titleLevel',
+      name: 'blockAccent',
       type: 'string',
-      title: 'Heading level',
-      description: 'Semantic level for accessibility and size.',
+      title: 'Theming',
+      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
       options: {
         list: [
-          { value: 'h2', title: 'H2' },
-          { value: 'h3', title: 'H3' },
-          { value: 'h4', title: 'H4' },
+          { value: 'primary', title: 'Primary (brand)' },
+          { value: 'secondary', title: 'Secondary' },
+          { value: 'neutral', title: 'Neutral (grey)' },
         ],
         layout: 'radio',
       },
-      initialValue: 'h2',
-      hidden: ({ parent }) => !parent?.title,
+      initialValue: 'primary',
+    }),
+    defineField({
+      name: 'surface',
+      type: 'string',
+      title: 'Emphasis',
+      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint. Colour comes from Theming.',
+      options: {
+        list: [
+          { value: 'ghost', title: 'Ghost (no background)' },
+          { value: 'minimal', title: 'Minimal' },
+          { value: 'subtle', title: 'Subtle' },
+          { value: 'bold', title: 'Bold' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'ghost',
     }),
     defineField({
       name: 'items',

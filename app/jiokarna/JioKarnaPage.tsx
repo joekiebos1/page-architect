@@ -6,9 +6,10 @@ import { Button } from '@marcelinodzn/ds-react'
 import { IntentScreen } from './screens/IntentScreen'
 import { InterviewScreen } from './screens/InterviewScreen'
 import { StructureScreen } from './screens/StructureScreen'
+import { PreviewScreen } from './screens/PreviewScreen'
 import type { IntentFormData, PageBrief } from './types'
 
-type Step = 'intent' | 'interview' | 'structure' | 'approved'
+type Step = 'intent' | 'interview' | 'structure' | 'preview' | 'approved'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -187,8 +188,16 @@ export function JioKarnaPage() {
         <StructureScreen
           brief={brief}
           isGenerating={isGenerating}
-          onApprove={handleApprove}
+          onPreview={() => setStep('preview')}
           onRegenerate={handleRegenerate}
+        />
+      )}
+
+      {step === 'preview' && brief && (
+        <PreviewScreen
+          brief={brief}
+          onApprove={handleApprove}
+          onBack={() => setStep('structure')}
         />
       )}
 
@@ -201,6 +210,8 @@ export function JioKarnaPage() {
 
 function ApprovedView({ brief, onStartOver }: { brief: PageBrief; onStartOver: () => void }) {
   const [activeTab, setActiveTab] = useState<'summary' | 'json'>('summary')
+  const [createStatus, setCreateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [createMessage, setCreateMessage] = useState<string>('')
 
   const markdownSummary = `# ${brief.meta.pageName}
 
@@ -288,7 +299,70 @@ ${s.contentSlots.headline ? `- Headline: ${s.contentSlots.headline}` : ''}${ctaS
       >
         {activeTab === 'summary' ? markdownSummary : JSON.stringify(brief, null, 2)}
       </pre>
-      <div style={{ display: 'flex', gap: 'var(--ds-spacing-m)', marginTop: 'var(--ds-spacing-l)' }}>
+      {createStatus === 'success' && createMessage && (
+        <div
+          style={{
+            marginTop: 'var(--ds-spacing-m)',
+            padding: 'var(--ds-spacing-m)',
+            background: 'var(--ds-color-background-positive-subtle)',
+            borderRadius: 'var(--ds-radius-card-s)',
+            fontSize: 'var(--ds-typography-body-s)',
+          }}
+        >
+          {createMessage}{' '}
+          <Link
+            href={`/${brief.meta.slug}`}
+            style={{ color: 'var(--ds-color-text-interactive)', fontWeight: 'var(--ds-typography-weight-high)' }}
+          >
+            View page →
+          </Link>
+        </div>
+      )}
+      {createStatus === 'error' && createMessage && (
+        <div
+          style={{
+            marginTop: 'var(--ds-spacing-m)',
+            padding: 'var(--ds-spacing-m)',
+            background: 'var(--ds-color-background-negative-subtle)',
+            borderRadius: 'var(--ds-radius-card-s)',
+            fontSize: 'var(--ds-typography-body-s)',
+            color: 'var(--ds-color-text-negative)',
+          }}
+        >
+          {createMessage}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 'var(--ds-spacing-m)', marginTop: 'var(--ds-spacing-l)', flexWrap: 'wrap' }}>
+        <Button
+          onPress={async () => {
+            setCreateStatus('loading')
+            setCreateMessage('')
+            try {
+              const res = await fetch('/api/jiokarna/create-page', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(brief),
+              })
+              const data = await res.json()
+              if (!res.ok) {
+                setCreateStatus('error')
+                setCreateMessage(data.error || 'Failed to create page')
+                return
+              }
+              setCreateStatus('success')
+              setCreateMessage(data.message || `Page created. Visit /${data.slug}`)
+            } catch (err) {
+              setCreateStatus('error')
+              setCreateMessage(err instanceof Error ? err.message : 'Failed to create page')
+            }
+          }}
+          appearance="secondary"
+          size="S"
+          attention="high"
+          isDisabled={createStatus === 'loading'}
+        >
+          {createStatus === 'loading' ? 'Creating…' : 'Create page in Sanity'}
+        </Button>
         <Button
           onPress={() => {
             const blob = new Blob(

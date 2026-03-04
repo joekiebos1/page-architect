@@ -9,7 +9,7 @@ import type { MediaCardConfig } from './Card.types'
 
 const GAP = 'var(--ds-spacing-l)'
 
-export type MediaCardLayout = 'compact' | 'large' | 'large-4x5'
+export type MediaCardLayout = 'compact' | 'medium' | 'large'
 
 export type MediaCardProps = {
   title?: string | null
@@ -37,7 +37,7 @@ export function MediaCard({
 }: MediaCardProps) {
   const router = useRouter()
   const { layout, imageHeight4_5 } = config
-  const isLarge = layout === 'large' || layout === 'large-4x5'
+  const isLarge = layout === 'large' || layout === 'medium'
 
   const handleCtaPress = (href: string) => {
     if (href.startsWith('/')) router.push(href)
@@ -47,9 +47,9 @@ export function MediaCard({
   const hasVideo = video && typeof video === 'string' && video.trim() !== ''
   const hasImage = image && typeof image === 'string' && image.trim() !== ''
 
-  // Large: 2:1 only. Large 4:5: 4:5 only. Compact: 4:5 and 8:5 (2:1 falls back to 8:5).
+  // Large: 2:1 only. Medium: 4:5 only. Compact: 4:5 and 8:5 (2:1 falls back to 8:5).
   const effectiveRatio =
-    layout === 'large-4x5'
+    layout === 'medium'
       ? '4:5'
       : layout === 'large'
         ? '2:1'

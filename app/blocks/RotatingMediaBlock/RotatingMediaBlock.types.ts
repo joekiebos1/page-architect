@@ -6,8 +6,11 @@ export type RotatingMediaItem = {
   label?: string | null
 }
 
+export type RotatingMediaBlockAccent = 'primary' | 'secondary' | 'neutral'
+
 export type RotatingMediaBlockProps = {
   variant?: RotatingMediaVariant
   items?: RotatingMediaItem[] | null
   surface?: 'ghost' | 'minimal' | 'subtle' | 'bold'
+  blockAccent?: RotatingMediaBlockAccent
 }

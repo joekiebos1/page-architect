@@ -24,13 +24,13 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const outPath = join(__dirname, '..', 'app', 'ds-tokens.generated.css')
 
-// JioHome theme for token resolution (matches DsProvider theme)
+// MyJio theme for token resolution (matches DsProvider theme)
 const ctx = createTokenContext({
   [COLLECTION_NAMES.PLATFORM]: PLATFORM_MODES.DESKTOP_1440,
   [COLLECTION_NAMES.DENSITY]: DENSITY_MODES.DEFAULT,
   [COLLECTION_NAMES.COLOR_MODE]: COLOR_MODE_MODES.LIGHT,
   [COLLECTION_NAMES.THEME]: '↓Pack1',
-  [COLLECTION_NAMES.THEME_PACK1]: 'JioHome',
+  [COLLECTION_NAMES.THEME_PACK1]: 'MyJio',
 })
 
 const vars = []
@@ -150,19 +150,22 @@ if (spacing2xl != null && spacingS != null) {
 }
 vars.push(`  --ds-spacing-hero-overlap: 12.5vw;`)
 vars.push(`  --ds-spacing-hero-panel-trim: 25vw;`)
-// Card radius from DS Shape tokens (XL=35, L=26, M=19, S=14)
+// Card radius from DS Shape tokens (XL=35, L=26, M=19, S=14). Pill = full rounded ends.
 const radiusCard = getVariableByName('Shape/XL', ctx)
 const radiusCardL = getVariableByName('Shape/L', ctx)
 const radiusCardM = getVariableByName('Shape/M', ctx)
 const radiusCardS = getVariableByName('Shape/S', ctx)
+const radiusPill = getVariableByName('Shape/Pill', ctx)
 const radiusCardPx = radiusCard != null ? `${Number(radiusCard)}px` : '32px'
 const radiusCardLPx = radiusCardL != null ? `${Number(radiusCardL)}px` : '26px'
 const radiusCardMPx = radiusCardM != null ? `${Number(radiusCardM)}px` : '19px'
 const radiusCardSPx = radiusCardS != null ? `${Number(radiusCardS)}px` : '14px'
+const radiusFullPx = radiusPill != null ? `${Number(radiusPill)}px` : '999px'
 vars.push(`  --ds-radius-card: ${radiusCardPx};`)
 vars.push(`  --ds-radius-card-l: ${radiusCardLPx};`)
 vars.push(`  --ds-radius-card-m: ${radiusCardMPx};`)
 vars.push(`  --ds-radius-card-s: ${radiusCardSPx};`)
+vars.push(`  --ds-radius-full: ${radiusFullPx};`)
 
 // Grid media queries – DS grid per breakpoint
 let gridCss = ''

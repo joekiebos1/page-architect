@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
+import type { Metadata } from 'next'
 import { getClient } from '../../lib/sanity/client'
 import { pageBySlugQuery, allPagesQuery } from '../../lib/sanity/queries'
 import { BlockRenderer } from '../components/BlockRenderer'
@@ -11,6 +12,15 @@ export const revalidate = 0
 
 type Props = {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
+  const pageData = await sanity.fetch<{ title: string } | null>(pageBySlugQuery, { slug })
+  if (!pageData) return { title: slug }
+  return { title: pageData.title }
 }
 
 export default async function PageBySlug({ params }: Props) {

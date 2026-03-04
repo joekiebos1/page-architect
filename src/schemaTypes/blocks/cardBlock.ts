@@ -63,7 +63,7 @@ export const cardItem = defineType({
       name: 'cardType',
       type: 'string',
       title: 'Card type',
-      description: 'Media: image/video with optional text below. Text on colour: text on coloured background (no media).',
+      description: 'Media: image/video with optional text below. Text on colour: text on coloured background (no media). Large carousel: media only.',
       options: {
         list: [
           { value: 'media', title: 'Media (image/video)' },
@@ -72,12 +72,25 @@ export const cardItem = defineType({
         layout: 'radio',
       },
       initialValue: 'media',
+      hidden: ({ document, path }) => {
+        if (!document?.sections || !Array.isArray(path) || path[0] !== 'sections') return false
+        const sectionSegment = path[1]
+        let block: { _type?: string; cardSize?: string } | undefined
+        if (typeof sectionSegment === 'number') {
+          block = document.sections[sectionSegment]
+        } else if (sectionSegment && typeof sectionSegment === 'object' && '_key' in sectionSegment) {
+          block = document.sections?.find(
+            (s: { _key?: string }) => s?._key === (sectionSegment as { _key: string })._key
+          )
+        }
+        return block?._type === 'carousel' && block?.cardSize === 'large'
+      },
     }),
     defineField({
       name: 'aspectRatio',
       type: 'string',
       title: 'Card size',
-      description: '4:5 = 1 slot, 8:5 = 2 slots (wider)',
+      description: 'Compact carousel only: 4:5 = 1 slot, 8:5 = 2 slots (wider), 2:1 = 2 slots. Hidden when carousel Card size is Large (2:1) or Medium (4:5).',
       options: {
         list: [
           { value: '4:5', title: '4:5 (1 slot)' },
@@ -87,6 +100,19 @@ export const cardItem = defineType({
         layout: 'radio',
       },
       initialValue: '4:5',
+      hidden: ({ document, path }) => {
+        if (!document?.sections || !Array.isArray(path) || path[0] !== 'sections') return false
+        const sectionSegment = path[1]
+        let block: { _type?: string; cardSize?: string } | undefined
+        if (typeof sectionSegment === 'number') {
+          block = document.sections[sectionSegment]
+        } else if (sectionSegment && typeof sectionSegment === 'object' && '_key' in sectionSegment) {
+          block = document.sections?.find(
+            (s: { _key?: string }) => s?._key === (sectionSegment as { _key: string })._key
+          )
+        }
+        return block?._type === 'carousel' && (block?.cardSize === 'large' || block?.cardSize === 'medium')
+      },
     }),
     defineField({
       name: 'link',

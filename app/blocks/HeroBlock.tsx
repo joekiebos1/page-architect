@@ -6,6 +6,7 @@ import { Display, Text, Button, SurfaceProvider } from '@marcelinodzn/ds-react'
 import { GridBlock, useGridCell } from '../components/GridBlock'
 import { BlockContainer } from './BlockContainer'
 import { BlockReveal } from './BlockReveal'
+import { SUBHEAD_STYLE } from '../lib/semantic-headline'
 
 /**
  * Variant options:
@@ -23,6 +24,7 @@ type HeroBlockProps = {
   cta2Text?: string | null
   cta2Link?: string | null
   image?: string | null
+  videoUrl?: string | null
 }
 
 export function HeroBlock({
@@ -35,11 +37,12 @@ export function HeroBlock({
   cta2Text,
   cta2Link,
   image,
+  videoUrl,
 }: HeroBlockProps) {
+  const mediaSrc = videoUrl?.trim() || image
+  const isVideo = Boolean(videoUrl?.trim())
   const isFullscreen = variant === 'fullscreen'
   const hasColouredBg = !isFullscreen && variant !== 'ghost'
-  const textColour = hasColouredBg || isFullscreen ? 'on-bold-high' : 'high'
-  const subheadlineColour = hasColouredBg ? 'on-bold-high' : 'medium'
   const router = useRouter()
   const cell = useGridCell('Wide')
   const sectionRef = useRef<HTMLElement>(null)
@@ -72,7 +75,7 @@ export function HeroBlock({
       cancelAnimationFrame(raf)
       cleanup?.()
     }
-  }, [isFullscreen, productName, headline, subheadline, image])
+  }, [isFullscreen, productName, headline, subheadline, mediaSrc])
 
   const handleCtaPress = (href: string) => {
     if (href.startsWith('/')) router.push(href)
@@ -140,8 +143,8 @@ export function HeroBlock({
             >
               <BlockContainer contentWidth="Default">
                 <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)' }}>
-                  {productName && <Text size="L" weight="high" color="on-bold-high" align="center" as="span">{productName}</Text>}
-                  {headline && <Display size="L" as="h1" color="on-bold-high" align="center" style={{ lineHeight: 1.1 }}>{headline}</Display>}
+                  {productName && <Text size="L" weight="high" align="center" as="span">{productName}</Text>}
+                  {headline && <Display size="L" as="h1" align="center" style={{ lineHeight: 1.1 }}>{headline}</Display>}
                 </div>
               </BlockContainer>
               {(ctaText || cta2Text) && (
@@ -184,14 +187,14 @@ export function HeroBlock({
             {(productName || headline) && (
               <BlockContainer contentWidth="Default">
                 <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-m)' }}>
-                  {productName && <Text size="L" weight="high" color={textColour} align="center" as="span">{productName}</Text>}
-                  {headline && <Display size="L" as="h1" color={textColour} align="center" style={{ lineHeight: 1.1 }}>{headline}</Display>}
+                  {productName && <Text size="L" weight="high" align="center" as="span">{productName}</Text>}
+                  {headline && <Display size="L" as="h1" align="center" style={{ lineHeight: 1.1 }}>{headline}</Display>}
                 </div>
               </BlockContainer>
             )}
             {subheadline && (
               <BlockContainer contentWidth="XS">
-                <Text size="S" weight="low" color={subheadlineColour} align="center" as="p" style={{ margin: 0, lineHeight: 1.4, textAlign: 'center', whiteSpace: 'pre-line' }}>{subheadline}</Text>
+                <Text align="center" as="p" style={{ margin: 0, lineHeight: 1.4, textAlign: 'center', whiteSpace: 'pre-line', ...SUBHEAD_STYLE }}>{subheadline}</Text>
               </BlockContainer>
             )}
             {(ctaText || cta2Text) && (
@@ -204,8 +207,19 @@ export function HeroBlock({
             )}
             <BlockContainer contentWidth="Wide" style={{ marginTop: 'var(--ds-spacing-xl)' }}>
               <div ref={imageRef} style={{ aspectRatio: '2 / 1', overflow: 'hidden', borderRadius: 'var(--ds-radius-card)' }}>
-                {image ? (
-                  <img src={image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                {mediaSrc ? (
+                  isVideo ? (
+                    <video
+                      src={mediaSrc}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    <img src={mediaSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  )
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: 'var(--ds-color-background-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Text size="M" weight="medium" color="low" as="span">Image 2:1</Text>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Headline, SurfaceProvider } from '@marcelinodzn/ds-react'
+import { Headline } from '@marcelinodzn/ds-react'
 import { GridBlock, useGridCell } from '../../components/GridBlock'
 import { BlockContainer } from '../BlockContainer'
 import { BlockReveal } from '../BlockReveal'
@@ -12,6 +12,7 @@ import {
 } from '../../components/Cards'
 import { useGridBreakpoint } from '../../lib/use-grid-breakpoint'
 import { getHeadlineFontSize, normalizeHeadingLevel } from '../../lib/semantic-headline'
+import { BlockSurfaceProvider } from '../../lib/block-surface'
 import type { CardGridBlockProps, CardGridItem } from './CardGridBlock.types'
 
 const MAX_ITEMS = 12
@@ -66,10 +67,11 @@ function CardGridCard({
 export function CardGridBlock({
   columns = 3,
   title,
-  titleLevel = 'h2',
+  blockSurface = 'ghost',
+  blockAccent = 'primary',
   items,
 }: CardGridBlockProps) {
-  const level = normalizeHeadingLevel(titleLevel)
+  const level = normalizeHeadingLevel('h2')
   const items_ = (items ?? []).filter((i) => i?.title || i?.image || i?.video).slice(0, MAX_ITEMS)
   const cell = useGridCell('Default')
   const { columns: gridColumns } = useGridBreakpoint()
@@ -92,7 +94,7 @@ export function CardGridBlock({
 
   return (
     <BlockReveal>
-      <SurfaceProvider level={0}>
+      <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent} fullWidth>
         <GridBlock as="section">
           <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-2xl)' }}>
             {title && (
@@ -118,7 +120,7 @@ export function CardGridBlock({
             </BlockContainer>
           </div>
         </GridBlock>
-      </SurfaceProvider>
+      </BlockSurfaceProvider>
     </BlockReveal>
   )
 }

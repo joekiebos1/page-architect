@@ -47,6 +47,21 @@ export const rotatingMediaBlock = defineType({
     'Auto-rotating media carousel. Small: 2×4 grid. Large: single full-width card. Combined: one large + small cards.',
   fields: [
     defineField({
+      name: 'blockAccent',
+      type: 'string',
+      title: 'Theming',
+      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
+      options: {
+        list: [
+          { value: 'primary', title: 'Primary (brand)' },
+          { value: 'secondary', title: 'Secondary' },
+          { value: 'neutral', title: 'Neutral (grey)' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'primary',
+    }),
+    defineField({
       name: 'variant',
       type: 'string',
       title: 'Variant',
@@ -63,7 +78,8 @@ export const rotatingMediaBlock = defineType({
     defineField({
       name: 'surface',
       type: 'string',
-      title: 'Background',
+      title: 'Emphasis',
+      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint. Colour comes from Theming.',
       options: {
         list: [
           { value: 'ghost', title: 'Ghost' },

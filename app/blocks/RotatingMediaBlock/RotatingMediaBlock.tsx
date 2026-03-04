@@ -13,9 +13,10 @@
 
 import { useState, useEffect } from 'react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
-import { Button, Icon, SurfaceProvider } from '@marcelinodzn/ds-react'
+import { Button, Icon } from '@marcelinodzn/ds-react'
 import { GridBlock, useGridCell } from '../../components/GridBlock'
 import { BlockContainer } from '../BlockContainer'
+import { BlockSurfaceProvider } from '../../lib/block-surface'
 import type { RotatingMediaBlockProps, RotatingMediaItem } from './RotatingMediaBlock.types'
 
 const IcPlay = () => (
@@ -311,6 +312,7 @@ export function RotatingMediaBlock({
   variant = 'small',
   items,
   surface = 'ghost',
+  blockAccent = 'primary',
 }: RotatingMediaBlockProps) {
   const cell = useGridCell('Wide')
   const [isPaused, setIsPaused] = useState(false)
@@ -327,14 +329,12 @@ export function RotatingMediaBlock({
   const items_ = items?.filter((i) => i?.image?.trim()) ?? []
   if (items_.length === 0) return null
 
-  const surfaceLevel = surface === 'ghost' ? 0 : 1
-  const hasBoldBackground = surface === 'bold'
   const handlePause = () => setIsPaused(true)
   const handleResume = () => setIsPaused(false)
   const effectivePaused = isPaused || prefersReducedMotion
 
   return (
-    <SurfaceProvider level={surfaceLevel} hasBoldBackground={hasBoldBackground}>
+    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} fullWidth>
       <style>{`
         @keyframes rotating-media-scroll {
           from { transform: translateX(0); }
@@ -386,6 +386,6 @@ export function RotatingMediaBlock({
           </BlockContainer>
         </div>
       </GridBlock>
-    </SurfaceProvider>
+    </BlockSurfaceProvider>
   )
 }
