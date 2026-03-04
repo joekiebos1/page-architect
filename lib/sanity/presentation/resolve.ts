@@ -15,5 +15,13 @@ export const resolve = {
         ],
       }),
     }),
+    labPage: defineLocations({
+      select: { title: 'title' },
+      resolve: (doc) => ({
+        locations: [
+          { title: doc?.title || 'Lab', href: '/lab' },
+        ],
+      }),
+    }),
   },
 }

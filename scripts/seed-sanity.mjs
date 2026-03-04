@@ -605,6 +605,29 @@ async function seed() {
 
   await client.createOrReplace(productPage)
   console.log('Created page: Product (slug: product)')
+
+  // Lab page – singleton for /lab experiments
+  const labImageId = getAsset(0)
+  const labPage = {
+    _type: 'labPage',
+    _id: 'labPage',
+    title: 'Lab',
+    description: 'Hero variants and TopNavBlock mega menu. Manage content here.',
+    hero: {
+      productName: 'Product Name',
+      headline: 'Designed for the way you live.',
+      subheadline: 'Clean lines. Thoughtful details. Built to last.',
+      ctaText: 'Shop now',
+      ctaLink: '#',
+      cta2Text: 'Learn more',
+      cta2Link: '#',
+      image: labImageId ? { _type: 'image', asset: { _type: 'reference', _ref: labImageId } } : undefined,
+      imagePosition: 'right',
+    },
+  }
+  await client.createOrReplace(labPage)
+  console.log('Created Lab page (singleton)')
+
   console.log('Done. Open your app to see the seeded content.')
 }
 

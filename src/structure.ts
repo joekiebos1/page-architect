@@ -1,4 +1,4 @@
-import { DocumentIcon, ImageIcon, UploadIcon } from '@sanity/icons'
+import { DocumentIcon, ImageIcon, UploadIcon, FlaskConicalIcon } from '@sanity/icons'
 import type { StructureResolver } from 'sanity/structure'
 import { ImageLibraryUpload } from './components/ImageLibraryUpload'
 
@@ -10,6 +10,15 @@ export const structure: StructureResolver = (S) =>
         .title('Pages')
         .icon(DocumentIcon)
         .child(S.documentTypeList('page').title('Pages')),
+      S.listItem()
+        .title('Lab')
+        .icon(FlaskConicalIcon)
+        .child(
+          S.document()
+            .documentId('labPage')
+            .schemaType('labPage')
+            .title('Lab')
+        ),
       S.listItem()
         .title('Image Library')
         .icon(ImageIcon)
@@ -28,6 +37,10 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
       ...S.documentTypeListItems().filter(
-        (item) => item.getId() !== 'page' && item.getId() !== 'sanity.imageAsset' && item.getId() !== 'sanity.fileAsset'
+        (item) =>
+          item.getId() !== 'page' &&
+          item.getId() !== 'labPage' &&
+          item.getId() !== 'sanity.imageAsset' &&
+          item.getId() !== 'sanity.fileAsset'
       ),
     ])

@@ -1,4 +1,5 @@
 import { pageType } from './page'
+import { labPageType } from './labPage'
 import { pageBuilderType } from './pageBuilder'
 import { heroBlock } from './blocks/hero'
 import { mediaTextBlock } from './blocks/mediaTextBlock'
@@ -14,6 +15,7 @@ import { rotatingMediaBlock, rotatingMediaItem } from './blocks/rotatingMedia'
 
 export const schemaTypes = [
   pageType,
+  labPageType,
   pageBuilderType,
   heroBlock,
   mediaTextBlock,

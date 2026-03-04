@@ -1,78 +1,61 @@
-'use client'
-
 /**
  * Lab – Block experiments
  *
- * Experimental blocks rendered with mock data. Same DS, tokens, and rules as production blocks.
- * Not in BlockRenderer or Sanity until promoted.
+ * Fetches content from Sanity (Lab page). Images from Image Library.
  */
 
-import { Text, DsProvider } from '@marcelinodzn/ds-react'
-import {
-  TopNavBlock,
-  HeroSplit50,
-  HeroSplit50Reveal,
-  HeroColourImage,
-  HeroColourEdge,
-} from './blocks'
-import { mockHero } from './mock-data'
+import { draftMode } from 'next/headers'
+import { getClient } from '../lib/sanity/client'
+import { labPageQuery } from '../lib/sanity/queries'
+import { LabPageClient } from './LabPageClient'
 
-export default function LabPage() {
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export default async function LabPage() {
+  const { isEnabled: draft } = await draftMode()
+  const sanity = getClient(draft)
+  let labData: {
+    title?: string | null
+    description?: string | null
+    hero?: {
+      productName?: string | null
+      headline?: string | null
+      subheadline?: string | null
+      ctaText?: string | null
+      ctaLink?: string | null
+      cta2Text?: string | null
+      cta2Link?: string | null
+      image?: string | null
+      imagePosition?: 'left' | 'right'
+    } | null
+  } | null = null
+
+  try {
+    labData = await sanity.fetch(labPageQuery)
+  } catch {
+    // Sanity not configured or fetch failed
+  }
+
+  const hero = labData?.hero
+    ? {
+        productName: hero.productName ?? null,
+        headline: hero.headline ?? null,
+        subheadline: hero.subheadline ?? null,
+        ctaText: hero.ctaText ?? null,
+        ctaLink: hero.ctaLink ?? null,
+        cta2Text: hero.cta2Text ?? null,
+        cta2Link: hero.cta2Link ?? null,
+        image: hero.image ?? null,
+        imagePosition: (hero.imagePosition ?? 'right') as 'left' | 'right',
+      }
+    : null
+
   return (
-    <>
-      <DsProvider platform="Desktop (1440)" colorMode="Light" density="Default" theme="MyJio">
-        <TopNavBlock />
-      </DsProvider>
-      <main className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
-        <div style={{ marginBottom: 'var(--ds-spacing-3xl)' }}>
-          <h1 style={{ fontSize: 'var(--ds-typography-h2)', fontWeight: 'var(--ds-typography-weight-high)', marginBottom: 'var(--ds-spacing-m)' }}>
-            Lab
-          </h1>
-          <Text size="M" weight="low" color="low" as="p" style={{ margin: 0 }}>
-            Hero variants and TopNavBlock mega menu. Same elements as production blocks.
-          </Text>
-        </div>
-
-      <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
-        <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
-          1. HeroSplit50 – 50/50 split
-        </h2>
-        <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
-          Text and image side by side. Reduces visual weight by giving the image only half the space.
-        </Text>
-        <HeroSplit50 {...mockHero} />
-      </section>
-
-      <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
-        <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
-          2. HeroSplit50Reveal – 50/50 with scroll transition
-        </h2>
-        <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
-          Same layout. Image fades and slides in when entering viewport.
-        </Text>
-        <HeroSplit50Reveal {...mockHero} />
-      </section>
-
-      <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
-        <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
-          3. HeroColourImage – Colour band + image
-        </h2>
-        <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
-          Bold colour holds the text. Strong visual separation. Image feels contained.
-        </Text>
-        <HeroColourImage {...mockHero} />
-      </section>
-
-      <section style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
-        <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-l)' }}>
-          4. HeroColourEdge – Full image with gradient overlay
-        </h2>
-        <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
-          Image fills the hero. Soft gradient from one edge holds the text.
-        </Text>
-        <HeroColourEdge {...mockHero} />
-      </section>
-      </main>
-    </>
+    <LabPageClient
+      title={labData?.title ?? 'Lab'}
+      description={labData?.description ?? null}
+      hero={hero}
+    />
   )
 }

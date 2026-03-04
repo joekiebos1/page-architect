@@ -127,3 +127,20 @@ export const allPagesQuery = `*[_type == "page"]{
   title,
   "slug": slug.current
 }`
+
+export const labPageQuery = `*[_type == "labPage" && _id == "labPage"][0]{
+  _id,
+  title,
+  description,
+  hero{
+    productName,
+    headline,
+    subheadline,
+    ctaText,
+    ctaLink,
+    cta2Text,
+    cta2Link,
+    "image": coalesce(imageUrl, image.asset->url),
+    imagePosition
+  }
+}`
