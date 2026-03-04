@@ -64,7 +64,7 @@ function MediaLayer({ item }: { item: CarouselItem }) {
  * 2. While sticky, images show in a fixed overlay; text scrolls; when item text crosses top, fade to next image
  * 3. When last item's text center reaches viewport center, container unsticks
  */
-export function FullBleedVerticalCarousel({ items }: FullBleedVerticalCarouselProps) {
+export function FullBleedVerticalCarousel({ surface = 'ghost', items }: FullBleedVerticalCarouselProps) {
   const items_ = items?.filter((i) => i?.title || i?.description) ?? []
   const n = items_.length
   const { ref: revealRef, isVisible: isItemVisible, containerVisible } = useCarouselReveal(n)
