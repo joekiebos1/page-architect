@@ -290,7 +290,6 @@ function mapMediaText5050Block(block: LabBlock): MediaText5050BlockProps {
 function mapHeroBlockProps(block: LabBlock) {
   const rawContentLayout = (block.contentLayout as string) ?? 'stacked'
   const contentLayout = rawContentLayout === 'fullscreen' ? 'mediaOverlay' : rawContentLayout
-  const overlayHeight = 'band' as const
   const containerLayout = (block.containerLayout as string) ?? 'edgeToEdge'
   return {
     productName: block.productName as string | null,
@@ -303,7 +302,6 @@ function mapHeroBlockProps(block: LabBlock) {
     image: block.image as string | null,
     videoUrl: block.videoUrl as string | null,
     contentLayout: (['stacked', 'sideBySide', 'category', 'mediaOverlay', 'textOnly'].includes(contentLayout) ? contentLayout : 'stacked') as HeroBlockProps['contentLayout'],
-    overlayHeight: overlayHeight as HeroBlockProps['overlayHeight'],
     containerLayout: (containerLayout === 'contained' ? 'contained' : 'edgeToEdge') as HeroBlockProps['containerLayout'],
     imageAnchor: ((block.imageAnchor as string) === 'bottom' ? 'bottom' : 'center') as HeroBlockProps['imageAnchor'],
     textAlign: ((block.textAlign as string) === 'center' ? 'center' : 'left') as HeroBlockProps['textAlign'],

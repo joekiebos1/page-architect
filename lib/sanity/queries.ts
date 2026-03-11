@@ -299,7 +299,6 @@ const LAB_SECTIONS_PROJECTION = `{
     "image": coalesce(imageUrl, image.asset->url),
     videoUrl,
     contentLayout,
-    overlayHeight,
     containerLayout,
     imageAnchor,
     textAlign,

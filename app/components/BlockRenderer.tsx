@@ -187,7 +187,6 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
         switch (block._type) {
           case 'hero': {
             const contentLayout = block.contentLayout as 'stacked' | 'sideBySide' | 'mediaOverlay' | 'textOnly' | 'fullscreen' | undefined
-            const overlayHeight = block.overlayHeight as 'band' | 'fullscreen' | undefined
             const blockSurface = block.blockSurface as 'ghost' | 'minimal' | 'subtle' | 'bold' | undefined
             const blockAccent = block.blockAccent as 'primary' | 'secondary' | 'neutral' | undefined
             const containerLayout = block.containerLayout as 'edgeToEdge' | 'contained' | undefined
@@ -210,7 +209,6 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 imageSlot={imageSlot}
                 imageState={imageState}
                 contentLayout={contentLayout}
-                overlayHeight={overlayHeight}
                 containerLayout={containerLayout}
                 imageAnchor={imageAnchor}
                 textAlign={textAlign}

@@ -31,8 +31,6 @@ const IMAGE_ASPECT_RATIO_SIDE_BY_SIDE = '5 / 4'
 const MEDIA_OVERLAY_ASPECT_RATIO = '2 / 1'
 
 export type HeroContentLayout = 'stacked' | 'sideBySide' | 'category' | 'mediaOverlay' | 'textOnly' | 'fullscreen'
-/** @deprecated fullscreen removed; legacy content renders as band */
-export type HeroOverlayHeight = 'band' | 'fullscreen'
 export type HeroContainerLayout = 'edgeToEdge' | 'contained'
 export type HeroImageAnchor = 'center' | 'bottom'
 export type HeroTextAlign = 'left' | 'center'
@@ -52,7 +50,6 @@ export type HeroBlockProps = {
   imageSlot?: string | null
   imageState?: ImageSlotState | null
   contentLayout?: HeroContentLayout | null
-  overlayHeight?: HeroOverlayHeight | null
   containerLayout?: HeroContainerLayout | null
   imageAnchor?: HeroImageAnchor | null
   textAlign?: HeroTextAlign | null
@@ -73,7 +70,6 @@ export function HeroBlock({
   imageSlot,
   imageState,
   contentLayout,
-  overlayHeight,
   containerLayout,
   imageAnchor,
   textAlign,

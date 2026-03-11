@@ -28,18 +28,6 @@ export const heroBlock = defineType({
       initialValue: 'stacked',
     }),
     defineField({
-      name: 'overlayHeight',
-      type: 'string',
-      title: 'Overlay height',
-      description: 'Band: fixed aspect ratio. Media overlay always uses band.',
-      options: {
-        list: [{ value: 'band', title: 'Band' }],
-        layout: 'radio',
-      },
-      initialValue: 'band',
-      hidden: true, // Always band; fullscreen removed. Kept for backwards compatibility.
-    }),
-    defineField({
       name: 'containerLayout',
       type: 'string',
       title: 'Container',
