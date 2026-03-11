@@ -82,8 +82,8 @@ export function getBlockLayoutTitle(block: LabBlock): string {
     case 'mediaZoomOutOnScroll':
       return block.videoUrl ? 'With video' : 'Image only'
     case 'iconGrid': {
-      const cols = (block.columns as number) ?? 'auto'
-      return cols === 'auto' || cols == null ? 'Auto columns' : `${cols} columns`
+      const cols = block.columns as number | undefined
+      return cols == null ? 'Auto columns' : `${cols} columns`
     }
     case 'proofPoints': {
       const v = (block.variant as string) ?? 'icon'
