@@ -106,9 +106,6 @@ function mapMediaTextBlock(block: Block): MediaTextBlockProps {
         ? { type: 'image' as const, src: imageUrl!, alt: '', aspectRatio }
         : undefined
 
-  const bulletList = block.bulletList as string[] | undefined
-  const bulletListFiltered = Array.isArray(bulletList) ? bulletList.filter((b): b is string => typeof b === 'string').slice(0, 6) : undefined
-
   const rawAlign = (() => {
     if (template === 'TextOnly') return block.textOnlyAlignment as string
     if (template === 'Stacked') {
@@ -136,7 +133,6 @@ function mapMediaTextBlock(block: Block): MediaTextBlockProps {
     eyebrow: block.eyebrow as string | undefined,
     subhead: block.subhead as string | undefined,
     body: block.body as string | undefined,
-    bulletList: bulletListFiltered ?? [],
     cta:
       block.ctaText && block.ctaLink
         ? { label: block.ctaText as string, href: block.ctaLink as string }
@@ -156,7 +152,8 @@ function mapMediaTextBlock(block: Block): MediaTextBlockProps {
     width,
     align: alignSource === 'center' || alignSource === 'left' ? alignSource : undefined,
     mediaStyle: 'contained',
-    stackImagePosition: (block.stackImagePosition as 'top' | 'bottom') ?? 'top',
+    descriptionTitle: block.descriptionTitle as string | undefined,
+    descriptionBody: block.descriptionBody as string | undefined,
   }
 }
 
@@ -219,12 +216,12 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
             const videoUrl = block.video as string | undefined
             const hasVideo = videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== ''
             const hasImage = imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== ''
-            const aspectRatio = (block.imageAspectRatio as string) || '4:3'
+            const aspectRatio = (block.imageAspectRatio as string) || undefined
             const media =
               hasVideo
-                ? { type: 'video' as const, src: videoUrl!, poster: hasImage ? imageUrl : undefined, alt: '', aspectRatio: aspectRatio as '16:9' | '4:3' | '1:1' | '3:4' | '2:1' | 'auto' }
+                ? { type: 'video' as const, src: videoUrl!, poster: hasImage ? imageUrl : undefined, alt: '', aspectRatio: aspectRatio as '5:4' | '1:1' | '4:5' }
                 : hasImage
-                  ? { type: 'image' as const, src: imageUrl!, alt: '', aspectRatio: aspectRatio as '16:9' | '4:3' | '1:1' | '3:4' | '2:1' | 'auto' }
+                  ? { type: 'image' as const, src: imageUrl!, alt: '', aspectRatio: aspectRatio as '5:4' | '1:1' | '4:5' }
                   : undefined
             const items = mapMediaText5050Items(block)
             const imageSlot = block.imageSlot as string | undefined
@@ -254,6 +251,7 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
             )
           }
             break
+          case 'mediaTextStacked':
           case 'mediaTextBlock': {
             const mapped = mapMediaTextBlock(block)
             const imageSlot = block.imageSlot as string | undefined
@@ -377,11 +375,11 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
         const blockBg = (block.blockBackground as string)?.toLowerCase?.()
         const blockSurf = ((block.surface ?? block.blockSurface) as string)?.toLowerCase?.()
         const hasColouredBackground = Boolean(
-          ((block._type === 'mediaTextBlock' || block._type === 'mediaText5050') && blockBg && !['ghost', 'none'].includes(blockBg)) ||
+          ((block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock' || block._type === 'mediaText5050') && blockBg && !['ghost', 'none'].includes(blockBg)) ||
           (['carousel', 'cardGrid', 'proofPoints', 'iconGrid', 'list'].includes(block._type) && blockSurf && blockSurf !== 'ghost')
         )
         const isOverflow =
-          block._type === 'mediaTextBlock' && block.mediaStyle === 'overflow'
+          (block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock') && block.mediaStyle === 'overflow'
         return (
           <BlockContainer
             key={block._key || block._type}

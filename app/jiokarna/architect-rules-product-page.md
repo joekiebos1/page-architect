@@ -150,9 +150,9 @@ For 50/50 (text and image side by side) layouts, use **mediaText5050** instead.
 **Valid template values:** `HeroOverlay` | `Stacked` | `TextOnly`
 **Valid size values:** `hero` | `feature` | `editorial`
 **Valid align values:** `left` | `center`
-**Valid stackImagePosition values (Stacked only):** `top` | `bottom`
 **Valid mediaStyle values:** `contained` | `overflow`
 **Valid blockBackground values:** `ghost` | `minimal` | `subtle` | `bold`
+**Valid stackImagePosition values (Stacked only):** `top` | `bottom`
 
 ### Carousel
 Use to group related items under one narrative umbrella. Carousels are
@@ -176,7 +176,7 @@ blocks when you have 4+ related items to show.
 
 **Stacking rules:**
 - Never stack two carousels directly on top of each other.
-- Always place at least one mediaTextBlock between two carousels.
+- Always place at least one mediaTextStacked between two carousels.
 - Never use carousel in Resolve.
 
 **Valid cardSize values:** `compact` | `medium` | `large`
@@ -191,7 +191,7 @@ weight and less interactivity. Use when all items deserve equal visibility.
 - Use 4 columns for dense feature lists where brevity is the point.
 - Do not use cardGrid and carousel for the same purpose back to back.
 - Never stack two cardGrids on top of each other.
-- Works well as a change of pace after a run of mediaTextBlocks.
+- Works well as a change of pace after a run of mediaTextStackeds.
 
 **Valid columns values:** `2` | `3` | `4`
 **Valid cardStyle values:** `image-above` | `text-on-colour` | `text-on-image`
@@ -204,15 +204,15 @@ weight and less interactivity. Use when all items deserve equal visibility.
 **Variety rule:**
 No single block type should dominate. Rotate through block types.
 A good Engage section might look like:
-mediaTextBlock → mediaTextBlock → carousel → mediaTextBlock → cardGrid →
-mediaTextBlock → mediaTextBlock → mediaTextBlock → carousel → mediaTextBlock
+mediaTextStacked → mediaTextStacked → carousel → mediaTextStacked → cardGrid →
+mediaTextStacked → mediaTextStacked → mediaTextStacked → carousel → mediaTextStacked
 
 **Scale progression rule:**
 Elements get progressively smaller and more detailed as the page scrolls down.
 - Setup: largest elements. Hero, large carousel if used, hero-size text.
-- Early Engage: feature-size mediaTextBlock, medium or large carousel.
+- Early Engage: feature-size mediaTextStacked, medium or large carousel.
 - Mid Engage: mix of feature and editorial, compact carousel, cardGrid.
-- Late Engage: editorial mediaTextBlock, compact carousel.
+- Late Engage: editorial mediaTextStacked, compact carousel.
 - Resolve: compact elements only. No hero or feature-size blocks.
 
 **Contrast rule:**
@@ -221,7 +221,7 @@ After a large cinematic moment → follow with something precise and detailed.
 After a text-heavy block → follow with a primarily visual block.
 
 **Content density rule:**
-A carousel with 7 rich cards delivers more than 3 thin mediaTextBlocks.
+A carousel with 7 rich cards delivers more than 3 thin mediaTextStackeds.
 Think in terms of total content delivered, not just block count.
 Prefer depth within a block over adding more blocks.
 
@@ -270,7 +270,7 @@ Return a JSON array. Each item:
 ```json
 {
   "section": "setup | engage | resolve",
-  "block": "hero | mediaTextBlock | carousel | cardGrid | proofPoints",
+  "block": "hero | mediaTextStacked | carousel | cardGrid | proofPoints",
   "decisions": {
     // key structural decisions only
     // use exact valid values as specified above

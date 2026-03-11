@@ -130,6 +130,15 @@ const DEFAULT_PLATFORM = PLATFORM_MODES.DESKTOP_1440
 const DEFAULT_VIEWPORT = 1440
 const DEFAULT_VALUES = resolveGridValues(DEFAULT_PLATFORM, DEFAULT_VIEWPORT)
 
+function gridValuesEqual(a: GridBreakpoint, b: GridBreakpoint): boolean {
+  return (
+    a.columns === b.columns &&
+    a.contentMaxDefault === b.contentMaxDefault &&
+    a.contentMaxWide === b.contentMaxWide &&
+    a.isDesktop === b.isDesktop
+  )
+}
+
 export function useGridBreakpoint(): GridBreakpoint {
   const [values, setValues] = useState<GridBreakpoint>(DEFAULT_VALUES)
 
@@ -137,7 +146,8 @@ export function useGridBreakpoint(): GridBreakpoint {
     const update = () => {
       const w = typeof window !== 'undefined' ? window.innerWidth : DEFAULT_VIEWPORT
       const platform = getPlatformForWidth(w)
-      setValues(resolveGridValues(platform, w))
+      const next = resolveGridValues(platform, w)
+      setValues((prev) => (gridValuesEqual(prev, next) ? prev : next))
     }
     update()
     window.addEventListener('resize', update)

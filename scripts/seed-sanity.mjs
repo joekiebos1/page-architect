@@ -41,7 +41,7 @@ async function seed() {
   console.log('Seeding Sanity...')
 
   // Remove legacy home/product pages and deprecated labPage singleton
-  const legacyIds = ['page-home', 'page-product', 'labPage']
+  const legacyIds = ['page-home', 'page-product', 'labPage', 'labBlockPage-cards']
   for (const id of legacyIds) {
     try {
       await client.delete(id)
@@ -108,18 +108,18 @@ async function seed() {
       _type: 'labBlockPage',
       _id: 'labBlockPage-media-text',
       slug: 'media-text',
-      title: 'Media + Text stacked',
+      title: 'Media + Text: Stacked',
       sections: [
-        { _type: 'mediaTextBlock', _key: 'mtb-textonly', template: 'TextOnly', textOnlyAlignment: 'center', title: 'Text only', body: 'No media. Centred text layout.', blockBackground: 'ghost', blockAccent: 'primary' },
-        { _type: 'mediaTextBlock', _key: 'mtb-stacked', template: 'Stacked', stackImagePosition: 'top', title: 'Stacked layout', body: 'Large image with text above or below.', image: imageRef(getAsset(0)), blockBackground: 'ghost', blockAccent: 'primary' },
-        { _type: 'mediaTextBlock', _key: 'mtb-herooverlay', template: 'HeroOverlay', overlayAlignment: 'left', title: 'Hero overlay', body: 'Full bleed image with text overlay.', videoUrl: LAB_MEDIA_URL, blockBackground: 'ghost', blockAccent: 'primary' },
+        { _type: 'mediaTextStacked', _key: 'mtb-textonly', template: 'TextOnly', textOnlyAlignment: 'center', title: 'Text only', body: 'No media. Centred text layout.', blockBackground: 'ghost', blockAccent: 'primary' },
+        { _type: 'mediaTextStacked', _key: 'mtb-stacked', template: 'Stacked', stackImagePosition: 'top', title: 'Stacked layout', body: 'Large image with text above or below.', image: imageRef(getAsset(0)), blockBackground: 'ghost', blockAccent: 'primary' },
+        { _type: 'mediaTextStacked', _key: 'mtb-herooverlay', template: 'HeroOverlay', overlayAlignment: 'left', title: 'Hero overlay', body: 'Full bleed image with text overlay.', videoUrl: LAB_MEDIA_URL, blockBackground: 'ghost', blockAccent: 'primary' },
       ],
     },
     {
       _type: 'labBlockPage',
       _id: 'labBlockPage-media-text-5050',
       slug: 'media-text-5050',
-      title: 'Media + Text 50/50',
+      title: 'Media + Text: 50/50',
       sections: [
         {
           _type: 'mediaText5050',
@@ -130,7 +130,7 @@ async function seed() {
             { _type: 'mediaText5050Item', _key: 'i1', subtitle: "Don't settle for less. Make the switch.", body: 'Transfer your data, iMessages, photos and more. Use Pixel functions that make switching simple. e-SIM transfer, innovative AI for photos and videos, and your data stays secure.' },
           ],
           image: imageRef(getAsset(0)),
-          imageAspectRatio: '4:3',
+          imageAspectRatio: '5:4',
           blockBackground: 'ghost',
           blockAccent: 'primary',
         },
@@ -146,7 +146,7 @@ async function seed() {
             { _type: 'mediaText5050Item', _key: 'a3', subtitle: '7 years of security and OS updates.', body: 'To protect you and your sensitive data, your Pixel receives regular software updates, making your phone more secure over time.' },
           ],
           image: imageRef(getAsset(1)),
-          imageAspectRatio: '4:3',
+          imageAspectRatio: '5:4',
           blockBackground: 'ghost',
           blockAccent: 'primary',
         },
@@ -161,7 +161,7 @@ async function seed() {
             { _type: 'mediaText5050Item', _key: 'p3', subtitle: '7 years of security and OS updates.', body: 'Your Pixel receives regular software updates, making your phone more secure over time.' },
           ],
           image: imageRef(getAsset(2)),
-          imageAspectRatio: '4:3',
+          imageAspectRatio: '5:4',
           blockBackground: 'ghost',
           blockAccent: 'primary',
         },
@@ -281,90 +281,127 @@ async function seed() {
       slug: 'card-grid',
       title: 'Card grid',
       sections: [
+        // 1. Layout variants: 2, 3, 4 columns
         {
-          _type: 'labGridBlockCard',
-          _key: 'cg-3-ghost',
-          columns: '3',
-          sectionTitle: 'Card grid',
-          blockSurface: 'ghost',
-          blockAccent: 'primary',
-          cards: [
-            { _type: 'labGridBlockCardItem', _key: 'c1', title: 'Card 1', description: 'Description', backgroundColor: 'primary' },
-            { _type: 'labGridBlockCardItem', _key: 'c2', title: 'Card 2', description: 'Description', backgroundColor: 'secondary' },
-            { _type: 'labGridBlockCardItem', _key: 'c3', title: 'Card 3', description: 'Description', backgroundColor: 'tertiary' },
-          ],
-        },
-        {
-          _type: 'labGridBlockCard',
-          _key: 'cg-3-bold',
-          columns: '3',
-          sectionTitle: 'Card grid',
-          blockSurface: 'bold',
-          blockAccent: 'primary',
-          cards: [
-            { _type: 'labGridBlockCardItem', _key: 'c1', title: 'Card 1', description: 'Description', backgroundColor: 'primary' },
-            { _type: 'labGridBlockCardItem', _key: 'c2', title: 'Card 2', description: 'Description', backgroundColor: 'secondary' },
-            { _type: 'labGridBlockCardItem', _key: 'c3', title: 'Card 3', description: 'Description', backgroundColor: 'tertiary' },
-          ],
-        },
-        {
-          _type: 'labGridBlockCard',
-          _key: 'cg-4-minimal',
-          columns: '4',
-          sectionTitle: 'Card grid',
-          blockSurface: 'minimal',
-          blockAccent: 'primary',
-          cards: [
-            { _type: 'labGridBlockCardItem', _key: 'c1', title: 'Card 1', description: 'Description', backgroundColor: 'primary' },
-            { _type: 'labGridBlockCardItem', _key: 'c2', title: 'Card 2', description: 'Description', backgroundColor: 'secondary' },
-            { _type: 'labGridBlockCardItem', _key: 'c3', title: 'Card 3', description: 'Description', backgroundColor: 'tertiary' },
-          ],
-        },
-      ],
-    },
-    {
-      _type: 'labBlockPage',
-      _id: 'labBlockPage-cards',
-      slug: 'cards',
-      title: 'Cards',
-      sections: [
-        {
-          _type: 'cardGrid',
-          _key: 'cg-2-ghost',
+          _type: 'labCardGrid',
+          _key: 'cg-2-cols',
           columns: '2',
-          title: 'Cards · 2 columns',
+          title: '2 columns · Media below',
           surface: 'ghost',
           blockAccent: 'primary',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardStyle: 'image-above', title: 'Card 1', description: 'Description for card 1.', image: imageRef(getAsset(0)) },
-            { _type: 'cardGridItem', _key: 'c2', cardStyle: 'image-above', title: 'Card 2', description: 'Description for card 2.', image: imageRef(getAsset(1)) },
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Image with text below. CTA optional.', image: imageRef(getAsset(0)), ctaText: 'Learn more', ctaLink: '#' },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Image with text below.', image: imageRef(getAsset(1)) },
           ],
         },
         {
-          _type: 'cardGrid',
-          _key: 'cg-3-minimal',
+          _type: 'labCardGrid',
+          _key: 'cg-3-cols',
           columns: '3',
-          title: 'Cards · 3 columns',
+          title: '3 columns · Media below',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Description for card 1.', image: imageRef(getAsset(2)) },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Description for card 2.', image: imageRef(getAsset(3)) },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Description for card 3.', image: imageRef(getAsset(4)) },
+          ],
+        },
+        {
+          _type: 'labCardGrid',
+          _key: 'cg-4-cols',
+          columns: '4',
+          title: '4 columns · Media below',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Short.', image: imageRef(getAsset(5)) },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Short.', image: imageRef(getAsset(6)) },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Short.', image: imageRef(getAsset(7)) },
+            { _type: 'cardGridItem', _key: 'c4', cardType: 'media-description-below', title: 'Card 4', description: 'Short.', image: imageRef(getAsset(0)) },
+          ],
+        },
+        // 2. Media card type: inside (text overlay)
+        {
+          _type: 'labCardGrid',
+          _key: 'cg-media-inside',
+          columns: '3',
+          title: 'Media + description inside · Text overlay on image',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-inside', title: 'Overlay card 1', description: 'Text over image.', image: imageRef(getAsset(1)) },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-inside', title: 'Overlay card 2', description: 'Text over image.', image: imageRef(getAsset(2)) },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-inside', title: 'Overlay card 3', description: 'Text over image.', image: imageRef(getAsset(3)) },
+          ],
+        },
+        // 3. Text inside: large (headline + description) — colour picker: primary-bold, secondary-bold, sparkle-bold
+        {
+          _type: 'labCardGrid',
+          _key: 'lab-text-large',
+          columns: '3',
+          title: 'Text inside · Large (headline + description)',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'labGridBlockCardItem', _key: 'c1', size: 'large', title: 'Primary bold', description: 'Headline and description with background colour.', backgroundColor: 'primary-bold' },
+            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'large', title: 'Secondary bold', description: 'Headline and description with background colour.', backgroundColor: 'secondary-bold' },
+            { _type: 'labGridBlockCardItem', _key: 'c3', size: 'large', title: 'Sparkle bold', description: 'Headline and description with background colour.', backgroundColor: 'sparkle-bold' },
+          ],
+        },
+        // 4. Text inside: small (icon, CTAs, features) — colour picker: primary-subtle, secondary-subtle, spectrum
+        {
+          _type: 'labCardGrid',
+          _key: 'lab-text-small',
+          columns: '3',
+          title: 'Text inside · Small (icon, CTAs, features)',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'labGridBlockCardItem', _key: 'c1', size: 'small', title: 'Feature card 1', description: 'With icon and CTA.', icon: 'IcWifiNetwork', backgroundColor: 'primary-subtle', callToActionButtons: [{ _key: 'b1', label: 'Learn more', link: '#', style: 'filled' }] },
+            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'small', title: 'Feature card 2', description: 'With features list.', backgroundColor: 'secondary-subtle', features: ['Feature A', 'Feature B', 'Feature C'] },
+            { _type: 'labGridBlockCardItem', _key: 'c3', size: 'small', title: 'Spectrum card', description: 'reliance.800 from full spectrum.', backgroundColor: 'reliance.800', callToActionButtons: [{ _key: 'b1', label: 'Explore', link: '#', style: 'outlined' }] },
+          ],
+        },
+        // 5. Mixed: media + text inside in one grid
+        {
+          _type: 'labCardGrid',
+          _key: 'cg-mixed',
+          columns: '3',
+          title: 'Mixed: media cards + text inside cards',
+          surface: 'ghost',
+          blockAccent: 'primary',
+          items: [
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Media below', description: 'Image with text underneath.', image: imageRef(getAsset(4)) },
+            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'large', title: 'Text inside', description: 'Coloured card in same grid.', backgroundColor: 'primary-bold' },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-inside', title: 'Media inside', description: 'Text overlay on image.', image: imageRef(getAsset(5)) },
+          ],
+        },
+        // 6. Block surface variants: minimal, bold (1–2 examples)
+        {
+          _type: 'labCardGrid',
+          _key: 'cg-surface-minimal',
+          columns: '3',
+          title: 'Surface: Minimal',
           surface: 'minimal',
           blockAccent: 'primary',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardStyle: 'image-above', title: 'Card 1', description: 'Description.', image: imageRef(getAsset(2)) },
-            { _type: 'cardGridItem', _key: 'c2', cardStyle: 'image-above', title: 'Card 2', description: 'Description.', image: imageRef(getAsset(3)) },
-            { _type: 'cardGridItem', _key: 'c3', cardStyle: 'image-above', title: 'Card 3', description: 'Description.', image: imageRef(getAsset(4)) },
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Light tint background.', image: imageRef(getAsset(6)) },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Light tint background.', image: imageRef(getAsset(7)) },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Light tint background.', image: imageRef(getAsset(0)) },
           ],
         },
         {
-          _type: 'cardGrid',
-          _key: 'cg-4-bold',
-          columns: '4',
-          title: 'Cards · 4 columns',
+          _type: 'labCardGrid',
+          _key: 'cg-surface-bold',
+          columns: '3',
+          title: 'Surface: Bold',
           surface: 'bold',
           blockAccent: 'primary',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardStyle: 'image-above', title: 'Card 1', image: imageRef(getAsset(5)) },
-            { _type: 'cardGridItem', _key: 'c2', cardStyle: 'image-above', title: 'Card 2', image: imageRef(getAsset(6)) },
-            { _type: 'cardGridItem', _key: 'c3', cardStyle: 'image-above', title: 'Card 3', image: imageRef(getAsset(7)) },
-            { _type: 'cardGridItem', _key: 'c4', cardStyle: 'image-above', title: 'Card 4', image: imageRef(getAsset(8)) },
+            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Strong tint, inverted text.', image: imageRef(getAsset(1)) },
+            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Strong tint, inverted text.', image: imageRef(getAsset(2)) },
+            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Strong tint, inverted text.', image: imageRef(getAsset(3)) },
           ],
         },
       ],
@@ -591,12 +628,11 @@ async function seed() {
         listVariant: 'links',
         items: [
           { _type: 'listItem', _key: 'hero', subtitle: 'Hero', linkUrl: '/lab/hero' },
-          { _type: 'listItem', _key: 'media-text', subtitle: 'Media + Text stacked', linkUrl: '/lab/media-text' },
-          { _type: 'listItem', _key: 'media-text-5050', subtitle: 'Media + Text 50/50', linkUrl: '/lab/media-text-5050' },
+          { _type: 'listItem', _key: 'media-text', subtitle: 'Media + Text: Stacked', linkUrl: '/lab/media-text' },
+          { _type: 'listItem', _key: 'media-text-5050', subtitle: 'Media + Text: 50/50', linkUrl: '/lab/media-text-5050' },
           { _type: 'listItem', _key: 'fbvc', subtitle: 'Full bleed vertical carousel', linkUrl: '/lab/full-bleed-vertical-carousel' },
           { _type: 'listItem', _key: 'rotating-media', subtitle: 'Rotating media', linkUrl: '/lab/rotating-media' },
-          { _type: 'listItem', _key: 'card-grid', subtitle: 'Card grid', linkUrl: '/lab/card-grid' },
-          { _type: 'listItem', _key: 'cards', subtitle: 'Cards', linkUrl: '/lab/cards' },
+          { _type: 'listItem', _key: 'card-grid', subtitle: 'Card grid (all options)', linkUrl: '/lab/card-grid' },
           { _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' },
           { _type: 'listItem', _key: 'icon-grid', subtitle: 'Icon grid', linkUrl: '/lab/icon-grid' },
           { _type: 'listItem', _key: 'proof-points', subtitle: 'Proof points', linkUrl: '/lab/proof-points' },
@@ -617,7 +653,7 @@ async function seed() {
     slug: { _type: 'slug', current: 'about-us' },
     sections: [
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'mission-statement',
         template: 'TextOnly',
         textOnlyAlignment: 'center',
@@ -653,7 +689,7 @@ async function seed() {
         ],
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'connection-header',
         template: 'TextOnly',
         textOnlyAlignment: 'center',
@@ -690,7 +726,7 @@ async function seed() {
         ],
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'for-everyone-header',
         template: 'TextOnly',
         textOnlyAlignment: 'center',
@@ -702,7 +738,7 @@ async function seed() {
         spacingBottom: 'medium',
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'for-everyone',
         template: 'Stacked',
         stackImagePosition: 'top',
@@ -715,7 +751,7 @@ async function seed() {
         spacingBottom: 'medium',
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'for-everywhere',
         template: 'Stacked',
         stackImagePosition: 'top',
@@ -728,7 +764,7 @@ async function seed() {
         spacingBottom: 'medium',
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'for-every-need',
         template: 'Stacked',
         stackImagePosition: 'top',
@@ -741,7 +777,7 @@ async function seed() {
         spacingBottom: 'medium',
       },
       {
-        _type: 'mediaTextBlock',
+        _type: 'mediaTextStacked',
         _key: 'hear-from-family-heading',
         template: 'TextOnly',
         textOnlyAlignment: 'center',

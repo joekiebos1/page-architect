@@ -19,6 +19,7 @@ export { BlockContainer } from './BlockContainer'
 
 export const BLOCK_REGISTRY = {
   hero: 'HeroBlock',
+  mediaTextStacked: 'MediaTextBlock',
   mediaTextBlock: 'MediaTextBlock',
   mediaText5050: 'MediaText5050Block',
   cardGrid: 'CardGridBlock',

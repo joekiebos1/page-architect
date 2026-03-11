@@ -15,7 +15,7 @@ export const pageBuilderType = defineType({
       },
     }),
     defineArrayMember({
-      type: 'mediaTextBlock',
+      type: 'mediaTextStacked',
       components: {
         input: BlockWithAIAssist,
       },

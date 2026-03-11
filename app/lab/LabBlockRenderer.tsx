@@ -8,12 +8,16 @@ import React from 'react'
 
 import {
   IconGridBlock,
+  LabCardGridBlock,
   MediaZoomOutOnScroll,
   FullBleedVerticalCarousel,
+  ResponsiveCarouselBlock,
   RotatingMediaBlock,
   MediaText5050Block,
+  TopNavBlock,
 } from './blocks'
-import { HeroBlock, MediaTextBlock, CardGridBlock, CarouselBlock, ProofPointsBlock, ListBlock } from '../blocks'
+import { HeroBlock, MediaTextBlock, ProofPointsBlock, ListBlock } from '../blocks'
+import { BlockContainer } from '../blocks/BlockContainer'
 import type { HeroBlockProps } from '../blocks/HeroBlock'
 import type { MediaTextBlockProps, MediaText5050BlockProps } from '../blocks'
 
@@ -26,17 +30,18 @@ type LabBlock = {
 function getBlockTypeTitle(_type: string): string {
   const titles: Record<string, string> = {
     hero: 'Hero',
-    mediaTextBlock: 'Media + Text stacked',
-    mediaText5050: 'Media + Text 50/50',
-    cardGrid: 'Card grid',
-    carousel: 'Carousel',
+    mediaTextStacked: 'Media + Text: Stacked',
+    mediaTextBlock: 'Media + Text: Stacked',
+    mediaText5050: 'Media + Text: 50/50',
+    labCardGrid: 'Card grid',
+    carousel: 'Carousel (responsive)',
     fullBleedVerticalCarousel: 'Full bleed vertical carousel',
     rotatingMedia: 'Rotating media',
-    labGridBlockCard: 'Card grid (lab)',
     iconGrid: 'Icon grid',
     proofPoints: 'Proof points',
     list: 'List',
     mediaZoomOutOnScroll: 'Media zoom out on scroll',
+    topNavBlock: 'Top nav (mega menu)',
   }
   return titles[_type] ?? _type
 }
@@ -79,8 +84,8 @@ export function getBlockSettings(block: LabBlock): string {
       return `Surface: ${(block.surface as string) ?? 'ghost'}`
     case 'rotatingMedia':
       return `Variant: ${(block.variant as string) ?? 'small'} · Surface: ${(block.surface as string) ?? 'ghost'}`
-    case 'labGridBlockCard':
-      return `Columns: ${(block.columns as string) ?? '3'} · Surface: ${(block.blockSurface as string) ?? 'ghost'} · Accent: ${(block.blockAccent as string) ?? 'primary'}`
+    case 'labCardGrid':
+      return `Columns: ${(block.columns as string) ?? '3'} · Surface: ${(block.surface as string) ?? 'ghost'} · Accent: ${(block.blockAccent as string) ?? 'primary'}`
     case 'mediaZoomOutOnScroll':
       return block.videoUrl ? 'With video' : 'Image only'
     case 'iconGrid':
@@ -97,6 +102,7 @@ export function getBlockSettings(block: LabBlock): string {
       const itemCount = Array.isArray(block.items) ? block.items.length : 0
       return `Variant: ${variantLabels[variant] ?? variant} · Items: ${itemCount} · Image ${imagePosition}`
     }
+    case 'mediaTextStacked':
     case 'mediaTextBlock': {
       const rawTemplate = (block.template as string) ?? 'Stacked'
       /** Legacy: SideBySide is now mediaText5050; treat as Stacked for display. */
@@ -116,12 +122,14 @@ export function getBlockSettings(block: LabBlock): string {
       }
       return parts.join(' · ')
     }
-    case 'cardGrid':
+    case 'labCardGrid':
       return `Columns: ${(block.columns as string) ?? '4'} · Surface: ${(block.surface as string) ?? 'ghost'}`
     case 'carousel':
-      return `Card size: ${(block.cardSize as string) ?? 'medium'} · Surface: ${(block.surface as string) ?? 'ghost'}`
+      return `Responsive · Card size: ${(block.cardSize as string) ?? 'medium'} · Surface: ${(block.surface as string) ?? 'ghost'}`
     case 'list':
       return `Variant: ${(block.listVariant as string) ?? 'textList'} · Surface: ${(block.blockSurface as string) ?? 'ghost'} · Items: ${Array.isArray(block.items) ? block.items.length : 0}`
+    case 'topNavBlock':
+      return 'Mega menu with L1/L2/L3 navigation'
     default:
       return ''
   }
@@ -177,9 +185,6 @@ function mapMediaTextBlock(block: LabBlock): MediaTextBlockProps {
         ? { type: 'image' as const, src: imageUrl!, alt: '', aspectRatio }
         : undefined
 
-  const bulletList = block.bulletList as string[] | undefined
-  const bulletListFiltered = Array.isArray(bulletList) ? bulletList.filter((b): b is string => typeof b === 'string').slice(0, 6) : undefined
-
   const rawAlign = (() => {
     if (template === 'TextOnly') return block.textOnlyAlignment as string
     if (template === 'Stacked') {
@@ -207,7 +212,6 @@ function mapMediaTextBlock(block: LabBlock): MediaTextBlockProps {
     eyebrow: block.eyebrow as string | undefined,
     subhead: block.subhead as string | undefined,
     body: block.body as string | undefined,
-    bulletList: bulletListFiltered ?? [],
     cta:
       block.ctaText && block.ctaLink
         ? { label: block.ctaText as string, href: block.ctaLink as string }
@@ -228,6 +232,8 @@ function mapMediaTextBlock(block: LabBlock): MediaTextBlockProps {
     align: alignSource === 'center' || alignSource === 'left' ? alignSource : undefined,
     mediaStyle: 'contained',
     stackImagePosition: (block.stackImagePosition as 'top' | 'bottom') ?? 'top',
+    descriptionTitle: block.descriptionTitle as string | undefined,
+    descriptionBody: block.descriptionBody as string | undefined,
   }
 }
 
@@ -263,7 +269,7 @@ function mapMediaText5050Block(block: LabBlock): MediaText5050BlockProps {
   const videoUrl = block.video as string | undefined
   const hasVideo = videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== ''
   const hasImage = imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== ''
-  const aspectRatio = ((block.imageAspectRatio as string) || '4:3') as '16:9' | '4:3' | '1:1' | '3:4' | '2:1' | 'auto'
+  const aspectRatio = (block.imageAspectRatio as string) || undefined
   const media =
     hasVideo
       ? { type: 'video' as const, src: videoUrl!, poster: hasImage ? imageUrl : undefined, alt: '', aspectRatio }
@@ -324,18 +330,45 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
   if (!blocks?.length) return null
 
   const wrapSection = (content: React.ReactNode, block: LabBlock, i: number) => {
-    if (clean) return <React.Fragment key={block._key}>{content}</React.Fragment>
+    const spacingTop =
+      block._type === 'hero'
+        ? undefined
+        : (block.spacingTop ? normalizeSpacing(block.spacingTop) : block.spacing ? normalizeSpacing(block.spacing) : undefined) as BlockSpacingValue | undefined
+    const spacingBottom = (block.spacingBottom ? normalizeSpacing(block.spacingBottom) : block.spacing ? normalizeSpacing(block.spacing) : undefined) as BlockSpacingValue | undefined
+    const blockBg = (block.blockBackground as string)?.toLowerCase?.()
+    const blockSurf = ((block.surface ?? block.blockSurface) as string)?.toLowerCase?.()
+    const hasColouredBackground = Boolean(
+      ((block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock' || block._type === 'mediaText5050') && blockBg && !['ghost', 'none'].includes(blockBg)) ||
+      (['carousel', 'labCardGrid', 'proofPoints', 'iconGrid', 'list', 'fullBleedVerticalCarousel', 'rotatingMedia'].includes(block._type) && blockSurf && blockSurf !== 'ghost')
+    )
+    const isOverflow =
+      (block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock') && block.mediaStyle === 'overflow'
+
+    const blockContent = (
+      <BlockContainer
+        contentWidth="full"
+        spacingTop={spacingTop}
+        spacingBottom={spacingBottom}
+        hasColouredBackground={hasColouredBackground}
+        spacingOnlyOnContent={isOverflow}
+        style={{ overflow: 'visible' }}
+      >
+        {content}
+      </BlockContainer>
+    )
+
+    if (clean) return <React.Fragment key={block._key}>{blockContent}</React.Fragment>
     const sectionTitle = variantLabels?.[i] ?? getBlockTypeTitle(block._type)
     const settings = getBlockSettings(block)
     return (
-      <section key={block._key} style={{ marginBottom: 'var(--ds-spacing-4xl)' }}>
+      <section key={block._key}>
         <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-xs)' }}>
           {sectionTitle}
         </h2>
         <p style={{ fontSize: 'var(--ds-typography-body-xs)', color: 'var(--ds-color-text-low)', margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
           {settings}
         </p>
-        {content}
+        {blockContent}
       </section>
     )
   }
@@ -348,6 +381,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
             const props = mapHeroBlockProps(block)
             return wrapSection(<HeroBlock {...props} />, block, i)
           }
+          case 'mediaTextStacked':
           case 'mediaTextBlock': {
             const mapped = mapMediaTextBlock(block)
             return wrapSection(<MediaTextBlock {...mapped} />, block, i)
@@ -356,17 +390,41 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
             const mapped = mapMediaText5050Block(block)
             return wrapSection(<MediaText5050Block {...mapped} />, block, i)
           }
-          case 'cardGrid': {
+          case 'labCardGrid': {
             const cols = block.columns as string
-            const items = ((block.items as Record<string, unknown>[]) ?? []).map((i) => ({
-              ...i,
-              _type: (i._type as 'cardGridItem' | 'textOnColourCardItem') ?? 'cardGridItem',
-              title: (i.title as string) ?? '',
-              cardStyle: i.cardStyle as string,
-              surface: i.surface as string,
-            })) as import('../blocks/CardGridBlock/CardGridBlock.types').CardGridBlockItem[]
+            const rawItems = (block.items as Record<string, unknown>[]) ?? []
+            const items = rawItems.map((i) => {
+              if (i._type === 'labGridBlockCardItem') {
+                const c = i as LabBlock
+                return {
+                  _type: 'textOnColourCardItem' as const,
+                  _key: c._key,
+                  size: ((c.size as string) === 'large' ? 'large' : 'small') as 'large' | 'small',
+                  icon: c.icon as string | undefined,
+                  iconImage: c.iconImage as string | undefined,
+                  title: (c.title as string) ?? '',
+                  description: c.description as string | undefined,
+                  callToActionButtons: (c.callToActionButtons as { label: string; link?: string; style?: string }[] | undefined)?.map((btn) => ({
+                    _key: (btn as { _key?: string })._key,
+                    label: btn.label,
+                    link: btn.link,
+                    style: (btn.style === 'filled' || btn.style === 'outlined' ? btn.style : 'filled') as 'filled' | 'outlined',
+                  })),
+                  features: c.features as string[] | undefined,
+                  backgroundColor: (c.backgroundColor as string) ?? 'primary-bold',
+                }
+              }
+              return {
+                ...i,
+                _type: 'cardGridItem' as const,
+                title: (i.title as string) ?? '',
+                cardType: i.cardType as string,
+                cardStyle: i.cardStyle as string,
+                surface: i.surface as string,
+              }
+            }) as import('../blocks/CardGridBlock/CardGridBlock.types').CardGridBlockItem[]
             return wrapSection(
-              <CardGridBlock
+              <LabCardGridBlock
                 columns={parseInt(cols, 10) as 2 | 3 | 4}
                 title={block.title as string}
                 blockSurface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
@@ -385,7 +443,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               aspectRatio: it.aspectRatio as '4:5' | '8:5' | '2:1',
             }))
             return wrapSection(
-              <CarouselBlock
+              <ResponsiveCarouselBlock
                 title={block.title as string}
                 cardSize={(block.cardSize as 'compact' | 'medium' | 'large') ?? 'medium'}
                 surface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
@@ -417,37 +475,6 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
                   title: i.title,
                   label: i.label,
                 }))}
-              />,
-              block,
-              i,
-            )
-          }
-          case 'labGridBlockCard': {
-            const cards = Array.isArray(block.cards) ? block.cards : []
-            const items = cards.map((c: LabBlock) => ({
-              _type: 'textOnColourCardItem' as const,
-              _key: c._key,
-              size: 'small' as const,
-              icon: c.icon as string | undefined,
-              iconImage: c.iconImage as string | undefined,
-              title: (c.title as string) ?? '',
-              description: c.description as string | undefined,
-              callToActionButtons: (c.callToActionButtons as { label: string; link?: string; style?: string }[] | undefined)?.map((btn) => ({
-                _key: (btn as { _key?: string })._key,
-                label: btn.label,
-                link: btn.link,
-                style: (btn.style === 'filled' || btn.style === 'outlined' ? btn.style : 'filled') as 'filled' | 'outlined',
-              })),
-              features: c.features as string[] | undefined,
-              backgroundColor: (c.backgroundColor === 'primary' || c.backgroundColor === 'secondary' || c.backgroundColor === 'tertiary' ? c.backgroundColor : 'primary') as 'primary' | 'secondary' | 'tertiary',
-            }))
-            return wrapSection(
-              <CardGridBlock
-                columns={(parseInt((block.columns as string) || '3', 10) || 3) as 2 | 3 | 4}
-                title={block.sectionTitle as string | null}
-                blockSurface={(block.blockSurface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
-                blockAccent={(block.blockAccent as 'primary' | 'secondary' | 'neutral') ?? 'primary'}
-                items={items}
               />,
               block,
               i,
@@ -502,6 +529,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               block,
               i,
             )
+          }
+          case 'topNavBlock': {
+            return wrapSection(<TopNavBlock />, block, i)
           }
           case 'list': {
             const listItems = Array.isArray(block.items)

@@ -21,19 +21,19 @@ const BLOCK_LIBRARY = `
 Full-width or compact hero. Use for page opening, product launch, campaign hero.
 Options: variant (category | product | ghost | fullscreen), productName, headline, subheadline, ctaText, ctaLink, cta2Text, cta2Link, image.
 
-### mediaTextBlock
+### mediaTextStacked
 Media + text stacked. Flexible layout for features, intros, CTAs.
 Options:
 - template: HeroOverlay (full bleed), Stacked (image above/below), TextOnly (no media — use for CTA banners)
 - size: hero (largest), feature (standard), editorial (compact)
 - blockBackground: ghost | minimal | subtle | bold
 - blockAccent: primary | secondary | neutral
-- stackImagePosition: top | bottom (for Stacked)
 - contentWidth: XS | S | M | Default | Wide | edgeToEdge
-Slots: eyebrow, title, subhead, body, bulletList (max 6), ctaText, ctaLink, cta2Text, cta2Link, image, video.
+- stackImagePosition: top | bottom (for Stacked)
+Slots: eyebrow, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, cta2Text, cta2Link, image, video.
 
 ### mediaText5050
-Media + text 50/50. Text and image side by side. Use for feature comparisons, accordions, multi-paragraph content.
+Media + Text: 50/50. Text and image side by side. Use for feature comparisons, accordions, multi-paragraph content.
 Options: variant (paragraphs | accordion), imagePosition (left | right), blockBackground, blockAccent.
 Slots: headline, items[] (subtitle, body), image, video.
 
@@ -168,8 +168,8 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
         "blockSurface": "ghost | minimal | subtle | bold | null",
         "blockAccent": "primary | secondary | neutral | null",
         "variant": "string or null (block-specific)",
-        "size": "hero | feature | editorial | null (mediaTextBlock)",
-        "template": "HeroOverlay | Stacked | TextOnly | null (mediaTextBlock)",
+        "size": "hero | feature | editorial | null (mediaTextStacked)",
+        "template": "HeroOverlay | Stacked | TextOnly | null (mediaTextStacked)",
         "cardSize": "compact | medium | large | null (carousel)",
         "columns": "2 | 3 | 4 | null (cardGrid)"
       } | null,
@@ -187,8 +187,8 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
 
 ## Hard Rules
 1. Never propose a component not in the component library provided.
-2. Every page starts with hero (or mediaTextBlock for text-only pages).
-3. Every page ends with a CTA-focused section (hero with CTAs, or mediaTextBlock with template TextOnly and CTAs) unless there is a very specific reason not to.
+2. Every page starts with hero (or mediaTextStacked for text-only pages).
+3. Every page ends with a CTA-focused section (hero with CTAs, or mediaTextStacked with template TextOnly and CTAs) unless there is a very specific reason not to.
 4. Page length: 12–25 blocks (minimum 12, maximum 25, target 14–18). Follow architect rules.
 5. Never ask about visual design or technical implementation.
 6. Always output the structured JSON — no markdown, no explanation, JSON only.

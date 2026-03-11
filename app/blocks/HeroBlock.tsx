@@ -23,6 +23,7 @@ import { useHeroStaggeredReveal } from '../lib/use-hero-staggered-reveal'
 import { StreamImage } from '../components/StreamImage'
 import { BlockSurfaceProvider, getSurfaceProviderProps, useBlockBackgroundColor } from '../lib/block-surface'
 import { useGridBreakpoint } from '../lib/use-grid-breakpoint'
+import { EDGE_TO_EDGE_BREAKOUT, EDGE_TO_EDGE_CAPPED_RADIUS, useEdgeToEdgeMediaStyles } from '../lib/edge-to-edge'
 import { TYPOGRAPHY, HERO_BODY_STYLE } from '../lib/semantic-headline'
 import type { ImageSlotState } from '../hooks/useImageStream'
 
@@ -79,6 +80,7 @@ export function HeroBlock({
   const router = useRouter()
   const { columns, contentMaxS, contentMaxXS, marginPx, gridMaxWidth } = useGridBreakpoint()
   const cell = useGridCell('Wide')
+  const edgeStyles = useEdgeToEdgeMediaStyles()
   const { ref: revealRef, getRevealStyle, prefersReducedMotion } = useHeroStaggeredReveal(4)
   const categorySectionRef = useRef<HTMLElement>(null)
   const categoryMediaRef = useRef<HTMLDivElement>(null)
@@ -290,7 +292,7 @@ export function HeroBlock({
     )
   }
 
-  /** Category: same layout as Stacked (text first, media below, center aligned). Two containers: wrapper for all elements, and a coloured background container that spans to half the media height. Uses Background functional colour (placeholder until DS adds fifth colour). */
+  /** Category: same layout as Stacked (text first, media below, center aligned). Two containers: wrapper for all elements, and a coloured background container that spans to half the media height. Uses Background functional colour (placeholder until DS adds fifth colour). Capped at 1920px on large screens. */
   if (isCategory) {
     const boldBg = 'var(--ds-color-background-functional, #200066)'
     const bgHeight = categoryBoldHeight ?? 320
@@ -300,22 +302,9 @@ export function HeroBlock({
           revealRef.current = el
           ;(categorySectionRef as React.MutableRefObject<HTMLElement | null>).current = el
         }}
-        style={{
-          position: 'relative',
-          width: '100vw',
-          maxWidth: '100vw',
-          marginLeft: 'calc(50% - 50vw)',
-          marginRight: 'calc(50% - 50vw)',
-          boxSizing: 'border-box',
-        }}
+        style={{ ...EDGE_TO_EDGE_BREAKOUT, position: 'relative', boxSizing: 'border-box' }}
       >
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            boxSizing: 'border-box',
-          }}
-        >
+        <div style={{ ...edgeStyles.inner, position: 'relative', boxSizing: 'border-box' }}>
           <div
             style={{
               position: 'absolute',
@@ -325,6 +314,12 @@ export function HeroBlock({
               height: bgHeight,
               background: boldBg,
               zIndex: 0,
+              ...(edgeStyles.isCapped
+                ? {
+                    borderBottomLeftRadius: EDGE_TO_EDGE_CAPPED_RADIUS,
+                    borderBottomRightRadius: EDGE_TO_EDGE_CAPPED_RADIUS,
+                  }
+                : {}),
             }}
           />
           <SurfaceProvider level={1} hasBoldBackground={true}>
@@ -379,45 +374,47 @@ export function HeroBlock({
     const leftPaddingInline =
       isCenter ? 0 : gridMaxWidth ? `calc((100vw - ${gridMaxWidth}) / 2 + ${marginPx})` : marginPx
     return (
-      <section
-        ref={revealRef}
-        style={{
-          position: 'relative',
-          width: '100vw',
-          maxWidth: '100vw',
-          marginLeft: 'calc(50% - 50vw)',
-          aspectRatio: MEDIA_OVERLAY_ASPECT_RATIO,
-          minHeight: 320,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCenter ? 'center' : 'flex-start',
-          overflow: 'hidden',
-        }}
-      >
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: mediaSrc ? undefined : 'var(--ds-color-background-subtle)' }}>
-            {mediaElement}
-          </div>
-          {gradientOverlay}
-          <SurfaceProvider level={0} hasBoldBackground={true}>
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 2,
-                width: isCenter ? undefined : '100%',
-                maxWidth: isCenter ? 'min(100%, 42rem)' : columns >= 12 ? contentMaxS : contentMaxXS,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: isCenter ? 'center' : 'flex-start',
-                justifyContent: 'center',
-                paddingBlock: 'var(--ds-spacing-3xl)',
-                paddingInline: isCenter ? 0 : `${leftPaddingInline} 0`,
-                marginInline: isCenter ? 'auto' : 0,
-              }}
-            >
-              {textContentOverlay(align)}
+      <div style={EDGE_TO_EDGE_BREAKOUT}>
+        <div style={edgeStyles.inner}>
+          <section
+            ref={revealRef}
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: MEDIA_OVERLAY_ASPECT_RATIO,
+              minHeight: 320,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isCenter ? 'center' : 'flex-start',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: mediaSrc ? undefined : 'var(--ds-color-background-subtle)' }}>
+              {mediaElement}
             </div>
-          </SurfaceProvider>
-        </section>
+            {gradientOverlay}
+            <SurfaceProvider level={0} hasBoldBackground={true}>
+              <div
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  width: isCenter ? undefined : '100%',
+                  maxWidth: isCenter ? 'min(100%, 42rem)' : columns >= 12 ? contentMaxS : contentMaxXS,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isCenter ? 'center' : 'flex-start',
+                  justifyContent: 'center',
+                  paddingBlock: 'var(--ds-spacing-3xl)',
+                  paddingInline: isCenter ? 0 : `${leftPaddingInline} 0`,
+                  marginInline: isCenter ? 'auto' : 0,
+                }}
+              >
+                {textContentOverlay(align)}
+              </div>
+            </SurfaceProvider>
+          </section>
+        </div>
+      </div>
     )
   }
 
@@ -440,10 +437,16 @@ export function HeroBlock({
     ? {
         position: 'relative' as const,
         overflow: 'hidden',
-        /** Desktop: 1:1 aspect ratio. Mobile/tablet: fill column height. No corner radius for this variant. */
+        /** Desktop: 1:1 aspect ratio. Mobile/tablet: fill column height. Top-to-bottom: media never has rounded corners. */
         ...(isDesktop ? { aspectRatio: '1 / 1' } : { height: '100%', minHeight: 0 }),
       }
-    : { position: 'relative' as const, aspectRatio: imageAspect, overflow: 'hidden', borderRadius: 'var(--ds-radius-card-m)' }
+    : {
+        position: 'relative' as const,
+        aspectRatio: imageAspect,
+        overflow: 'hidden',
+        /** Contained: media rounded always. Edge-to-edge (non top-to-bottom): rounded when capped. */
+        borderRadius: (isContained || (isEdgeToEdge && edgeStyles.isCapped)) ? 'var(--ds-radius-card-m)' : 0,
+      }
 
   const imageContent = (
     <div style={{ ...imageWrapperStyle, ...getRevealStyle(3) }}>
@@ -453,13 +456,13 @@ export function HeroBlock({
     </div>
   )
 
-  /** Pull image below grid only when there is bottom padding to pull into. Skip when flush (top-to-bottom = no padding). */
+  /** Pull image below grid only when there is bottom padding to pull into. Skip top-to-bottom (causes overlap on scroll). */
   const imageColumnPullsToBottom =
     imageAnchor === 'bottom' &&
     !isStacked &&
+    !isTopToBottom &&
     isEdgeToEdge &&
-    effectiveSurface !== 'ghost' &&
-    !(isSideBySide && isTopToBottom && (effectiveSurface === 'minimal' || effectiveSurface === 'subtle'))
+    effectiveSurface !== 'ghost'
   const imageColumnPullAmount = isEdgeToEdge ? 'var(--ds-spacing-4xl)' : null
 
   const columnStyle = (isImageColumn: boolean) => ({
@@ -506,17 +509,8 @@ export function HeroBlock({
     )
     if (useBoldHalfHeight) {
       return (
-        <div
-          ref={revealRef}
-          style={{
-            width: '100vw',
-            maxWidth: '100vw',
-            marginLeft: 'calc(50% - 50vw)',
-            marginRight: 'calc(50% - 50vw)',
-            position: 'relative',
-            boxSizing: 'border-box',
-          }}
-        >
+        <div style={{ ...EDGE_TO_EDGE_BREAKOUT, position: 'relative', boxSizing: 'border-box' }}>
+          <div ref={revealRef} style={{ ...edgeStyles.inner, position: 'relative', boxSizing: 'border-box' }}>
             <div
               style={{
                 position: 'absolute',
@@ -532,6 +526,7 @@ export function HeroBlock({
               {content}
             </SurfaceProvider>
           </div>
+        </div>
       )
     }
     /** Top-to-bottom = no padding. Contained = has padding. Edge-to-edge + center = has padding. */

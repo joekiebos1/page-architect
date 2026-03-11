@@ -4,7 +4,7 @@ import { labOverviewType } from './labOverview'
 import { pageBuilderType } from './pageBuilder'
 import { labPageBuilderType } from './labPageBuilder'
 import { heroBlock } from './blocks/hero'
-import { mediaTextBlock } from './blocks/mediaTextBlock'
+import { mediaTextStackedBlock } from './blocks/mediaTextStacked'
 import { cardGridBlock, cardGridItem } from './blocks/cardGrid'
 import { textOnColourCardItem } from './blocks/textOnColourCardItem'
 import {
@@ -16,6 +16,7 @@ import { carouselBlock } from './blocks/carousel'
 import { proofPointsBlock } from './blocks/proofPoints'
 import { rotatingMediaBlock, rotatingMediaItem } from './blocks/rotatingMedia'
 import { labGridBlockCardBlock, labGridBlockCardItem } from './blocks/labGridBlockCard'
+import { labCardGridBlock } from './blocks/labCardGrid'
 import { mediaZoomOutOnScrollBlock } from './blocks/mediaZoomOutOnScroll'
 import { iconGridBlock, iconGridItem } from './blocks/iconGrid'
 import { listBlock, listItem } from './blocks/listBlock'
@@ -31,7 +32,7 @@ export const schemaTypes = [
   labBlockPageType,
   labOverviewType,
   heroBlock,
-  mediaTextBlock,
+  mediaTextStackedBlock,
   cardGridItem,
   cardGridBlock,
   textOnColourCardItem,
@@ -45,6 +46,7 @@ export const schemaTypes = [
   rotatingMediaBlock,
   labGridBlockCardItem,
   labGridBlockCardBlock,
+  labCardGridBlock,
   mediaZoomOutOnScrollBlock,
   iconGridItem,
   iconGridBlock,

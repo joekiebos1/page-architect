@@ -1,6 +1,7 @@
 'use client'
 
 import { useGridBreakpoint } from '../lib/use-grid-breakpoint'
+import { EDGE_TO_EDGE_BREAKOUT, useEdgeToEdgeMediaStyles } from '../lib/edge-to-edge'
 
 type BlockContainerElement = 'div' | 'section' | 'article' | 'main'
 
@@ -9,7 +10,7 @@ type BlockContainerElement = 'div' | 'section' | 'article' | 'main'
  * Desktop (12 cols): XS=4, S=6, M=8, Default=10, Wide=12.
  * Tablet (8 cols): XS=4, S=6, M=6, Default=6, Wide=8.
  * Mobile (4 cols): all=4.
- * - edgeToEdge: 100vw, no padding (uncapped)
+ * - edgeToEdge: full viewport, capped at 1920px on large screens (rounded corners when capped)
  * - full: 100% width, no max-width (for block wrapper)
  *
  * Above 1440px, all content widths cap at ContainerWidth/L (1440)/100-100-100 (1346px).
@@ -66,7 +67,6 @@ export function BlockContainer({
   const paddingBlockEnd = bottomValue
 
   const {
-    marginPx,
     contentMaxXS,
     contentMaxS,
     contentMaxM,
@@ -80,21 +80,20 @@ export function BlockContainer({
   }
 
   if (contentWidth === 'edgeToEdge') {
+    const edgeStyles = useEdgeToEdgeMediaStyles()
     return (
       <Component
         style={{
-          width: '100vw',
-          maxWidth: '100vw',
-          marginLeft: `-${marginPx}`,
-          marginRight: 0,
+          ...EDGE_TO_EDGE_BREAKOUT,
           paddingInline: 0,
-          boxSizing: 'border-box',
           ...paddingStyle,
           ...style,
         }}
         {...props}
       >
-        {children}
+        <div style={edgeStyles.inner}>
+          {children}
+        </div>
       </Component>
     )
   }

@@ -3,10 +3,10 @@ import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
 import { minimalBackgroundStyleField } from '../shared/minimalBackgroundStyleField'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 
-export const mediaTextBlock = defineType({
-  name: 'mediaTextBlock',
+export const mediaTextStackedBlock = defineType({
+  name: 'mediaTextStacked',
   type: 'object',
-  title: 'Media + Text stacked',
+  title: 'Media + Text: Stacked',
   fields: [
     spacingTopField,
     spacingBottomField,
@@ -15,7 +15,7 @@ export const mediaTextBlock = defineType({
       name: 'template',
       type: 'string',
       title: 'Variant',
-      description: 'HeroOverlay: full bleed image with overlay. Stacked: large image with text above or below. TextOnly: no media. For 50/50 layouts use Media + Text 50/50 block.',
+      description: 'HeroOverlay: full bleed image with overlay. Stacked: large image with text above or below. TextOnly: no media. For 50/50 layouts use Media + Text: 50/50 block.',
       options: {
         list: [
           { value: 'HeroOverlay', title: 'HeroOverlay – Full bleed image with text overlay' },
@@ -27,29 +27,14 @@ export const mediaTextBlock = defineType({
       initialValue: 'Stacked',
     }),
     defineField({
-      name: 'stackImagePosition',
-      type: 'string',
-      title: 'Image position',
-      description: 'For Stacked layout: image on top or bottom',
-      options: {
-        list: [
-          { value: 'top', title: 'Image on top' },
-          { value: 'bottom', title: 'Image on bottom' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'top',
-      hidden: ({ parent }) => parent?.template !== 'Stacked',
-    }),
-    defineField({
       name: 'mediaSize',
       type: 'string',
       title: 'Media size',
-      description: 'Edge to edge: full viewport, text always center. Default: contained width, choose left or center alignment.',
+      description: 'Edge to edge: full viewport, text always center. Contained: media within grid, choose left or center alignment.',
       options: {
         list: [
           { value: 'edgeToEdge', title: 'Edge to edge' },
-          { value: 'default', title: 'Default width' },
+          { value: 'default', title: 'Contained' },
         ],
         layout: 'radio',
       },
@@ -146,19 +131,12 @@ export const mediaTextBlock = defineType({
       initialValue: 'ghost',
     }),
     minimalBackgroundStyleField('blockBackground'),
-    // Content
+    // Content – text above image (eyebrow, title, subtitle, body)
     defineField({
       name: 'eyebrow',
       type: 'string',
       title: 'Eyebrow',
       description: 'Small label above the headline (e.g. "MOBILE GAMES").',
-    }),
-    defineField({
-      name: 'subhead',
-      type: 'text',
-      title: 'Subhead',
-      description: 'Secondary headline below the main title. Press Enter for a line break.',
-      rows: 2,
     }),
     defineField({
       name: 'title',
@@ -168,18 +146,32 @@ export const mediaTextBlock = defineType({
       description: 'Press Enter for a line break.',
     }),
     defineField({
+      name: 'subhead',
+      type: 'text',
+      title: 'Subhead',
+      description: 'Secondary headline below the main title. Press Enter for a line break.',
+      rows: 2,
+    }),
+    defineField({
       name: 'body',
       type: 'text',
       title: 'Body',
       rows: 4,
     }),
     defineField({
-      name: 'bulletList',
-      type: 'array',
-      title: 'Bullet list',
-      description: 'Max 6 bullets. Shown in centered-media-below and feature layouts.',
-      validation: (Rule) => Rule.max(6),
-      of: [{ type: 'string' }],
+      name: 'descriptionTitle',
+      type: 'string',
+      title: 'Image description title',
+      description: 'Optional. Shown below the image (Stacked only). Uses same styling as Large Carousel card (h5).',
+      hidden: ({ parent }) => parent?.template !== 'Stacked',
+    }),
+    defineField({
+      name: 'descriptionBody',
+      type: 'text',
+      title: 'Image description',
+      description: 'Optional. Body copy below the image (Stacked only). Uses label-s typography.',
+      rows: 3,
+      hidden: ({ parent }) => parent?.template !== 'Stacked',
     }),
     defineField({
       name: 'ctaText',
@@ -249,10 +241,10 @@ export const mediaTextBlock = defineType({
         TextOnly: 'TextOnly',
       }
       const layout = layoutLabels[template || 'Stacked'] ?? template
-      const inferredTitle = (title || eyebrow || '').toString().trim() || 'Media + Text stacked'
+      const inferredTitle = (title || eyebrow || '').toString().trim() || 'Media + Text: Stacked'
       return {
         title: inferredTitle,
-        subtitle: `Media + Text stacked · ${layout}`,
+        subtitle: `Media + Text: Stacked · ${layout}`,
       }
     },
   },

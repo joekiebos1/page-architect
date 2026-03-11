@@ -1,5 +1,7 @@
 'use client'
 
+import { useEdgeToEdgeMediaStyles } from './edge-to-edge'
+
 /**
  * Block-level surface and accent utilities.
  * Content managers set these per block via Sanity; blocks use them for SurfaceProvider and background colours.
@@ -132,6 +134,7 @@ export function BlockSurfaceProvider({
 }: BlockSurfaceProviderProps) {
   const surfaceProps = getSurfaceProviderProps(blockSurface)
   const bgColor = useBlockBackgroundColor(blockSurface, blockAccent)
+  const edgeStyles = useEdgeToEdgeMediaStyles()
 
   const content = <SurfaceProvider {...surfaceProps}>{children}</SurfaceProvider>
 
@@ -142,7 +145,7 @@ export function BlockSurfaceProvider({
       ? `linear-gradient(to bottom, white 0%, ${bgColor} 100%)`
       : bgColor
 
-        /** Coloured padding: Large (4xl) by default. flushTop/flushBottom omit padding for symmetric alignment (sideBySide edgeToEdge Hero). */
+    /** Coloured padding: Large (4xl) by default. flushTop/flushBottom omit padding for symmetric alignment (sideBySide edgeToEdge Hero). fullWidth: capped at 1920px on large screens. */
     return (
       <div
         style={{
@@ -150,13 +153,26 @@ export function BlockSurfaceProvider({
           maxWidth: fullWidth ? '100vw' : undefined,
           marginLeft: fullWidth ? 'calc(50% - 50vw)' : undefined,
           marginRight: fullWidth ? 'calc(50% - 50vw)' : undefined,
-          background,
+          background: fullWidth ? undefined : background,
           boxSizing: 'border-box',
-          paddingBlockStart: flushTop ? 0 : 'var(--ds-spacing-4xl)',
-          paddingBlockEnd: flushBottom ? 0 : 'var(--ds-spacing-4xl)',
+          paddingBlockStart: fullWidth ? undefined : (flushTop ? 0 : 'var(--ds-spacing-4xl)'),
+          paddingBlockEnd: fullWidth ? undefined : (flushBottom ? 0 : 'var(--ds-spacing-4xl)'),
         }}
       >
-        {content}
+        {fullWidth ? (
+          <div
+            style={{
+              ...edgeStyles.innerContainer,
+              background,
+              paddingBlockStart: flushTop ? 0 : 'var(--ds-spacing-4xl)',
+              paddingBlockEnd: flushBottom ? 0 : 'var(--ds-spacing-4xl)',
+            }}
+          >
+            {content}
+          </div>
+        ) : (
+          content
+        )}
       </div>
     )
   }

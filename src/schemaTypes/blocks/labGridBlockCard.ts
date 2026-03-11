@@ -1,44 +1,52 @@
 import { defineField, defineType } from 'sanity'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { IconPickerInput } from '../../components/IconPickerInput'
+import { ColorPickerInput } from '../../components/ColorPickerInput'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
 
-/** Lab: GridBlock Card – Section with centred heading and grid of coloured cards */
+/** Lab: Text inside cards – large (headline + description) or small (icon, CTAs, features). Both with background colour. */
 export const labGridBlockCardItem = defineType({
   name: 'labGridBlockCardItem',
   type: 'object',
   title: 'Card',
   fields: [
     defineField({
-      name: 'backgroundColor',
+      name: 'size',
       type: 'string',
-      title: 'Background colour',
-      description: 'Card background: primary (dark purple), secondary (dark blue), tertiary (teal).',
+      title: 'Size',
+      description: 'Large: headline + description only. Small: full card with icon, CTAs, and features.',
       options: {
         list: [
-          { value: 'primary', title: 'Primary (dark purple)' },
-          { value: 'secondary', title: 'Secondary (dark blue)' },
-          { value: 'tertiary', title: 'Tertiary (teal)' },
+          { value: 'large', title: 'Large (headline + description)' },
+          { value: 'small', title: 'Small (icon, CTAs, features)' },
         ],
         layout: 'radio',
       },
-      initialValue: 'primary',
+      initialValue: 'small',
+    }),
+    defineField({
+      name: 'backgroundColor',
+      type: 'string',
+      title: 'Background colour',
+      description: 'Theme colours (Primary, Secondary, Sparkle × Minimal, Subtle, Bold) or full DS spectrum.',
+      components: { input: ColorPickerInput },
+      initialValue: 'primary-bold',
     }),
     defineField({
       name: 'icon',
       type: 'string',
       title: 'Icon',
-      description: 'DS icon name. Optional.',
-      components: {
-        input: IconPickerInput,
-      },
+      description: 'DS icon name. Only when size is small.',
+      components: { input: IconPickerInput },
+      hidden: ({ parent }) => parent?.size === 'large',
     }),
     defineField({
       name: 'iconImage',
       type: 'image',
       title: 'Icon image',
-      description: 'Custom image as icon. Used when icon (DS) is not set.',
+      description: 'Custom image as icon. Only when size is small.',
       options: { hotspot: false },
+      hidden: ({ parent }) => parent?.size === 'large',
     }),
     defineField({
       name: 'title',
@@ -56,6 +64,7 @@ export const labGridBlockCardItem = defineType({
       name: 'callToActionButtons',
       type: 'array',
       title: 'Call to action buttons',
+      hidden: ({ parent }) => parent?.size === 'large',
       of: [
         {
           type: 'object',
@@ -88,16 +97,15 @@ export const labGridBlockCardItem = defineType({
       type: 'array',
       title: 'Features',
       of: [{ type: 'string' }],
-      options: {
-        layout: 'tags',
-      },
+      options: { layout: 'tags' },
+      hidden: ({ parent }) => parent?.size === 'large',
     }),
   ],
   preview: {
-    select: { title: 'title', backgroundColor: 'backgroundColor' },
-    prepare: ({ title, backgroundColor }) => ({
+    select: { title: 'title', size: 'size', backgroundColor: 'backgroundColor' },
+    prepare: ({ title, size, backgroundColor }) => ({
       title: title || 'Card',
-      subtitle: backgroundColor ? `Background: ${backgroundColor}` : undefined,
+      subtitle: [size === 'large' ? 'Large' : 'Small', backgroundColor].filter(Boolean).join(' · '),
     }),
   },
 })
@@ -105,8 +113,8 @@ export const labGridBlockCardItem = defineType({
 export const labGridBlockCardBlock = defineType({
   name: 'labGridBlockCard',
   type: 'object',
-  title: 'Grid block card',
-  description: 'Section with centred heading above a grid of coloured cards. Business solutions, product offerings, etc.',
+  title: 'Text inside cards',
+  description: 'Grid of coloured cards with text only. Large: headline + description. Small: icon, CTAs, features. Both with background colour.',
   fields: [
     spacingTopField,
     spacingBottomField,

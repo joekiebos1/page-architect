@@ -132,7 +132,7 @@ async function seed() {
     },
     // 4. MediaTextBlock – The power of Gemini intro (intro flows into carousel)
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-intro-gemini',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -166,7 +166,7 @@ async function seed() {
     },
     // 6. MediaTextBlock – Unlock Google AI Pro banner
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-ai-pro',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -211,7 +211,7 @@ async function seed() {
     },
     // 9. MediaTextBlock – Pixel 10 Pro camera intro (flows into lenses carousel)
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-camera-intro',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -279,7 +279,7 @@ async function seed() {
     },
     // 13. MediaTextBlock – As resilient (Stacked edge-to-edge, center only)
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-durable',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -293,7 +293,7 @@ async function seed() {
     },
     // 14. MediaTextBlock – Breakthrough performance
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-tensor',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -342,7 +342,7 @@ async function seed() {
     },
     // 16. MediaTextBlock – Pixel Drops
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'mt-drops',
       spacingTop: 'large',
       spacingBottom: 'large',

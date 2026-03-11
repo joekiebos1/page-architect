@@ -4,13 +4,16 @@
  * Text on colour card for grid context.
  * Size: large (title + description only) or small (full card with icon, CTAs, features).
  * When size is large, icon, CTAs, and features are not rendered.
+ * backgroundColor: DS theme tokens (primary-minimal, etc.), spectrum shades (reliance.800), or legacy (primary, secondary, tertiary).
  */
 
 import { useRouter } from 'next/navigation'
 import { Headline, Text, Button, Icon } from '@marcelinodzn/ds-react'
+import { useDsContextOptional } from '../../lib/use-ds-token-context'
 import { getProofPointIcon } from '@/lib/proof-point-icons'
+import { resolveCardBackgroundColor } from '../../lib/resolve-card-background-color'
 
-export type TextOnColourCardGridBackground = 'primary' | 'secondary' | 'tertiary'
+export type TextOnColourCardGridBackground = string
 
 export type TextOnColourCardGridProps = {
   size?: 'large' | 'small'
@@ -23,10 +26,17 @@ export type TextOnColourCardGridProps = {
   backgroundColor?: TextOnColourCardGridBackground | null
 }
 
-const BG_MAP: Record<TextOnColourCardGridBackground, string> = {
-  primary: 'var(--ds-color-block-background-bold)',
-  secondary: 'var(--ds-color-surface-secondary)',
-  tertiary: 'var(--ds-color-card-tertiary)',
+/** Legacy and bold DS tokens typically need light text. */
+const DARK_BG_VALUES = new Set([
+  'primary', 'secondary', 'primary-bold', 'secondary-bold', 'sparkle-bold',
+  'reliance.800', 'indigo.600', 'purple.800', 'crimson.800', 'red.1100', 'scarlet.1000',
+])
+
+function isDarkBackground(value: string | null | undefined): boolean {
+  if (!value) return true
+  if (DARK_BG_VALUES.has(value)) return true
+  if (value.includes('.') && parseInt(value.split('.')[1], 10) < 1200) return true
+  return false
 }
 
 export function TextOnColourCardGrid({
@@ -40,9 +50,10 @@ export function TextOnColourCardGrid({
   backgroundColor = 'primary',
 }: TextOnColourCardGridProps) {
   const router = useRouter()
-  const bg = backgroundColor ?? 'primary'
-  const bgColor = BG_MAP[bg] ?? BG_MAP.primary
-  const isDark = bg === 'primary' || bg === 'secondary'
+  const ctx = useDsContextOptional()
+  const tokenContext = ctx?.tokenContext
+  const bgColor = resolveCardBackgroundColor(backgroundColor ?? 'primary', tokenContext)
+  const isDark = isDarkBackground(backgroundColor)
   const isLarge = size === 'large'
 
   const handleCtaPress = (href: string) => {

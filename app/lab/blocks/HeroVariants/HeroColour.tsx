@@ -279,7 +279,7 @@ export function HeroColour({
     </div>
   )
 
-  const imageColumnPullsToBottom = imageAnchor === 'bottom' && !isStacked && (isEdgeToEdge ? effectiveSurface !== 'ghost' : isContained)
+  const imageColumnPullsToBottom = imageAnchor === 'bottom' && !isStacked && !isTopToBottom && (isEdgeToEdge ? effectiveSurface !== 'ghost' : isContained)
   const imageColumnPullAmount = isEdgeToEdge ? 'var(--ds-spacing-4xl)' : isContained ? 'var(--ds-spacing-3xl)' : null
 
   const columnStyle = (isImageColumn: boolean) => ({

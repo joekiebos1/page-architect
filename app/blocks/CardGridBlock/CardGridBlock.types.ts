@@ -1,15 +1,18 @@
-export type CardGridCardStyle = 'image-above' | 'text-on-image'
+export type CardGridCardType = 'media-description-below' | 'media-description-inside'
 export type CardGridColumns = 2 | 3 | 4
 export type CardGridBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
 export type CardGridBlockAccent = 'primary' | 'secondary' | 'neutral'
 
 export type CardGridItem = {
   _type?: 'cardGridItem'
-  cardStyle?: CardGridCardStyle
+  cardType?: CardGridCardType
+  /** @deprecated Use cardType. Maps: image-above → media-description-below, text-on-image → media-description-inside */
+  cardStyle?: string
   title: string
   description?: string | null
   image?: string | null
   video?: string | null
+  videoUrl?: string | null
   ctaText?: string | null
   ctaLink?: string | null
   imageSlot?: string

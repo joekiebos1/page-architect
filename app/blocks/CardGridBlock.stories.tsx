@@ -11,34 +11,50 @@ export default meta
 type Story = StoryObj<typeof CardGridBlock>
 
 const items = [
-  { title: 'Card 1', description: 'Description', image: '/placeholder-preview.svg', cardStyle: 'image-above' as const },
-  { title: 'Card 2', description: 'Description', image: '/placeholder-preview.svg', cardStyle: 'image-above' as const },
-  { title: 'Card 3', description: 'Description', image: '/placeholder-preview.svg', cardStyle: 'image-above' as const },
+  { title: 'Card 1', description: 'Description', image: '/placeholder-preview.svg', cardType: 'media-description-below' as const },
+  { title: 'Card 2', description: 'Description', image: '/placeholder-preview.svg', cardType: 'media-description-below' as const },
+  { title: 'Card 3', description: 'Description', image: '/placeholder-preview.svg', cardType: 'media-description-below' as const },
 ]
 
-export const ImageAbove: Story = {
+export const MediaDescriptionBelow: Story = {
   args: {
-    title: 'Card grid',
+    title: 'Media + description below',
     columns: 3,
     blockSurface: 'ghost',
     items,
   },
 }
 
-export const TextOnColour: Story = {
+export const MediaDescriptionInside: Story = {
   args: {
-    title: 'Text on colour cards',
+    title: 'Media + description inside',
     columns: 3,
-    blockSurface: 'bold',
-    items: items.map((i) => ({ ...i, cardStyle: 'text-on-colour' as const })),
+    blockSurface: 'ghost',
+    items: items.map((i) => ({ ...i, cardType: 'media-description-inside' as const })),
   },
 }
 
-export const TextOnImage: Story = {
+export const MixedCardTypes: Story = {
   args: {
-    title: 'Text on image cards',
-    columns: 3,
+    title: 'Mixed media card types',
+    columns: 2,
     blockSurface: 'ghost',
-    items: items.map((i) => ({ ...i, cardStyle: 'text-on-image' as const })),
+    items: [
+      { ...items[0], cardType: 'media-description-below' as const },
+      { ...items[1], cardType: 'media-description-inside' as const },
+    ],
+  },
+}
+
+export const Layout2Columns: Story = {
+  args: { ...MediaDescriptionBelow.args, title: '2 columns', columns: 2 },
+}
+
+export const Layout4Columns: Story = {
+  args: {
+    ...MediaDescriptionBelow.args,
+    title: '4 columns',
+    columns: 4,
+    items: [...items, { ...items[0], title: 'Card 4', cardType: 'media-description-below' as const }],
   },
 }

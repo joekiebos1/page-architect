@@ -27,11 +27,11 @@ Content-Type: application/json
     {
       "slot": "string — unique slot ID; must match exactly in callback",
       "section": "string — narrative role: setup | engage | resolve",
-      "blockType": "string — hero | mediaTextBlock | cardGrid | carousel",
+      "blockType": "string — hero | mediaTextStacked | cardGrid | carousel",
       "headline": "string — section or card headline",
       "imageBrief": "string — description of the ideal visual (use for AI prompts)",
       "intent": "string — lifestyle | product | abstract",
-      "mediaStyle": "string | undefined — contained | overflow (mediaTextBlock only)"
+      "mediaStyle": "string | undefined — contained | overflow (mediaTextStacked only)"
     }
   ]
 }
@@ -44,7 +44,7 @@ Slots follow this pattern so your service can map results back:
 | Block type      | Slot pattern                    | Example                    |
 |-----------------|---------------------------------|----------------------------|
 | hero            | `hero-{i}-image`                | `hero-0-image`             |
-| mediaTextBlock  | `mediaTextBlock-{i}-media`      | `mediaTextBlock-1-media`   |
+| mediaTextStacked  | `mediaTextStacked-{i}-media`      | `mediaTextStacked-1-media`   |
 | cardGrid        | `cardGrid-{i}-item-{j}-image`   | `cardGrid-2-item-0-image`   |
 | carousel        | `carousel-{i}-item-{j}-image`   | `carousel-3-item-1-image`  |
 
@@ -68,9 +68,9 @@ Slots follow this pattern so your service can map results back:
       "intent": "lifestyle"
     },
     {
-      "slot": "mediaTextBlock-1-media",
+      "slot": "mediaTextStacked-1-media",
       "section": "engage",
-      "blockType": "mediaTextBlock",
+      "blockType": "mediaTextStacked",
       "headline": "Curated playlists for every mood",
       "imageBrief": "Person listening on headphones, relaxed setting",
       "intent": "lifestyle",
@@ -149,7 +149,7 @@ Content-Type: application/json
 | blocks       | array  | yes      | List of image slots to fill |
 | blocks[].slot | string | yes     | Unique slot ID |
 | blocks[].section | string | yes   | setup \| engage \| resolve |
-| blocks[].blockType | string | yes | hero \| mediaTextBlock \| cardGrid \| carousel |
+| blocks[].blockType | string | yes | hero \| mediaTextStacked \| cardGrid \| carousel |
 | blocks[].headline | string | yes | Section or card headline |
 | blocks[].imageBrief | string | yes | Visual description for prompts |
 | blocks[].intent | string | yes | lifestyle \| product \| abstract |

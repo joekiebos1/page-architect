@@ -28,9 +28,9 @@ const ART_DIRECTOR_PAYLOAD = {
       intent: 'lifestyle',
     },
     {
-      slot: 'mediaTextBlock-0-media',
+      slot: 'mediaTextStacked-0-media',
       section: 'engage',
-      blockType: 'mediaTextBlock',
+      blockType: 'mediaTextStacked',
       headline: 'Stream anywhere',
       imageBrief:
         'Jiosaavn: person streaming music on phone while commuting, headphones, urban setting',
@@ -38,9 +38,9 @@ const ART_DIRECTOR_PAYLOAD = {
       mediaStyle: 'contained',
     },
     {
-      slot: 'mediaTextBlock-1-media',
+      slot: 'mediaTextStacked-1-media',
       section: 'engage',
-      blockType: 'mediaTextBlock',
+      blockType: 'mediaTextStacked',
       headline: 'Offline listening',
       imageBrief:
         'Jiosaavn: downloaded songs for offline playback, airplane or no-signal scenario, music always available',
@@ -48,9 +48,9 @@ const ART_DIRECTOR_PAYLOAD = {
       mediaStyle: 'contained',
     },
     {
-      slot: 'mediaTextBlock-2-media',
+      slot: 'mediaTextStacked-2-media',
       section: 'engage',
-      blockType: 'mediaTextBlock',
+      blockType: 'mediaTextStacked',
       headline: 'Curated playlists',
       imageBrief:
         'Jiosaavn: music playlists for every mood, Bollywood, regional, international, personalized recommendations',

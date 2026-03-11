@@ -30,13 +30,9 @@ export interface MediaTextBlockCTA {
   appearance?: 'primary' | 'secondary' | 'ghost'
 }
 
-export type MediaTextBlockStackImagePosition = 'top' | 'bottom'
-
 export interface MediaTextBlockProps {
   size?: MediaTextBlockSize
   variant?: MediaTextBlockVariant
-  /** For Stacked: image on top or bottom. When top, title renders as subtitle (smaller, lighter). */
-  stackImagePosition?: MediaTextBlockStackImagePosition
   width?: MediaTextBlockWidth
   mediaStyle?: MediaTextBlockMediaStyle
   blockBackground?: BlockBackgroundMode
@@ -50,7 +46,9 @@ export interface MediaTextBlockProps {
   headline: string
   subhead?: string
   body?: string
-  bulletList?: string[]
+  /** Image description (below image): title + body, card-style typography. */
+  descriptionTitle?: string
+  descriptionBody?: string
   cta?: MediaTextBlockCTA
   ctaSecondary?: MediaTextBlockCTA
   media?: MediaTextBlockMedia

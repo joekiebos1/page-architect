@@ -114,11 +114,7 @@ main * {
   }
 }
 
-/* Carousel card - rounded corners from DS Shape/M token (19px), one step down from L */
-.carousel-card {
-  border-radius: var(--ds-radius-card-m) !important;
-  overflow: hidden !important;
-}
+/* Carousel card – rounded corners on media only, not container or text */
 .carousel-card-inner {
   border-radius: var(--ds-radius-card-m) !important;
   overflow: hidden !important;

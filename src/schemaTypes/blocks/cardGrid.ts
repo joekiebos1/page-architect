@@ -2,6 +2,8 @@ import { defineField, defineType } from 'sanity'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
 import { minimalBackgroundStyleField } from '../shared/minimalBackgroundStyleField'
+const CARD_TYPE_MEDIA_BELOW = 'media-description-below'
+const CARD_TYPE_MEDIA_INSIDE = 'media-description-inside'
 
 export const cardGridItem = defineType({
   name: 'cardGridItem',
@@ -9,18 +11,18 @@ export const cardGridItem = defineType({
   title: 'Card',
   fields: [
     defineField({
-      name: 'cardStyle',
+      name: 'cardType',
       type: 'string',
-      title: 'Card style',
-      description: 'image-above: image on top, text below. text-on-image: text overlay on image. For text on colour, use Text on colour card type.',
+      title: 'Card type',
+      description: 'Media + description below: image/video with text underneath. Media + description inside: text overlay on image. For text inside cards, use the Lab block.',
       options: {
         list: [
-          { value: 'image-above', title: 'Image above' },
-          { value: 'text-on-image', title: 'Text on image' },
+          { value: CARD_TYPE_MEDIA_BELOW, title: 'Media + description below' },
+          { value: CARD_TYPE_MEDIA_INSIDE, title: 'Media + description inside' },
         ],
         layout: 'radio',
       },
-      initialValue: 'image-above',
+      initialValue: CARD_TYPE_MEDIA_BELOW,
     }),
     defineField({
       name: 'title',
@@ -36,6 +38,7 @@ export const cardGridItem = defineType({
       title: 'Description',
       rows: 2,
     }),
+    // Media types
     defineField({
       name: 'image',
       type: 'image',
@@ -52,29 +55,29 @@ export const cardGridItem = defineType({
       name: 'videoUrl',
       type: 'string',
       title: 'Video URL',
-      description: 'External video URL. When set, video is shown instead of image (image-above only).',
-      hidden: ({ parent }) => parent?.cardStyle !== 'image-above',
+      description: 'External video URL. When set, video is shown instead of image. Media + description below only.',
+      hidden: ({ parent }) => parent?.cardType !== CARD_TYPE_MEDIA_BELOW,
     }),
     defineField({
       name: 'ctaText',
       type: 'string',
       title: 'CTA label',
-      description: 'Call-to-action button label.',
-      hidden: ({ parent }) => parent?.cardStyle !== 'image-above',
+      description: 'Call-to-action button label. Media + description below only.',
+      hidden: ({ parent }) => parent?.cardType !== CARD_TYPE_MEDIA_BELOW,
     }),
     defineField({
       name: 'ctaLink',
       type: 'string',
       title: 'CTA link',
       description: 'Call-to-action destination URL.',
-      hidden: ({ parent }) => parent?.cardStyle !== 'image-above' || !parent?.ctaText,
+      hidden: ({ parent }) => parent?.cardType !== CARD_TYPE_MEDIA_BELOW || !parent?.ctaText,
     }),
   ],
   preview: {
-    select: { title: 'title', cardStyle: 'cardStyle' },
-    prepare: ({ title, cardStyle }) => ({
+    select: { title: 'title', cardType: 'cardType' },
+    prepare: ({ title, cardType }) => ({
       title: title || 'Card',
-      subtitle: cardStyle === 'image-above' ? 'Image above' : 'Text on image',
+      subtitle: cardType === CARD_TYPE_MEDIA_INSIDE ? 'Media + description inside' : 'Media + description below',
     }),
   },
 })
@@ -83,7 +86,7 @@ export const cardGridBlock = defineType({
   name: 'cardGrid',
   type: 'object',
   title: 'Card grid',
-  description: 'Grid of 2, 3, or 4 cards. Each card can have image above, text on colour, or text on image.',
+  description: 'Grid of 2, 3, or 4 cards. Media + description below or inside. For text inside cards, use the Lab block.',
   fields: [
     spacingTopField,
     spacingBottomField,
@@ -91,8 +94,8 @@ export const cardGridBlock = defineType({
     defineField({
       name: 'columns',
       type: 'string',
-      title: 'Columns',
-      description: 'Number of columns on desktop (2, 3, or 4).',
+      title: 'Layout',
+      description: 'Number of cards per row on desktop (2, 3, or 4).',
       options: {
         list: [
           { value: '2', title: '2' },
@@ -159,7 +162,7 @@ export const cardGridBlock = defineType({
       name: 'items',
       type: 'array',
       title: 'Cards',
-      of: [{ type: 'cardGridItem' }, { type: 'textOnColourCardItem' }],
+      of: [{ type: 'cardGridItem' }],
       validation: (Rule) => Rule.required().min(1).max(12),
     }),
   ],

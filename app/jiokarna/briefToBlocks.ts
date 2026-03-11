@@ -28,7 +28,7 @@ export type ArtDirectorPayload = {
   blocks: ArtDirectorBlock[]
 }
 
-/** Build Art Director payload from brief. Slot naming: hero-{i}-image, mediaTextBlock-{i}-media, cardGrid-{i}-item-{j}-image, carousel-{i}-item-{j}-image */
+/** Build Art Director payload from brief. Slot naming: hero-{i}-image, mediaTextStacked-{i}-media, cardGrid-{i}-item-{j}-image, carousel-{i}-item-{j}-image */
 export function extractArtDirectorPayload(brief: PageBrief, jobId: string): ArtDirectorPayload {
   const blocks: ArtDirectorBlock[] = []
   const sections = [...brief.sections].sort((a, b) => a.order - b.order)
@@ -54,12 +54,12 @@ export function extractArtDirectorPayload(brief: PageBrief, jobId: string): ArtD
           intent,
         })
         break
-      case 'mediaTextBlock':
+      case 'mediaTextStacked':
         if (s.mediaType === 'image') {
           blocks.push({
-            slot: `mediaTextBlock-${i}-media`,
+            slot: `mediaTextStacked-${i}-media`,
             section: sectionLabel,
-            blockType: 'mediaTextBlock',
+            blockType: 'mediaTextStacked',
             headline,
             imageBrief,
             intent,
@@ -127,8 +127,8 @@ export function extractImageSlots(brief: PageBrief): { slot: string }[] {
       case 'hero':
         slots.push({ slot: `hero-${i}-image` })
         break
-      case 'mediaTextBlock':
-        if (s.mediaType === 'image') slots.push({ slot: `mediaTextBlock-${i}-media` })
+      case 'mediaTextStacked':
+        if (s.mediaType === 'image') slots.push({ slot: `mediaTextStacked-${i}-media` })
         break
       case 'cardGrid': {
         const items = Array.isArray(s.items) ? s.items : []
@@ -267,14 +267,13 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
         }
       }
 
-      case 'mediaTextBlock': {
+      case 'mediaTextStacked': {
         const template = opts.template ?? 'Stacked'
         const hasMedia = slots.mediaType === 'image' || slots.mediaType === 'video'
         return {
           ...base,
           template: hasMedia ? template : 'TextOnly',
           size: opts.size ?? 'feature',
-          stackImagePosition: (opts.stackImagePosition as 'top' | 'bottom') ?? 'top',
           blockAccent: opts.blockAccent ?? 'primary',
           blockBackground: opts.blockSurface ?? 'ghost',
           contentWidth: 'Default',
@@ -282,14 +281,15 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
           title: slots.headline ?? s.sectionName,
           subhead: slots.subhead,
           body: slots.body,
-          bulletList: undefined,
+          descriptionTitle: opts.descriptionTitle,
+          descriptionBody: opts.descriptionBody,
           ctaText: cta?.label,
           ctaLink: cta?.href ?? '#',
           cta2Text: undefined,
           cta2Link: undefined,
           image: hasMedia ? resolveImage(undefined, sanityImageUrls, i) : undefined,
           video: undefined,
-          imageSlot: hasMedia ? `mediaTextBlock-${i}-media` : undefined,
+          imageSlot: hasMedia ? `mediaTextStacked-${i}-media` : undefined,
         }
       }
 

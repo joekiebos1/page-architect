@@ -6,14 +6,15 @@ import {
   Headline,
   Text,
   Icon,
+  Button,
   IcChevronDown,
   IcChevronUp,
   SurfaceProvider,
 } from '@marcelinodzn/ds-react'
+import { createTransition } from '@marcelinodzn/ds-tokens'
 import { Collapsible } from '@base-ui/react/collapsible'
 import { GridBlock, useGridCell } from '../../../components/GridBlock'
 import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
-import { BlockContainer } from '../../../blocks/BlockContainer'
 import { VideoWithControls } from '../../../components/VideoWithControls'
 import { StreamImage } from '../../../components/StreamImage'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../../lib/block-surface'
@@ -21,69 +22,118 @@ import { MEDIA_TEXT_SUBTITLE_BODY_STYLE, TYPOGRAPHY } from '../../../lib/semanti
 import type { MediaText5050BlockProps, MediaText5050Item } from '../../../blocks/MediaText5050Block/MediaText5050Block.types'
 
 const ASPECT_RATIOS: Record<string, string> = {
-  '16:9': '16 / 9',
-  '4:3': '4 / 3',
+  '5:4': '5 / 4',
   '1:1': '1 / 1',
-  '3:4': '3 / 4',
-  '2:1': '2 / 1',
-  auto: 'auto',
-}
+  '4:5': '4 / 5',
+};
 
-function AccordionItem({ item }: { item: MediaText5050Item }) {
+function AccordionItem({
+  item,
+  isLast,
+  open,
+  onOpenChange,
+  prefersReducedMotion,
+}: {
+  item: MediaText5050Item
+  isLast: boolean
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  prefersReducedMotion: boolean
+}) {
+  const motionLevel = prefersReducedMotion ? 'subtle' : 'moderate'
+  const panelTransition = prefersReducedMotion ? undefined : createTransition('height', 'l', 'transition', motionLevel)
   return (
-    <Collapsible.Root defaultOpen={false}>
+    <Collapsible.Root open={open} onOpenChange={onOpenChange}>
       <div
         style={{
-          borderBottom: '1px solid var(--ds-color-border-subtle)',
+          borderBottom: isLast ? undefined : '1px solid var(--ds-color-border-subtle)',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          width: '100%',
         }}
       >
-        <Collapsible.Trigger
-          render={(props, state) => (
-            <button
-              {...props}
-              type="button"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                gap: 'var(--ds-spacing-m)',
-                padding: 'var(--ds-spacing-m) 0',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontFamily: 'inherit',
-              }}
-            >
-              {item.subtitle && (
-                <Headline
-                  size="S"
-                  weight="high"
-                  as="h3"
-                  style={{
-                    margin: 0,
-                    ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
-                    whiteSpace: 'pre-line',
-                    flex: 1,
-                  }}
-                >
-                  {item.subtitle}
-                </Headline>
-              )}
-              <span style={{ display: 'flex', flexShrink: 0 }}>
-                <Icon
-                  asset={state?.open ? <IcChevronUp /> : <IcChevronDown />}
-                  size="L"
-                  appearance="secondary"
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            gap: 'var(--ds-spacing-m)',
+            padding: 'var(--ds-spacing-m) 0',
+            minHeight: 'var(--ds-spacing-2xl)',
+          }}
+        >
+          <Collapsible.Trigger
+            render={(props) => (
+              <button
+                type="button"
+                {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+                style={{
+                  flex: 1,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: 0,
+                  width: '100%',
+                  border: 'none',
+                  background: 'none',
+                  padding: 0,
+                  fontFamily: 'inherit',
+                  textAlign: 'left',
+                }}
+              >
+                {item.subtitle && (
+                  <Headline
+                    size="S"
+                    weight="high"
+                    as="h3"
+                    style={{
+                      margin: 0,
+                      width: '100%',
+                      ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {item.subtitle}
+                  </Headline>
+                )}
+              </button>
+            )}
+          />
+          <Collapsible.Trigger
+            render={(props, state) => {
+              const { onClick, ...rest } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
+              return (
+                <Button
+                  single
+                  appearance="auto"
+                  contained={false}
+                  attention="high"
+                  size="M"
+                  aria-label={state?.open ? 'Collapse' : 'Expand'}
+                  {...rest}
+                  onPress={(e: unknown) =>
+                    onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+                  }
+                  content={
+                    <Icon
+                      asset={state?.open ? <IcChevronUp /> : <IcChevronDown />}
+                      size="S"
+                      appearance="secondary"
+                    />
+                  }
                 />
-              </span>
-            </button>
-          )}
-        />
+              )
+            }}
+          />
+        </div>
         <Collapsible.Panel
+          keepMounted={!prefersReducedMotion}
           style={{
             paddingBottom: 'var(--ds-spacing-m)',
+            overflow: 'hidden',
+            transition: panelTransition,
           }}
         >
           {item.body && (
@@ -118,6 +168,7 @@ export function MediaText5050Block({
   imageState,
 }: MediaText5050BlockProps) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [accordionOpenIndex, setAccordionOpenIndex] = useState<number | null>(0)
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -134,8 +185,7 @@ export function MediaText5050Block({
   const { columns } = useGridBreakpoint()
   const isStacked = columns < 8
 
-  const rawRatio = media?.aspectRatio ?? '4:3'
-  const aspectRatio = ASPECT_RATIOS[rawRatio] ?? '4 / 3'
+  const aspectRatio = media?.aspectRatio ? ASPECT_RATIOS[media.aspectRatio] : undefined
   const isVideo = media?.type === 'video'
   const useStreamImage = imageState && imageSlot && media?.type === 'image'
 
@@ -149,7 +199,7 @@ export function MediaText5050Block({
             style={{
               position: 'relative',
               width: '100%',
-              aspectRatio: rawRatio === 'auto' ? undefined : aspectRatio,
+              aspectRatio,
               overflow: 'hidden',
               borderRadius: 'var(--ds-radius-card-m)',
             }}
@@ -169,7 +219,7 @@ export function MediaText5050Block({
             style={{
               position: 'relative',
               width: '100%',
-              aspectRatio: rawRatio === 'auto' ? undefined : aspectRatio,
+              aspectRatio,
               overflow: 'hidden',
               borderRadius: 'var(--ds-radius-card-m)',
             }}
@@ -177,7 +227,7 @@ export function MediaText5050Block({
             <StreamImage
               slot={imageSlot!}
               imageState={imageState!}
-              aspectRatio={aspectRatio.replace(/\s/g, '')}
+              aspectRatio={aspectRatio ? aspectRatio.replace(/\s/g, '') : undefined}
             />
           </div>
         )
@@ -188,7 +238,7 @@ export function MediaText5050Block({
           style={{
             position: 'relative',
             width: '100%',
-            aspectRatio: rawRatio === 'auto' ? undefined : aspectRatio,
+            aspectRatio,
             overflow: 'hidden',
             borderRadius: 'var(--ds-radius-card-m)',
           }}
@@ -222,8 +272,10 @@ export function MediaText5050Block({
     gap: MEDIA_TEXT_SUBTITLE_BODY_STYLE.gap,
     alignItems: 'flex-start',
     minWidth: 0,
-    ...(!isStacked && mediaFirst && { paddingLeft: 'var(--ds-spacing-xl)' }),
-    ...(!isStacked && !mediaFirst && { paddingRight: 'var(--ds-spacing-xl)' }),
+    ...(!isStacked &&
+      (mediaFirst
+        ? { paddingLeft: 'var(--ds-spacing-2xl)' }
+        : { paddingRight: 'var(--ds-spacing-2xl)' })),
   }
 
   const bgColor = useBlockBackgroundColor(blockBackground, blockAccent)
@@ -258,6 +310,7 @@ export function MediaText5050Block({
   /** Variant 1: Paragraphs – 1 item = feature size (larger), 2+ items = editorial size (smaller, stacked). Spacing matches accordion: headline→first item = gap; between items = border + padding. */
   const isFeatureSize = items.length === 1
   const paragraphItemGap = MEDIA_TEXT_SUBTITLE_BODY_STYLE.gap
+  const headlineToBodyGap = 'var(--ds-spacing-l)'
   const paragraphsContent = (
     <div style={textColumnStyle}>
       {headline && (
@@ -267,7 +320,7 @@ export function MediaText5050Block({
           as="h2"
           style={{
             margin: 0,
-            marginBottom: items.length > 0 ? paragraphItemGap : undefined,
+            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
             fontSize: TYPOGRAPHY.h3,
             whiteSpace: 'pre-line',
           }}
@@ -318,9 +371,9 @@ export function MediaText5050Block({
     </div>
   )
 
-  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content) */
+  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). Same text container structure as paragraphs. */
   const accordionContent = (
-    <div style={{ ...textColumnStyle, width: '100%' }}>
+    <div style={{ ...textColumnStyle, gap: 0 }}>
       {headline && (
         <Headline
           size="M"
@@ -328,7 +381,7 @@ export function MediaText5050Block({
           as="h2"
           style={{
             margin: 0,
-            marginBottom: MEDIA_TEXT_SUBTITLE_BODY_STYLE.gap,
+            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
             fontSize: TYPOGRAPHY.h3,
             whiteSpace: 'pre-line',
           }}
@@ -336,9 +389,27 @@ export function MediaText5050Block({
           {headline}
         </Headline>
       )}
-      {items.map((item, i) => (
-        <AccordionItem key={i} item={item} />
-      ))}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0,
+          alignItems: 'stretch',
+          minWidth: 0,
+          width: '100%',
+        }}
+      >
+        {items.map((item, i) => (
+          <AccordionItem
+            key={i}
+            item={item}
+            isLast={i === items.length - 1}
+            open={accordionOpenIndex === i}
+            onOpenChange={(open) => setAccordionOpenIndex(open ? i : null)}
+            prefersReducedMotion={prefersReducedMotion}
+          />
+        ))}
+      </div>
     </div>
   )
 
@@ -366,9 +437,7 @@ export function MediaText5050Block({
         ...(!isStacked && { gridColumn: `span ${HALF_COLS}` }),
       }}
     >
-      <BlockContainer contentWidth="Default" style={{ width: '100%' }}>
-        {mediaContent}
-      </BlockContainer>
+      {mediaContent}
     </div>
   )
 

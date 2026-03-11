@@ -1,19 +1,25 @@
 'use client'
 
+/**
+ * Lab CardGridBlock – same as production but with wrapper fix for text-inside cards.
+ * Prevents cards from sticking out of the BlockContainer when using text-on-colour cards.
+ * Promote to production when validated.
+ */
+
 import { useEffect, useState } from 'react'
 import { Headline } from '@marcelinodzn/ds-react'
-import { GridBlock, useGridCell } from '../../components/GridBlock'
-import { BlockContainer } from '../BlockContainer'
-import { BlockReveal } from '../BlockReveal'
-import { CardRenderer } from './CardRenderer'
-import { useGridBreakpoint } from '../../lib/use-grid-breakpoint'
-import { normalizeHeadingLevel, TYPOGRAPHY } from '../../lib/semantic-headline'
-import { BlockSurfaceProvider } from '../../lib/block-surface'
-import type { CardGridBlockProps } from './CardGridBlock.types'
+import { GridBlock, useGridCell } from '../../../components/GridBlock'
+import { BlockContainer } from '../../../blocks/BlockContainer'
+import { BlockReveal } from '../../../blocks/BlockReveal'
+import { CardRenderer } from '../../../blocks/CardGridBlock/CardRenderer'
+import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
+import { normalizeHeadingLevel, TYPOGRAPHY } from '../../../lib/semantic-headline'
+import { BlockSurfaceProvider } from '../../../lib/block-surface'
+import type { CardGridBlockProps } from '../../../blocks/CardGridBlock/CardGridBlock.types'
 
 const MAX_ITEMS = 12
 
-export function CardGridBlock({
+export function LabCardGridBlock({
   columns,
   title,
   blockSurface,
@@ -55,7 +61,7 @@ export function CardGridBlock({
                 </Headline>
               </BlockContainer>
             )}
-            <BlockContainer contentWidth="Default">
+            <BlockContainer contentWidth="Default" style={{ overflow: 'visible' }}>
               <div
                 style={{
                   display: 'grid',
@@ -65,14 +71,17 @@ export function CardGridBlock({
                 }}
               >
                 {items_.map((item, i) => (
-                  <CardRenderer
-                    key={(item as { _key?: string })._key ?? i}
-                    item={item}
-                    prefersReducedMotion={prefersReducedMotion}
-                    imageState={(item as { imageSlot?: string }).imageSlot && images
-                      ? images[(item as { imageSlot: string }).imageSlot]
-                      : undefined}
-                  />
+                  <div key={(item as { _key?: string })._key ?? i} style={{ minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                      <CardRenderer
+                        item={item}
+                        prefersReducedMotion={prefersReducedMotion}
+                        imageState={(item as { imageSlot?: string }).imageSlot && images
+                          ? images[(item as { imageSlot: string }).imageSlot]
+                          : undefined}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             </BlockContainer>

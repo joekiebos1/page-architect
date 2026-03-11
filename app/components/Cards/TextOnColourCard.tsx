@@ -64,8 +64,6 @@ export function TextOnColourCard({
         boxSizing: 'border-box',
         aspectRatio: ASPECT_MAP[aspectRatio],
         minHeight: 0,
-        overflow: 'hidden',
-        borderRadius: 'var(--ds-radius-card-m)',
         background: hasBoldBackground
           ? 'var(--ds-color-surface-bold)'
           : 'var(--ds-color-block-background-subtle)',

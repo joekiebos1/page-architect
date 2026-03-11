@@ -30,7 +30,7 @@ export const mediaText5050Item = defineType({
 export const mediaText5050Block = defineType({
   name: 'mediaText5050',
   type: 'object',
-  title: 'Media + Text 50/50',
+  title: 'Media + Text: 50/50',
   description:
     'Split layout: 50% media, 50% text. Two variants: paragraphs (stacked sections) or accordion (collapsible sections).',
   fields: [
@@ -147,14 +147,13 @@ export const mediaText5050Block = defineType({
       title: 'Aspect ratio',
       options: {
         list: [
-          { value: '4:3', title: '4:3' },
-          { value: '3:4', title: '3:4' },
+          { value: '5:4', title: '5:4' },
           { value: '1:1', title: '1:1' },
-          { value: '16:9', title: '16:9' },
+          { value: '4:5', title: '4:5' },
         ],
         layout: 'radio',
       },
-      initialValue: '4:3',
+      initialValue: '5:4',
     }),
   ],
   preview: {
@@ -171,7 +170,7 @@ export const mediaText5050Block = defineType({
       const v = variantLabels[variant || 'paragraphs'] ?? variant
       const pos = imagePosition ? ` · Image ${imagePosition}` : ''
       return {
-        title: headline || 'Media + Text 50/50',
+        title: headline || 'Media + Text: 50/50',
         subtitle: `${v}${pos}`,
       }
     },

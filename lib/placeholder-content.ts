@@ -29,6 +29,15 @@ export const PLACEHOLDER_CONTENT = {
     template: 'Stacked',
     stackImagePosition: 'top',
   },
+  mediaTextStacked: {
+    eyebrow: 'MOBILE GAMES',
+    title: 'Free to play and install in the JioGames app.',
+    body: 'The Home tab is your all-in-one destination for getting back into the games you love. Browse trending titles, pick up where you left off, and discover new favorites—all in one place.',
+    ctaText: 'Visit JioGames',
+    ctaLink: '/games',
+    template: 'Stacked',
+    stackImagePosition: 'top',
+  },
   proofPoints: {
     title: 'Why believe us',
     items: [

@@ -10,7 +10,7 @@ export interface MediaText5050Media {
   src: string
   alt?: string
   poster?: string
-  aspectRatio?: '16:9' | '4:3' | '1:1' | '3:4' | '2:1' | 'auto'
+  aspectRatio?: '5:4' | '1:1' | '4:5'
 }
 
 export interface MediaText5050Item {

@@ -1,23 +1,27 @@
 'use client'
 
 /**
- * CarouselBlock — Consistent layout for all sizes.
+ * ResponsiveCarouselBlock — Lab experiment for breakpoint-aware carousel.
  *
- * All carousels: side buttons (size M), vertically centered on media.
- * **Large**: 1 card per view, 2:1, infinite loop. **Medium**: 2 cards, 4:5, finite. **Compact** (small): 3 cards, 4:5 or 8:5, finite — ends when last card is in viewport.
+ * Adapts card count and layout across breakpoints:
+ * - Mobile (4 cols): 1 card visible, compact nav buttons
+ * - Tablet (8 cols): 2 cards for compact/medium, 1 for large
+ * - Desktop (12 cols): 3 for compact, 2 for medium, 1 for large
+ *
+ * Uses DS tokens, GridBlock, useGridCell, useGridBreakpoint.
  */
 
 import { useRef, useState, useEffect } from 'react'
 import type { CSSProperties } from 'react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
 import { Headline, Button, Icon, IcChevronLeft, IcChevronRight } from '@marcelinodzn/ds-react'
-import { getHeadlineSize, normalizeHeadingLevel, TYPOGRAPHY } from '../lib/semantic-headline'
-import { BlockSurfaceProvider } from '../lib/block-surface'
-import { GridBlock, useGridCell } from '../components/GridBlock'
-import { useGridBreakpoint } from '../lib/use-grid-breakpoint'
-import { BlockContainer } from './BlockContainer'
-import { useCarouselReveal } from '../lib/use-carousel-reveal'
-import { MediaCard, TextOnColourCard } from '../components/Cards'
+import { getHeadlineSize, normalizeHeadingLevel, TYPOGRAPHY } from '../../../lib/semantic-headline'
+import { BlockSurfaceProvider } from '../../../lib/block-surface'
+import { GridBlock, useGridCell } from '../../../components/GridBlock'
+import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
+import { BlockContainer } from '../../../blocks/BlockContainer'
+import { useCarouselReveal } from '../../../lib/use-carousel-reveal'
+import { MediaCard, TextOnColourCard } from '../../../components/Cards'
 
 type CarouselItem = {
   cardType?: 'media' | 'text-on-colour' | null
@@ -37,57 +41,57 @@ type CarouselSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
 
 type CarouselBlockAccent = 'primary' | 'secondary' | 'neutral'
 
-type CarouselBlockProps = {
+export type ResponsiveCarouselBlockProps = {
   title?: string | null
   cardSize?: CarouselCardSize
   surface?: CarouselSurface
   minimalBackgroundStyle?: 'block' | 'gradient' | null
   blockAccent?: CarouselBlockAccent
   items?: CarouselItem[] | null
-  /** JioKarna preview: progressive image stream state keyed by slot. */
   images?: Record<string, { url: string; alt: string; source: 'database' | 'generated'; ready: boolean }>
 }
 
 const GAP = 'var(--ds-spacing-l)'
 
-/** Faded opacity for cards outside Default span (DS: no opacity token; use semantic value) */
 const CAROUSEL_FADED_OPACITY = 0.25
 
-const CARD_SIZE_CONFIG = {
-  /** Compact: 3 cols, 4:5 = 1 slot (3 cards), 8:5 = 2 slots. 2:1 falls back to 8:5. Media and coloured container interchangeable. */
-  compact: {
-    cols: 3,
-    contentWidth: 'Default' as const,
-    getSlots: (ratio?: '4:5' | '8:5' | '2:1') => (ratio === '8:5' || ratio === '2:1' ? 2 : 1),
+/** Responsive cols: mobile (4) → 1, tablet (8) → 2 for compact/medium, desktop (12) → 3/2/1 by cardSize */
+function getResponsiveCols(columns: number, cardSize: CarouselCardSize): number {
+  if (columns <= 4) return 1
+  if (columns <= 8) return cardSize === 'large' ? 1 : 2
+  switch (cardSize) {
+    case 'compact': return 3
+    case 'medium': return 2
+    case 'large': return 1
+    default: return 2
+  }
+}
+
+function getResponsiveConfig(columns: number, cardSize: CarouselCardSize) {
+  const cols = getResponsiveCols(columns, cardSize)
+  const gap = GAP
+
+  return {
+    cols,
+    gap,
+    getSlots: (ratio?: '4:5' | '8:5' | '2:1') =>
+      cols >= 2 && (ratio === '8:5' || ratio === '2:1') ? 2 : 1,
     getSlotWidthCss: (slots: number) => {
-      const colWidth = `calc((100cqw - 2 * ${GAP}) / 3)`
-      return slots === 1 ? colWidth : `calc(${colWidth} * 2 + ${GAP})`
+      if (cols === 1) return '100cqw'
+      const colWidth = `calc((100cqw - ${cols - 1} * ${gap}) / ${cols})`
+      return slots === 1 ? colWidth : `calc(${colWidth} * 2 + ${gap})`
     },
-    getImageHeight4_5: () =>
-      `calc(((100cqw - 2 * ${GAP}) / 3) * 5 / 4)`,
-    getScrollAmount: (viewportW: number, gapPx: number) =>
-      (viewportW - 2 * gapPx) / 3 + gapPx,
-  },
-  /** Large 2:1: 1 card per view, spans Default width (10 cols). Wide container for side buttons. 2:1 only. */
-  large: {
-    cols: 1,
-    contentWidth: 'Default' as const,
-    getSlots: () => 1,
-    getSlotWidthCss: () => '100cqw',
-    getImageHeight4_5: () => 'auto',
-    getScrollAmount: (viewportW: number, gapPx: number) => viewportW + gapPx,
-  },
-  /** Medium: 2 cards per view within Default width. Each card = (Default - gap) / 2. 4:5 only. */
-  medium: {
-    cols: 2,
-    contentWidth: 'Default' as const,
-    getSlots: () => 1,
-    getSlotWidthCss: () => `calc((100cqw - ${GAP}) / 2)`,
-    getImageHeight4_5: () => `calc(((100cqw - ${GAP}) / 2) * 5 / 4)`,
-    getScrollAmount: (viewportW: number, gapPx: number) =>
-      (viewportW - gapPx) / 2 + gapPx,
-  },
-} as const
+    getImageHeight4_5: () => {
+      if (cols === 1) return 'auto'
+      const colWidth = `calc((100cqw - ${cols - 1} * ${gap}) / ${cols})`
+      return `calc(${colWidth} * 5 / 4)`
+    },
+    getScrollAmount: (viewportW: number, gapPx: number) => {
+      if (cols === 1) return viewportW + gapPx
+      return (viewportW - (cols - 1) * gapPx) / cols + gapPx
+    },
+  }
+}
 
 function NavButton({
   direction,
@@ -122,20 +126,20 @@ function NavButton({
   )
 }
 
-export function CarouselBlock({
+export function ResponsiveCarouselBlock({
   title,
-  cardSize,
-  surface,
-  minimalBackgroundStyle,
-  blockAccent,
+  cardSize = 'medium',
+  surface = 'ghost',
+  minimalBackgroundStyle = 'block',
+  blockAccent = 'primary',
   items,
   images,
-}: CarouselBlockProps) {
+}: ResponsiveCarouselBlockProps) {
   const level = normalizeHeadingLevel('h2')
-  const { contentMaxDefault } = useGridBreakpoint()
+  const { columns, contentMaxDefault } = useGridBreakpoint()
   const cellContainer = useGridCell('Wide')
-  const config = cardSize && cardSize in CARD_SIZE_CONFIG ? CARD_SIZE_CONFIG[cardSize] : undefined
-  if (!config) return null
+  const config = getResponsiveConfig(columns, cardSize)
+
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -146,14 +150,16 @@ export function CarouselBlock({
 
   const items_ = items?.filter((i) => i?.title || i?.image || i?.video) ?? []
   const isLargeLayout = cardSize === 'large'
-  const isInfiniteCarousel = cardSize === 'large'
+  const isInfiniteCarousel = cardSize === 'large' && config.cols <= 2
 
   useEffect(() => {
     if (!isInfiniteCarousel) infiniteInitializedRef.current = false
   }, [isInfiniteCarousel])
+
   const { ref: revealRef, isVisible: isCardVisible, containerVisible, prefersReducedMotion } = useCarouselReveal(
     isInfiniteCarousel ? items_.length + 2 : items_.length
   )
+
   if (items_.length === 0) return null
 
   const displayItems: CarouselItem[] = isInfiniteCarousel && items_.length > 1
@@ -166,7 +172,7 @@ export function CarouselBlock({
     if (!viewport || !track) return 0
     const gapPx = parseFloat(getComputedStyle(track).gap) || 0
     const firstCard = track.children[0] as HTMLElement | undefined
-    if ((cardSize === 'compact' || cardSize === 'medium') && firstCard) return firstCard.offsetWidth + gapPx
+    if (config.cols > 1 && firstCard) return firstCard.offsetWidth + gapPx
     return config.getScrollAmount(viewport.clientWidth, gapPx)
   }
 
@@ -177,7 +183,7 @@ export function CarouselBlock({
     const gapPx = parseFloat(getComputedStyle(track).gap) || 0
     const firstCard = track.children[0] as HTMLElement | undefined
     const max =
-      (cardSize === 'compact' || cardSize === 'medium') && firstCard && displayItems.length > config.cols
+      config.cols > 1 && firstCard && displayItems.length > config.cols
         ? Math.max(0, (displayItems.length - config.cols) * (firstCard.offsetWidth + gapPx))
         : Math.max(0, track.offsetWidth - viewport.clientWidth)
     setMaxScroll(max)
@@ -205,7 +211,7 @@ export function CarouselBlock({
       ro.disconnect()
       window.removeEventListener('resize', updateScrollBounds)
     }
-  }, [items_, displayItems, isInfiniteCarousel])
+  }, [items_, displayItems, isInfiniteCarousel, config.cols])
 
   useEffect(() => {
     if (!isInfiniteCarousel && maxScroll >= 0) {
@@ -225,7 +231,7 @@ export function CarouselBlock({
     const gapPx = parseFloat(getComputedStyle(track).gap) || 0
     const firstCard = track.children[0] as HTMLElement | undefined
     const scrollAmount =
-      (cardSize === 'compact' || cardSize === 'medium') && firstCard
+      config.cols > 1 && firstCard
         ? firstCard.offsetWidth + gapPx
         : config.getScrollAmount(viewport.clientWidth, gapPx)
     const next = dir === 'left' ? scrollPosition - scrollAmount : scrollPosition + scrollAmount
@@ -258,7 +264,7 @@ export function CarouselBlock({
   const trackStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'flex-start',
-    gap: GAP,
+    gap: config.gap,
     width: 'max-content',
     minWidth: '100%',
     transform: `translateX(-${scrollPosition}px)`,
@@ -275,9 +281,7 @@ export function CarouselBlock({
 
   const leftCardIndex = cardStepPx > 0 ? Math.floor(scrollPosition / cardStepPx) : 0
   const isCardInViewportForFade = (i: number) =>
-    cardSize === 'medium'
-      ? i >= leftCardIndex && i < leftCardIndex + config.cols
-      : isCardInView(i)
+    cardSize === 'medium' ? i >= leftCardIndex && i < leftCardIndex + config.cols : isCardInView(i)
 
   const titleTransition = prefersReducedMotion
     ? undefined
@@ -296,16 +300,19 @@ export function CarouselBlock({
     }
   }
 
+  const navButtonSize = columns <= 4 ? 'XS' : columns <= 8 ? 'S' : 'M'
   const halfBtn = 'var(--ds-spacing-l)'
   const buttonMediaCenterOffset =
-    cardSize === 'large'
-      ? `calc(${contentMaxDefault} / 4 - ${halfBtn})`
-      : cardSize === 'medium'
-        ? `calc((${contentMaxDefault} - var(--ds-spacing-l)) * 5 / 16 - ${halfBtn})`
-        : `calc((${contentMaxDefault} - 2 * var(--ds-spacing-l)) * 5 / 24 - ${halfBtn})`
+    columns >= 12
+      ? cardSize === 'large'
+        ? `calc(${contentMaxDefault} / 4 - ${halfBtn})`
+        : cardSize === 'medium'
+          ? `calc((${contentMaxDefault} - ${config.gap}) * 5 / 16 - ${halfBtn})`
+          : `calc((${contentMaxDefault} - 2 * ${config.gap}) * 5 / 24 - ${halfBtn})`
+      : undefined
 
   return (
-    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'} fullWidth>
+    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle} fullWidth>
       <GridBlock as="section">
         <div
           ref={revealRef}
@@ -354,14 +361,16 @@ export function CarouselBlock({
                     flexShrink: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    marginTop: buttonMediaCenterOffset,
+                    ...(buttonMediaCenterOffset
+                      ? { marginTop: buttonMediaCenterOffset }
+                      : { alignSelf: 'center' }),
                   }}
                 >
                   <NavButton
                     direction="left"
                     disabled={!canScrollLeft}
                     onPress={() => scroll('left')}
-                    size="M"
+                    size={navButtonSize}
                     surface={surface}
                   />
                 </div>
@@ -487,14 +496,16 @@ export function CarouselBlock({
                     flexShrink: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    marginTop: buttonMediaCenterOffset,
+                    ...(buttonMediaCenterOffset
+                      ? { marginTop: buttonMediaCenterOffset }
+                      : { alignSelf: 'center' }),
                   }}
                 >
                   <NavButton
                     direction="right"
                     disabled={!canScrollRight}
                     onPress={() => scroll('right')}
-                    size="M"
+                    size={navButtonSize}
                     surface={surface}
                   />
                 </div>

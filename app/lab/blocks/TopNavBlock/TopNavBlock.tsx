@@ -18,6 +18,8 @@ import {
   IcSearch,
   IcProfile,
 } from '@marcelinodzn/ds-react'
+import { createTransition } from '@marcelinodzn/ds-tokens'
+import { useGridBreakpoint } from '../../../lib/use-grid-breakpoint'
 import {
   L1_CONFIG,
   L2_CONFIG,
@@ -26,42 +28,51 @@ import {
   type L2MainItem,
 } from './megaMenuData'
 
-const MEGA_MENU_MAX_WIDTH = 1184
-const HEADER_HEIGHT = 56
-
-const navLinkStyle: React.CSSProperties = {
-  color: 'var(--ds-color-text-medium)',
-  fontSize: 'var(--ds-typography-body-xs)',
-  lineHeight: 1.5,
-  fontWeight: 'var(--ds-typography-weight-low)',
-  transition: 'color 0.15s ease',
-  cursor: 'pointer',
-  background: 'none',
-  border: 'none',
-  padding: 0,
-  fontFamily: 'inherit',
+function getNavLinkStyle(transition: string | undefined): React.CSSProperties {
+  return {
+    color: 'var(--ds-color-text-medium)',
+    fontSize: 'var(--ds-typography-body-xs)',
+    lineHeight: 1.5,
+    fontWeight: 'var(--ds-typography-weight-low)',
+    fontFamily: 'var(--ds-font-family)',
+    ...(transition && { transition }),
+    cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+    padding: 0,
+  }
 }
 
-const navLinkActiveStyle = {
-  ...navLinkStyle,
-  color: 'var(--ds-color-surface-secondary)',
-  fontWeight: 'var(--ds-typography-weight-medium)',
+function getNavLinkActiveStyle(base: React.CSSProperties): React.CSSProperties {
+  return {
+    ...base,
+    color: 'var(--ds-color-surface-secondary)',
+    fontWeight: 'var(--ds-typography-weight-medium)',
+  }
 }
 
-const navTextLargeStyle: React.CSSProperties = {
-  fontSize: 'var(--ds-typography-body-xs)',
-  lineHeight: 1.5,
-  fontWeight: 'var(--ds-typography-weight-low)',
-  color: 'var(--ds-color-text-medium)',
-  transition: 'color 0.15s ease, transform 0.15s ease',
+function getNavTextLargeStyle(transition: string | undefined): React.CSSProperties {
+  return {
+    fontFamily: 'var(--ds-font-family)',
+    fontSize: 'var(--ds-typography-body-xs)',
+    lineHeight: 1.5,
+    fontWeight: 'var(--ds-typography-weight-low)',
+    color: 'var(--ds-color-text-medium)',
+    textDecoration: 'none',
+    ...(transition && { transition }),
+  }
 }
 
-const navTextSmallStyle: React.CSSProperties = {
-  fontSize: '12px',
-  lineHeight: 1.5,
-  fontWeight: 'var(--ds-typography-weight-low)',
-  color: 'var(--ds-color-text-medium)',
-  transition: 'color 0.15s ease, transform 0.15s ease',
+function getNavTextSmallStyle(transition: string | undefined): React.CSSProperties {
+  return {
+    fontFamily: 'var(--ds-font-family)',
+    fontSize: 'var(--ds-typography-body-xs)',
+    lineHeight: 1.5,
+    fontWeight: 'var(--ds-typography-weight-low)',
+    color: 'var(--ds-color-text-medium)',
+    textDecoration: 'none',
+    ...(transition && { transition }),
+  }
 }
 
 function isL2MainItemObject(item: L2MainItem): item is { label: string; showArrow?: boolean } {
@@ -73,7 +84,24 @@ export function TopNavBlock() {
   const [mobileExpandedL2, setMobileExpandedL2] = useState<string | null>(null)
   const [businessHoverL2, setBusinessHoverL2] = useState<string | null>(null)
   const [businessHoverL3, setBusinessHoverL3] = useState<string | null>(null)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { contentMaxDefault } = useGridBreakpoint()
+
+  const navTransition = prefersReducedMotion ? undefined : createTransition('color', 's', 'transition', 'subtle')
+  const navTextTransition = prefersReducedMotion ? undefined : createTransition(['color', 'transform'], 's', 'transition', 'subtle')
+  const navLinkStyle = getNavLinkStyle(navTransition)
+  const navLinkActiveStyle = getNavLinkActiveStyle(navLinkStyle)
+  const navTextLargeStyle = getNavTextLargeStyle(navTextTransition)
+  const navTextSmallStyle = getNavTextSmallStyle(navTextTransition)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mq.matches)
+    const handler = () => setPrefersReducedMotion(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -111,17 +139,17 @@ export function TopNavBlock() {
   const l3 = l2?.l3.find((x) => x.id === businessHoverL3)
 
   return (
-    <div ref={containerRef} style={{ position: 'relative' }}>
+    <div ref={containerRef} style={{ position: 'relative', fontFamily: 'var(--ds-font-family)' }}>
       {/* Header bar */}
       <header
         style={{
-          backgroundColor: 'var(--ds-color-background-subtle)',
+          backgroundColor: 'white',
           borderBottom: '1px solid var(--ds-color-stroke-divider)',
         }}
       >
         <div
           style={{
-            maxWidth: MEGA_MENU_MAX_WIDTH,
+            maxWidth: contentMaxDefault,
             width: '100%',
             margin: '0 auto',
             paddingLeft: 'var(--ds-spacing-l)',
@@ -129,10 +157,10 @@ export function TopNavBlock() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            height: HEADER_HEIGHT,
+            height: 'var(--ds-spacing-3xl)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '56px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-2xl)' }}>
             <a
               href="#"
               style={{
@@ -142,7 +170,7 @@ export function TopNavBlock() {
                 textDecoration: 'none',
               }}
             >
-              <img src="/logo.png" alt="Jio" style={{ height: 32, width: 'auto' }} />
+              <img src="/logo.png" alt="Jio" style={{ height: 'var(--ds-spacing-xl)', width: 'auto' }} />
             </a>
             <nav style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-l)' }}>
               {L1_CONFIG.map((item) => (
@@ -205,18 +233,18 @@ export function TopNavBlock() {
             right: 0,
             top: '100%',
             zIndex: 50,
-            backgroundColor: 'var(--ds-color-background-subtle)',
+            backgroundColor: 'white',
             borderTop: '1px solid var(--ds-color-stroke-divider)',
           }}
         >
           <div
             style={{
-              maxWidth: MEGA_MENU_MAX_WIDTH,
+              maxWidth: contentMaxDefault,
               width: '100%',
               margin: '0 auto',
               paddingLeft: 'var(--ds-spacing-l)',
               paddingRight: 'var(--ds-spacing-l)',
-              paddingTop: HEADER_HEIGHT,
+              paddingTop: 'var(--ds-spacing-3xl)',
               paddingBottom: 'var(--ds-spacing-2xl)',
               textAlign: 'left',
             }}
@@ -259,7 +287,7 @@ export function TopNavBlock() {
                                 border: 'none',
                                 padding: 0,
                                 cursor: 'pointer',
-                                fontFamily: 'inherit',
+                                fontFamily: 'var(--ds-font-family)',
                               }}
                             >
                               {label}
@@ -352,7 +380,7 @@ export function TopNavBlock() {
                 {openL1 === 'business' && !businessHoverL2 && (
                   <div>
                     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-s)' }}>
-                      <li style={{ minHeight: 24, display: 'flex', alignItems: 'center' }}>
+                      <li style={{ minHeight: 'var(--ds-spacing-l)', display: 'flex', alignItems: 'center' }}>
                         <a href="#" style={{ ...navTextLargeStyle, display: 'block' }}>
                           Discover Business
                         </a>
@@ -373,7 +401,7 @@ export function TopNavBlock() {
                               border: 'none',
                               padding: 0,
                               cursor: 'pointer',
-                              fontFamily: 'inherit',
+                              fontFamily: 'var(--ds-font-family)',
                               color: businessHoverL2 === l2Item.id ? 'var(--ds-color-surface-secondary)' : undefined,
                             }}
                           >
@@ -390,7 +418,7 @@ export function TopNavBlock() {
                 {openL1 === 'business' && businessHoverL2 && (
                   <div style={{ paddingRight: 'var(--ds-spacing-xl)' }}>
                     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-s)' }}>
-                      <li style={{ minHeight: 24, display: 'flex', alignItems: 'center' }}>
+                      <li style={{ minHeight: 'var(--ds-spacing-l)', display: 'flex', alignItems: 'center' }}>
                         <button
                           type="button"
                           onClick={() => {
@@ -405,7 +433,7 @@ export function TopNavBlock() {
                             background: 'transparent',
                             display: 'flex',
                             cursor: 'pointer',
-                            fontFamily: 'inherit',
+                            fontFamily: 'var(--ds-font-family)',
                           }}
                           aria-label="Back to Business menu"
                         >
@@ -443,7 +471,7 @@ export function TopNavBlock() {
                               border: 'none',
                               padding: 0,
                               cursor: 'pointer',
-                              fontFamily: 'inherit',
+                              fontFamily: 'var(--ds-font-family)',
                               color:
                                 businessHoverL3 === l3Item.id
                                   ? 'var(--ds-color-surface-secondary)'
@@ -510,6 +538,8 @@ export function TopNavBlock() {
                             gap: 'var(--ds-spacing-s)',
                             marginBottom: 'var(--ds-spacing-l)',
                             width: 'fit-content',
+                            textDecoration: 'none',
+                            fontFamily: 'var(--ds-font-family)',
                           }}
                         >
                           <span style={navTextLargeStyle}>{listing.title}</span>
@@ -526,7 +556,7 @@ export function TopNavBlock() {
                         >
                           {listing.products.map((p, i) => (
                             <div key={i}>
-                              <a href="#" style={{ display: 'block' }}>
+                              <a href="#" style={{ display: 'block', textDecoration: 'none', fontFamily: 'var(--ds-font-family)' }}>
                                 <span style={navTextSmallStyle}>{p.title}</span>
                                 {p.desc && (
                                   <span
@@ -595,6 +625,8 @@ export function TopNavBlock() {
                               gap: 'var(--ds-spacing-s)',
                               marginBottom: 'var(--ds-spacing-l)',
                               width: 'fit-content',
+                              textDecoration: 'none',
+                              fontFamily: 'var(--ds-font-family)',
                             }}
                           >
                             <span style={navTextLargeStyle}>{listing.title}</span>
@@ -612,7 +644,7 @@ export function TopNavBlock() {
                         >
                           {listing.products.map((p, i) => (
                             <div key={i}>
-                              <a href="#" style={{ display: 'block' }}>
+                              <a href="#" style={{ display: 'block', textDecoration: 'none', fontFamily: 'var(--ds-font-family)' }}>
                                 <span style={navTextSmallStyle}>{p.title}</span>
                                 {p.desc && (
                                   <span
@@ -639,7 +671,7 @@ export function TopNavBlock() {
               {/* Helpful links column */}
               {showHelpfulLinks && (
                 <div style={{ textAlign: 'left' }}>
-                  <Label size="S" weight="low" color="low" as="h3" style={{ marginBottom: 'var(--ds-spacing-l)' }}>
+                  <Label size="S" weight="low" color="low" as="h3" style={{ marginBottom: 'var(--ds-spacing-l)', fontFamily: 'var(--ds-font-family)' }}>
                     Helpful links
                   </Label>
                   {openL1 === 'mobile' && (

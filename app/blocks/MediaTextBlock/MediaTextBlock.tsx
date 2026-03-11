@@ -19,6 +19,7 @@ import { VideoWithControls } from '../../components/VideoWithControls'
 import { StreamImage } from '../../components/StreamImage'
 import { MEDIA_TEXT_SUBTITLE_BODY_STYLE, TYPOGRAPHY } from '../../lib/semantic-headline'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../lib/block-surface'
+import { EDGE_TO_EDGE_BREAKOUT, useEdgeToEdgeMediaStyles } from '../../lib/edge-to-edge'
 import type { MediaTextBlockProps } from './MediaTextBlock.types'
 
 const ASPECT_RATIOS: Record<string, string> = {
@@ -30,10 +31,23 @@ const ASPECT_RATIOS: Record<string, string> = {
   auto: 'auto',
 }
 
+/** Card-style typography for image description (matches Large Carousel 2:1 card) */
+const DESCRIPTION_TITLE_STYLE = {
+  fontSize: 'var(--ds-typography-h5)',
+  fontWeight: 'var(--ds-typography-weight-medium)',
+  color: 'var(--ds-color-text-high)',
+  lineHeight: 1.4,
+} as const
+const DESCRIPTION_BODY_STYLE = {
+  fontSize: 'var(--ds-typography-label-s)',
+  lineHeight: 1.4,
+  color: 'var(--ds-color-text-low)',
+  fontWeight: 'var(--ds-typography-weight-low)',
+} as const
+
 export function MediaTextBlock({
   size,
   variant,
-  stackImagePosition = 'top',
   width,
   mediaStyle,
   blockBackground,
@@ -47,7 +61,8 @@ export function MediaTextBlock({
   headline,
   subhead,
   body,
-  bulletList,
+  descriptionTitle,
+  descriptionBody,
   cta,
   ctaSecondary,
   media,
@@ -67,6 +82,7 @@ export function MediaTextBlock({
 
   const hasMedia = media?.src && media.src.trim() !== ''
   const isNarrow = width === 'M'
+  const edgeStyles = useEdgeToEdgeMediaStyles()
   const isFullBleed = variant === 'full-bleed'
   const isEdgeToEdge = width === 'edgeToEdge'
   /** Edge to edge: no emphasis (ghost surface, no bold). */
@@ -80,8 +96,6 @@ export function MediaTextBlock({
     if (href.startsWith('/')) router.push(href)
     else window.location.href = href
   }
-
-  const bullets = (bulletList ?? []).slice(0, 6)
 
   const derivedCentered =
     isNarrow ||
@@ -156,10 +170,10 @@ export function MediaTextBlock({
     </BlockContainer>
   )
 
-  /** Stacked layout: all text (headline, subhead, body) together – either above or below media per stackImagePosition.
-   * When image on top: headline renders as subtitle (smaller, lighter). */
+  /** Stacked layout: optional text above image (eyebrow, title, subhead, body) + optional image description below (card-style). */
   const stackedBlockStyle = variant === 'centered-media-below' && align === 'left' ? { marginInline: 0 } : undefined
-  const headlineAsSubtitle = variant === 'centered-media-below' && stackImagePosition === 'top'
+  const hasTextAbove = Boolean(eyebrow || headline || subhead || body)
+  const hasTextBelow = Boolean(descriptionTitle || descriptionBody)
   const stackedTitleContent =
     variant === 'centered-media-below' ? (
       <BlockContainer contentWidth={titleContentWidth} style={{ width: '100%', ...stackedBlockStyle }}>
@@ -178,19 +192,7 @@ export function MediaTextBlock({
               {eyebrow}
             </Label>
           )}
-          {headlineAsSubtitle ? (
-            <Title
-              level={3}
-              as="h2"
-              style={{
-                textAlign,
-                whiteSpace: 'pre-line',
-                ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
-              }}
-            >
-              {headline}
-            </Title>
-          ) : (
+          {headline && (
             <>
               {size === 'hero' && <Display as="h1" style={{ textAlign, whiteSpace: 'pre-line' }}>{headline}</Display>}
               {size === 'feature' && (
@@ -229,7 +231,7 @@ export function MediaTextBlock({
     ) : null
 
   const bodyContent =
-    (size !== 'hero' && (body || bullets.length > 0)) || (cta || ctaSecondary) ? (
+    (size !== 'hero' && body) || (cta || ctaSecondary) ? (
       <BlockContainer contentWidth={bodyContentWidth} style={{ width: '100%', ...(variant === 'centered-media-below' ? stackedBlockStyle : undefined), ...textOnlyLeftContainerStyle }}>
         <div
           style={{
@@ -255,23 +257,6 @@ export function MediaTextBlock({
             >
               {body}
             </Text>
-          )}
-          {size !== 'hero' && bullets.length > 0 && (
-            <ul style={{ margin: 0, paddingLeft: textAlign === 'center' ? 0 : 'var(--ds-spacing-l)', listStyle: 'disc', listStylePosition: textAlign === 'center' ? 'inside' : 'outside', textAlign }}>
-              {bullets.map((item, i) => (
-                <li key={i} style={{ marginBottom: i < bullets.length - 1 ? 'var(--ds-spacing-xs)' : 0 }}>
-                  <Text
-                    size={variant === 'text-only' || variant === 'centered-media-below' ? 'S' : 'M'}
-                    weight="low"
-                    as="span"
-                    color="medium"
-                    style={{ whiteSpace: 'pre-line', ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.body }}
-                  >
-                    {item}
-                  </Text>
-                </li>
-              ))}
-            </ul>
           )}
           {(cta || ctaSecondary) && (
             <div style={{ display: 'flex', gap: 'var(--ds-spacing-s)', flexWrap: 'wrap', marginTop: 'var(--ds-spacing-l)' }}>
@@ -378,18 +363,14 @@ export function MediaTextBlock({
         : bgColor
       : undefined
 
-  /** Full-width background band. Coloured padding: always Large (top and bottom) for all blocks. */
+  /** Full-width background band. Coloured padding: always Large (top and bottom) for all blocks. Capped at 1920px on large screens. */
   const blockBgWrapper = (children: ReactNode) =>
     background ? (
-      <>
+      <div style={{ ...EDGE_TO_EDGE_BREAKOUT }}>
         <div
           style={{
-            width: '100vw',
-            maxWidth: '100vw',
-            marginLeft: 'calc(50% - 50vw)',
-            marginRight: 'calc(50% - 50vw)',
+            ...edgeStyles.innerContainer,
             background,
-            boxSizing: 'border-box',
             paddingBlockStart: internalPaddingLarge,
             paddingBlockEnd: internalPaddingLarge,
             minHeight: 1,
@@ -397,7 +378,7 @@ export function MediaTextBlock({
         >
           {children}
         </div>
-      </>
+      </div>
     ) : (
       children
     )
@@ -479,9 +460,11 @@ export function MediaTextBlock({
 
   if (variant === 'centered-media-below' && hasMedia) {
     const stackedIsEdgeToEdge = width === 'edgeToEdge'
-    const stackedAlignItems = align === 'center' ? 'center' : 'flex-start'
-    const imageOnTop = stackImagePosition === 'top'
-    const stackedTextContent = (
+    const stackedAlignItems = stackedIsEdgeToEdge ? 'center' : (align === 'center' ? 'center' : 'flex-start')
+    const textAlignStacked = stackedIsEdgeToEdge ? 'center' : (align ?? 'left')
+
+    /** Text above image: eyebrow, title, subhead, body. */
+    const stackedTextAbove = hasTextAbove && (
       <div
         style={{
           display: 'flex',
@@ -494,24 +477,52 @@ export function MediaTextBlock({
         {bodyContent}
       </div>
     )
-    const stackedMediaBlock = stackedIsEdgeToEdge ? (
-      <div
+
+    /** Image description below: card-style typography (h5 + label-s). Same width as 2:1 Card (BlockContainer S). */
+    const stackedTextBelow = hasTextBelow ? (
+      <BlockContainer
+        contentWidth="S"
         style={{
-          width: '100vw',
-          position: 'relative' as const,
-          left: 0,
-          marginLeft: 0,
-          paddingLeft: 0,
-          boxSizing: 'border-box',
-          alignSelf: 'flex-start',
+          alignSelf: stackedAlignItems === 'center' ? 'center' : 'flex-start',
+          ...(stackedAlignItems === 'flex-start' ? { marginInline: 0 } : {}),
+          textAlign: textAlignStacked,
         }}
       >
-        {mediaContent}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: stackedAlignItems === 'center' ? 'center' : 'flex-start',
+            gap: 'var(--ds-spacing-m)',
+            width: '100%',
+            minWidth: 0,
+          }}
+        >
+          {descriptionTitle ? (
+            <p style={{ margin: 0, width: '100%', whiteSpace: 'pre-line', ...DESCRIPTION_TITLE_STYLE }}>
+              {descriptionTitle}
+            </p>
+          ) : null}
+          {descriptionBody ? (
+            <p style={{ margin: 0, width: '100%', whiteSpace: 'pre-line', ...DESCRIPTION_BODY_STYLE }}>
+              {descriptionBody}
+            </p>
+          ) : null}
+        </div>
+      </BlockContainer>
+    ) : null
+
+    const stackedMediaBlock = stackedIsEdgeToEdge ? (
+      <div style={{ ...EDGE_TO_EDGE_BREAKOUT, alignSelf: 'flex-start' }}>
+        <div style={edgeStyles.inner}>
+          {mediaContent}
+        </div>
       </div>
     ) : (
       <div style={{ width: '100%' }}>{mediaContent}</div>
     )
-    const gridWrappedText = (
+
+    const gridWrappedSection = (children: React.ReactNode) => (
       <GridBlock as="div">
         <div
           style={{
@@ -522,10 +533,11 @@ export function MediaTextBlock({
             gap: 'var(--ds-spacing-l)',
           }}
         >
-          {stackedTextContent}
+          {children}
         </div>
       </GridBlock>
     )
+
     return blockBgWrapper(
       <BlockReveal>
         <SurfaceProvider {...surfaceProps}>
@@ -534,21 +546,15 @@ export function MediaTextBlock({
               display: 'flex',
               flexDirection: 'column',
               alignItems: stackedIsEdgeToEdge ? 'center' : stackedAlignItems,
-              gap: 'var(--ds-spacing-2xl)',
+              gap: 'var(--ds-spacing-l)',
             }}
           >
             {stackedIsEdgeToEdge ? (
-              imageOnTop ? (
-                <>
-                  {stackedMediaBlock}
-                  {gridWrappedText}
-                </>
-              ) : (
-                <>
-                  {gridWrappedText}
-                  {stackedMediaBlock}
-                </>
-              )
+              <>
+                {stackedTextAbove}
+                {stackedMediaBlock}
+                {hasTextBelow && gridWrappedSection(stackedTextBelow)}
+              </>
             ) : (
               <BlockContainer contentWidth="Default" style={{ width: '100%' }}>
                 <div
@@ -556,20 +562,12 @@ export function MediaTextBlock({
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: stackedAlignItems,
-                    gap: 'var(--ds-spacing-2xl)',
+                    gap: 'var(--ds-spacing-l)',
                   }}
                 >
-                  {imageOnTop ? (
-                    <>
-                      {stackedMediaBlock}
-                      {stackedTextContent}
-                    </>
-                  ) : (
-                    <>
-                      {stackedTextContent}
-                      {stackedMediaBlock}
-                    </>
-                  )}
+                  {stackedTextAbove}
+                  {stackedMediaBlock}
+                  {stackedTextBelow}
                 </div>
               </BlockContainer>
             )}

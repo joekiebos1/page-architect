@@ -43,10 +43,10 @@ export type BlockOptions = {
   variant?: string | null
   size?: 'hero' | 'feature' | 'editorial' | null
   template?: 'HeroOverlay' | 'Stacked' | 'TextOnly' | null
-  stackImagePosition?: 'top' | 'bottom' | null
   imagePosition?: 'left' | 'right' | null
   mediaStyle?: 'contained' | 'overflow' | null
   imageAspectRatio?: string | null
+  stackImagePosition?: 'top' | 'bottom' | null
   cardSize?: 'compact' | 'medium' | 'large' | null
   columns?: 2 | 3 | 4 | null
 }

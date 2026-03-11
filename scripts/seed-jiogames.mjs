@@ -87,7 +87,7 @@ async function seed() {
     },
     // 3. MediaText – HeroOverlay center (full screen image), Games-themed
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'jg-mt-1',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -104,7 +104,7 @@ async function seed() {
     },
     // 4. MediaText – Stacked
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'jg-mt-2',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -121,7 +121,7 @@ async function seed() {
     },
     // 5. MediaText – Stacked
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'jg-mt-3',
       spacingTop: 'large',
       spacingBottom: 'large',
@@ -138,7 +138,7 @@ async function seed() {
     },
     // 6. MediaText – Stacked
     {
-      _type: 'mediaTextBlock',
+      _type: 'mediaTextStacked',
       _key: 'jg-mt-4',
       spacingTop: 'large',
       spacingBottom: 'large',

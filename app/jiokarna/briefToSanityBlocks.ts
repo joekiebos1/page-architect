@@ -119,7 +119,7 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         }
       }
 
-      case 'mediaTextBlock': {
+      case 'mediaTextStacked': {
         const template = opts.template ?? 'Stacked'
         const hasMedia = slots.mediaType === 'image' || slots.mediaType === 'video'
         const assetId = hasMedia ? getAsset(assetIds, i) : null
