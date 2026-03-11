@@ -20,7 +20,7 @@ export const MediaDescriptionBelow: Story = {
   args: {
     title: 'Media + description below',
     columns: 3,
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -29,7 +29,7 @@ export const MediaDescriptionInside: Story = {
   args: {
     title: 'Media + description inside',
     columns: 3,
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items: items.map((i) => ({ ...i, cardType: 'media-description-inside' as const })),
   },
 }
@@ -38,7 +38,7 @@ export const MixedCardTypes: Story = {
   args: {
     title: 'Mixed media card types',
     columns: 2,
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items: [
       { ...items[0], cardType: 'media-description-below' as const },
       { ...items[1], cardType: 'media-description-inside' as const },

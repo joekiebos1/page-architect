@@ -18,14 +18,14 @@ const items = [
 
 export const Default: Story = {
   args: {
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
 
 export const Bold: Story = {
   args: {
-    surface: 'bold',
+    emphasis: 'bold',
     items,
   },
 }

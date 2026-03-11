@@ -10,7 +10,7 @@
  * - mediaOverlay: image as background, content overlaid. Always Bold, no accent. Full width, no side padding.
  * - textOnly: centered text, no media. No Bold.
  *
- * blockSurface (Emphasis): ghost, minimal, subtle, bold. Category and mediaOverlay use Bold by default (option hidden).
+ * emphasis: ghost, minimal, subtle, bold. Category and mediaOverlay use Bold by default (option hidden).
  * Supports StreamImage (imageSlot, imageState) for AI-generated images.
  */
 
@@ -35,8 +35,8 @@ export type HeroContentLayout = 'stacked' | 'sideBySide' | 'category' | 'mediaOv
 export type HeroContainerLayout = 'edgeToEdge' | 'contained'
 export type HeroImageAnchor = 'center' | 'bottom'
 export type HeroTextAlign = 'left' | 'center'
-export type BlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
-export type BlockAccent = 'primary' | 'secondary' | 'neutral'
+export type HeroEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
+export type HeroSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type HeroBlockProps = {
   productName?: string | null
@@ -54,8 +54,8 @@ export type HeroBlockProps = {
   containerLayout?: HeroContainerLayout | null
   imageAnchor?: HeroImageAnchor | null
   textAlign?: HeroTextAlign | null
-  blockSurface?: BlockSurface | null
-  blockAccent?: BlockAccent | null
+  emphasis?: HeroEmphasis | null
+  surfaceColour?: HeroSurfaceColour | null
 }
 
 export function HeroBlock({
@@ -74,8 +74,8 @@ export function HeroBlock({
   containerLayout,
   imageAnchor,
   textAlign,
-  blockSurface = 'minimal',
-  blockAccent = 'primary',
+  emphasis,
+  surfaceColour,
 }: HeroBlockProps) {
   const router = useRouter()
   const { columns, contentMaxS, contentMaxXS, marginPx, gridMaxWidth } = useGridBreakpoint()
@@ -155,10 +155,10 @@ export function HeroBlock({
   const isEdgeToEdge = isCategory ? false : containerLayout === 'edgeToEdge'
   const isContained = isCategory ? true : containerLayout === 'contained'
 
-  /** Category and mediaOverlay: Bold (option hidden). All other variants: ghost, minimal, subtle. Default from schema/query. */
-  const effectiveSurface: BlockSurface =
-    isMediaOverlay || isCategory ? 'bold' : (blockSurface ?? 'minimal')
-  const effectiveAccent: BlockAccent = blockAccent ?? 'primary'
+  /** Category and mediaOverlay: Bold (option hidden). All other variants: use emphasis from props. */
+  const effectiveSurface: HeroEmphasis =
+    isMediaOverlay || isCategory ? 'bold' : (emphasis as HeroEmphasis)
+  const effectiveAccent: HeroSurfaceColour = surfaceColour as HeroSurfaceColour
 
   const surfaceProps = getSurfaceProviderProps(effectiveSurface)
   const bgColor = useBlockBackgroundColor(effectiveSurface, effectiveAccent)
@@ -280,7 +280,7 @@ export function HeroBlock({
 
   if (isTextOnly) {
     return (
-      <BlockSurfaceProvider blockSurface={effectiveSurface} blockAccent={effectiveAccent} fullWidth>
+      <BlockSurfaceProvider emphasis={effectiveSurface} surfaceColour={effectiveAccent} fullWidth>
         <section ref={revealRef} style={{ width: '100%' }}>
           <GridBlock as="div">
             <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-m)' }}>
@@ -348,7 +348,7 @@ export function HeroBlock({
 
   if (isStackedLayout) {
     return (
-      <BlockSurfaceProvider blockSurface={effectiveSurface} blockAccent={effectiveAccent} fullWidth>
+      <BlockSurfaceProvider emphasis={effectiveSurface} surfaceColour={effectiveAccent} fullWidth>
         <section ref={revealRef} style={{ width: '100%' }}>
           <GridBlock as="div">
             <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-m)' }}>
@@ -536,8 +536,8 @@ export function HeroBlock({
       (effectiveSurface === 'minimal' || effectiveSurface === 'subtle')
     return (
         <BlockSurfaceProvider
-          blockSurface={effectiveSurface}
-          blockAccent={effectiveAccent}
+          emphasis={effectiveSurface}
+          surfaceColour={effectiveAccent}
           fullWidth
           flushTop={flushEdges}
           flushBottom={flushEdges}

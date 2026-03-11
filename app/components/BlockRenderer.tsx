@@ -143,9 +143,9 @@ function mapMediaTextBlock(block: Block): MediaTextBlockProps {
         : undefined,
     media,
     variant,
-    blockBackground: block.blockBackground as MediaTextBlockProps['blockBackground'],
+    emphasis: block.emphasis as MediaTextBlockProps['emphasis'],
     minimalBackgroundStyle: block.minimalBackgroundStyle as 'block' | 'gradient' | undefined,
-    blockAccent: block.blockAccent as MediaTextBlockProps['blockAccent'] | undefined,
+    surfaceColour: block.surfaceColour as MediaTextBlockProps['surfaceColour'] | undefined,
     spacing: normalizeSpacing(block.spacing) as MediaTextBlockProps['spacing'],
     spacingTop: block.spacingTop ? normalizeSpacing(block.spacingTop) as MediaTextBlockProps['spacingTop'] : undefined,
     spacingBottom: block.spacingBottom ? normalizeSpacing(block.spacingBottom) as MediaTextBlockProps['spacingBottom'] : undefined,
@@ -180,8 +180,8 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
         switch (block._type) {
           case 'hero': {
             const contentLayout = block.contentLayout as 'stacked' | 'sideBySide' | 'mediaOverlay' | 'textOnly' | 'fullscreen' | undefined
-            const blockSurface = block.blockSurface as 'ghost' | 'minimal' | 'subtle' | 'bold' | undefined
-            const blockAccent = block.blockAccent as 'primary' | 'secondary' | 'neutral' | undefined
+            const emphasis = block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold' | undefined
+            const surfaceColour = block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral' | undefined
             const containerLayout = block.containerLayout as 'edgeToEdge' | 'contained' | undefined
             const imageAnchor = block.imageAnchor as 'center' | 'bottom' | undefined
             const textAlign = block.textAlign as 'left' | 'center' | undefined
@@ -205,8 +205,8 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 containerLayout={containerLayout}
                 imageAnchor={imageAnchor}
                 textAlign={textAlign}
-                blockSurface={blockSurface}
-                blockAccent={blockAccent}
+                emphasis={emphasis}
+                surfaceColour={surfaceColour}
               />
             )
           }
@@ -232,9 +232,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
             const props: MediaText5050BlockProps = {
               variant,
               imagePosition: (block.imagePosition as 'left' | 'right') ?? 'right',
-              blockBackground: block.blockBackground as MediaText5050BlockProps['blockBackground'],
+              emphasis: block.emphasis as MediaText5050BlockProps['emphasis'],
               minimalBackgroundStyle: (block.minimalBackgroundStyle as 'block' | 'gradient') ?? 'block',
-              blockAccent: block.blockAccent as MediaText5050BlockProps['blockAccent'],
+              surfaceColour: block.surfaceColour as MediaText5050BlockProps['surfaceColour'],
               spacingTop: block.spacingTop ? normalizeSpacing(block.spacingTop) as MediaText5050BlockProps['spacingTop'] : undefined,
               spacingBottom: block.spacingBottom ? normalizeSpacing(block.spacingBottom) as MediaText5050BlockProps['spacingBottom'] : undefined,
               headline: block.headline as string | undefined,
@@ -273,9 +273,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 key={block._key || block._type}
                 columns={parseInt(cols, 10) as 2 | 3 | 4}
                 title={block.title as string}
-                blockSurface={block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={block.blockAccent as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={((block.items as Record<string, unknown>[]) ?? []).map((i) => ({
                   ...i,
                   _type: (i._type as 'cardGridItem' | 'textOnColourCardItem') ?? 'cardGridItem',
@@ -294,9 +294,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 key={block._key || block._type}
                 title={block.title as string}
                 cardSize={block.cardSize as 'compact' | 'medium' | 'large'}
-                surface={block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={block.blockAccent as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={((block.items ?? []) as { cardType?: string; title?: string; description?: string; image?: string; video?: string; link?: string; ctaText?: string; aspectRatio?: '4:5' | '8:5' | '2:1'; imageSlot?: string }[]).map((it) => ({
                   ...it,
                   cardType: it.cardType as 'media' | 'text-on-colour',
@@ -313,9 +313,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 key={block._key || block._type}
                 title={block.title as string}
                 variant={block.variant as 'icon' | 'stat'}
-                blockSurface={block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={block.blockAccent as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={block.items as { title?: string; description?: string; icon?: string }[]}
               />
             )
@@ -337,9 +337,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 key={block._key || block._type}
                 items={items}
                 columns={block.columns as 3 | 4 | 5 | 6 | undefined}
-                blockSurface={block.blockSurface as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={block.blockAccent as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
               />
             )
           }
@@ -361,9 +361,9 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                 listVariant={(block.listVariant as 'textList' | 'faq' | 'links') ?? 'textList'}
                 items={listItems}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
-                blockSurface={block.blockSurface as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={block.blockAccent as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
               />
             )
           }
@@ -372,8 +372,8 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
             return null
         }
         if (!content) return null
-        const blockBg = (block.blockBackground as string)?.toLowerCase?.()
-        const blockSurf = ((block.surface ?? block.blockSurface) as string)?.toLowerCase?.()
+        const blockBg = (block.emphasis as string)?.toLowerCase?.()
+        const blockSurf = (block.emphasis as string)?.toLowerCase?.()
         const hasColouredBackground = Boolean(
           ((block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock' || block._type === 'mediaText5050') && blockBg && !['ghost', 'none'].includes(blockBg)) ||
           (['carousel', 'cardGrid', 'proofPoints', 'iconGrid', 'list'].includes(block._type) && blockSurf && blockSurf !== 'ghost')

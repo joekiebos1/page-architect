@@ -16,9 +16,9 @@ const MAX_ITEMS = 12
 export function CardGridBlock({
   columns,
   title,
-  blockSurface,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   items,
   images,
 }: CardGridBlockProps) {
@@ -45,7 +45,7 @@ export function CardGridBlock({
 
   return (
     <BlockReveal>
-      <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle} fullWidth>
+      <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} minimalBackgroundStyle={minimalBackgroundStyle} fullWidth>
         <GridBlock as="section">
           <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-2xl)' }}>
             {title && (

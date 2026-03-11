@@ -20,7 +20,7 @@ export const Compact: Story = {
   args: {
     title: 'Carousel',
     cardSize: 'compact',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -29,7 +29,7 @@ export const Medium: Story = {
   args: {
     title: 'Medium carousel',
     cardSize: 'medium',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -38,7 +38,7 @@ export const Large: Story = {
   args: {
     title: 'Large carousel',
     cardSize: 'large',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items: items.map((i) => ({ ...i, aspectRatio: '2:1' as const })),
   },
 }

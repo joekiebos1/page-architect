@@ -16,7 +16,8 @@ type CarouselItem = {
 }
 
 type FullBleedVerticalCarouselProps = {
-  surface?: 'ghost' | 'minimal' | 'subtle' | 'bold'
+  emphasis?: 'ghost' | 'minimal' | 'subtle' | 'bold'
+  surfaceColour?: 'primary' | 'secondary' | 'sparkle' | 'neutral'
   items?: CarouselItem[] | null
 }
 
@@ -64,7 +65,7 @@ function MediaLayer({ item }: { item: CarouselItem }) {
  * 2. While sticky, images show in a fixed overlay; text scrolls; when item text crosses top, fade to next image
  * 3. When last item's text center reaches viewport center, container unsticks
  */
-export function FullBleedVerticalCarousel({ surface = 'ghost', items }: FullBleedVerticalCarouselProps) {
+export function FullBleedVerticalCarousel({ emphasis = 'ghost', surfaceColour = 'primary', items }: FullBleedVerticalCarouselProps) {
   const items_ = items?.filter((i) => i?.title || i?.description) ?? []
   const n = items_.length
   const { ref: revealRef, isVisible: isItemVisible, containerVisible } = useCarouselReveal(n)
@@ -154,7 +155,7 @@ export function FullBleedVerticalCarousel({ surface = 'ghost', items }: FullBlee
     : createTransition(['opacity', 'transform'], 'xl', 'entrance', level)
 
   return (
-    <BlockSurfaceProvider blockSurface={surface} fullWidth>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth>
     <section ref={revealRef} style={{ marginTop: 'var(--ds-spacing-2xl)' }}>
       <style>{`
         @keyframes carouselFade {

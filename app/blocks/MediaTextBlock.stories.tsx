@@ -33,7 +33,6 @@ export const Stacked: Story = {
     size: 'feature',
     headline: 'Stacked layout',
     subhead: 'Image below the text.',
-    stackImagePosition: 'bottom',
     align: 'center',
     media,
   },
@@ -45,7 +44,6 @@ export const StackedTextBelowLeft: Story = {
     size: 'feature',
     headline: 'Same layout as Large Carousel card',
     body: '2:1 media with h5 + label-s typography below, left aligned.',
-    stackImagePosition: 'bottom',
     align: 'left',
     media: { ...media, aspectRatio: '2:1' as const },
   },
@@ -57,7 +55,6 @@ export const StackedImageOnTop: Story = {
     size: 'feature',
     headline: 'Stacked with image on top',
     subhead: 'Image above the text.',
-    stackImagePosition: 'top',
     media,
   },
 }

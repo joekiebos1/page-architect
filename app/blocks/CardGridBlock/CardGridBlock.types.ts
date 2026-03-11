@@ -1,7 +1,7 @@
 export type CardGridCardType = 'media-description-below' | 'media-description-inside'
 export type CardGridColumns = 2 | 3 | 4
-export type CardGridBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
-export type CardGridBlockAccent = 'primary' | 'secondary' | 'neutral'
+export type CardGridEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
+export type CardGridSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type CardGridItem = {
   _type?: 'cardGridItem'
@@ -35,9 +35,9 @@ export type CardGridBlockItem = CardGridItem | TextOnColourCardGridItem
 export type CardGridBlockProps = {
   columns?: CardGridColumns
   title?: string | null
-  blockSurface?: CardGridBlockSurface
+  emphasis?: CardGridEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: CardGridBlockAccent
+  surfaceColour?: CardGridSurfaceColour
   items?: CardGridBlockItem[] | null
   /** JioKarna preview: progressive image stream state keyed by slot. */
   images?: Record<string, import('../../hooks/useImageStream').ImageSlotState>

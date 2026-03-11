@@ -38,8 +38,8 @@ export type ImageIntent = 'lifestyle' | 'product' | 'abstract'
 /** Block-level options content managers can set per block. */
 export type BlockOptions = {
   contentLayout?: 'stacked' | 'sideBySide' | 'category' | 'mediaOverlay' | 'textOnly' | 'fullscreen' | null
-  blockSurface?: 'ghost' | 'minimal' | 'subtle' | 'bold' | null
-  blockAccent?: 'primary' | 'secondary' | 'neutral' | null
+  emphasis?: 'ghost' | 'minimal' | 'subtle' | 'bold' | null
+  surfaceColour?: 'primary' | 'secondary' | 'sparkle' | 'neutral' | null
   variant?: string | null
   size?: 'hero' | 'feature' | 'editorial' | null
   template?: 'HeroOverlay' | 'Stacked' | 'TextOnly' | null
@@ -49,6 +49,8 @@ export type BlockOptions = {
   stackImagePosition?: 'top' | 'bottom' | null
   cardSize?: 'compact' | 'medium' | 'large' | null
   columns?: 2 | 3 | 4 | null
+  descriptionTitle?: string | null
+  descriptionBody?: string | null
 }
 
 export type Section = {

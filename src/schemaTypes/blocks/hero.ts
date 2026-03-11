@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { spacingBottomField } from '../shared/spacingFields'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
+import { surfaceColourField, emphasisField } from '../shared/blockColourFields'
 
 export const heroBlock = defineType({
   name: 'hero',
@@ -84,38 +85,14 @@ export const heroBlock = defineType({
       },
       initialValue: DS_THEME_DEFAULT,
     }),
-    defineField({
-      name: 'blockSurface',
-      type: 'string',
-      title: 'Emphasis',
-      description: 'Ghost, Minimal, or Subtle. Category and Media overlay use Bold (option hidden).',
-      options: {
-        list: [
-          { value: 'ghost', title: 'Ghost' },
-          { value: 'minimal', title: 'Minimal' },
-          { value: 'subtle', title: 'Subtle' },
-        ],
-        layout: 'radio',
-      },
+    emphasisField({
       initialValue: 'minimal',
       hidden: ({ parent }) =>
-        parent?.contentLayout === 'category' || parent?.contentLayout === 'mediaOverlay',
+        (parent as { contentLayout?: string })?.contentLayout === 'category' || (parent as { contentLayout?: string })?.contentLayout === 'mediaOverlay',
     }),
-    defineField({
-      name: 'blockAccent',
-      type: 'string',
-      title: 'Theming',
-      options: {
-        list: [
-          { value: 'primary', title: 'Primary' },
-          { value: 'secondary', title: 'Secondary' },
-          { value: 'neutral', title: 'Neutral' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'primary',
+    surfaceColourField({
       hidden: ({ parent }) =>
-        parent?.contentLayout === 'category' || parent?.contentLayout === 'mediaOverlay',
+        (parent as { contentLayout?: string })?.contentLayout === 'category' || (parent as { contentLayout?: string })?.contentLayout === 'mediaOverlay',
     }),
     // Content
     defineField({

@@ -221,9 +221,9 @@ export function ListBlock({
   listVariant = 'textList',
   items,
   size: _size = 'feature',
-  blockSurface,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   openLinksInNewTab,
 }: ListBlockProps) {
   const router = useRouter()
@@ -291,8 +291,8 @@ export function ListBlock({
 
   return (
     <BlockSurfaceProvider
-      blockSurface={blockSurface}
-      blockAccent={blockAccent}
+      emphasis={emphasis}
+      surfaceColour={surfaceColour}
       minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'}
       fullWidth
     >

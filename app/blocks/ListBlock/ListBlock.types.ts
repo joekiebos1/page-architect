@@ -28,8 +28,8 @@ export type ListBlockLinkItem = {
 
 export type ListBlockItem = ListBlockTextItem | ListBlockFaqItem | ListBlockLinkItem
 
-export type ListBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
-export type ListBlockAccent = 'primary' | 'secondary' | 'neutral'
+export type ListBlockEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
+export type ListBlockSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type ListBlockSize = 'hero' | 'feature' | 'editorial'
 
@@ -38,9 +38,9 @@ export type ListBlockProps = {
   listVariant?: ListBlockVariant
   items?: ListBlockItem[] | null
   size?: ListBlockSize
-  blockSurface?: ListBlockSurface
+  emphasis?: ListBlockEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: ListBlockAccent
+  surfaceColour?: ListBlockSurfaceColour
   spacingTop?: 'none' | 'medium' | 'large'
   spacingBottom?: 'none' | 'medium' | 'large'
   /** When true, links open in new tab (target="_blank"). */

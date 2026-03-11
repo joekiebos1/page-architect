@@ -19,7 +19,7 @@ const items = [
 export const Default: Story = {
   args: {
     title: 'Why choose us',
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -27,7 +27,7 @@ export const Default: Story = {
 export const Bold: Story = {
   args: {
     title: 'Proof points on bold',
-    blockSurface: 'bold',
+    emphasis: 'bold',
     items,
   },
 }

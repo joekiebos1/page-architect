@@ -274,8 +274,8 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
           ...base,
           template: hasMedia ? template : 'TextOnly',
           size: opts.size ?? 'feature',
-          blockAccent: opts.blockAccent ?? 'primary',
-          blockBackground: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           contentWidth: 'Default',
           mediaStyle: opts.mediaStyle ?? 'contained',
           title: slots.headline ?? s.sectionName,
@@ -308,8 +308,8 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
           ...base,
           columns: String(opts.columns ?? 3),
           title: slots.headline ?? s.sectionName,
-          blockSurface: opts.blockSurface ?? 'ghost',
-          blockAccent: opts.blockAccent ?? 'primary',
+          emphasis: opts.emphasis,
+          surfaceColour: opts.surfaceColour,
           items,
         }
       }
@@ -330,8 +330,8 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
         return {
           ...base,
           cardSize: carouselCardSize,
-          blockAccent: opts.blockAccent ?? 'primary',
-          surface: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           title: slots.headline ?? s.sectionName,
           items,
         }
@@ -350,8 +350,8 @@ export function briefToBlocks(brief: PageBrief, sanityImageUrls: string[] = []):
         return {
           ...base,
           title: slots.headline ?? s.sectionName,
-          blockSurface: opts.blockSurface ?? 'ghost',
-          blockAccent: opts.blockAccent ?? 'primary',
+          emphasis: opts.emphasis,
+          surfaceColour: opts.surfaceColour,
           items,
         }
       }

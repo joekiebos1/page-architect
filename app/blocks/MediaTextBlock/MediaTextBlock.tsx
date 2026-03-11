@@ -50,9 +50,9 @@ export function MediaTextBlock({
   variant,
   width,
   mediaStyle,
-  blockBackground,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   spacing: _spacing,
   spacingTop: _spacingTop,
   spacingBottom: _spacingBottom,
@@ -90,7 +90,7 @@ export function MediaTextBlock({
     ? { level: 0 as const, hasBoldBackground: false }
     : isFullBleed
       ? { level: 1 as const, hasBoldBackground: true }
-      : getSurfaceProviderProps(blockBackground)
+      : getSurfaceProviderProps(emphasis)
 
   const handleCtaPress = (href: string) => {
     if (href.startsWith('/')) router.push(href)
@@ -351,9 +351,9 @@ export function MediaTextBlock({
   const internalPaddingLarge = SPACING_VAR.large
   const cellMedia = useGridCell('Default')
 
-  const bgColor = useBlockBackgroundColor(blockBackground, blockAccent)
+  const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
   const useGradient =
-    blockBackground === 'minimal' && minimalBackgroundStyle === 'gradient'
+    emphasis === 'minimal' && minimalBackgroundStyle === 'gradient'
   /** Edge to edge: no emphasis (no background colour). */
   const background = isEdgeToEdge
     ? undefined

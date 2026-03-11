@@ -311,8 +311,8 @@ function CombinedLayout({
 export function RotatingMediaBlock({
   variant = 'small',
   items,
-  surface = 'ghost',
-  blockAccent = 'primary',
+  emphasis = 'ghost',
+  surfaceColour = 'primary',
 }: RotatingMediaBlockProps) {
   const cell = useGridCell('Wide')
   const [isPaused, setIsPaused] = useState(false)
@@ -334,7 +334,7 @@ export function RotatingMediaBlock({
   const effectivePaused = isPaused || prefersReducedMotion
 
   return (
-    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} fullWidth>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth>
       <style>{`
         @keyframes rotating-media-scroll {
           from { transform: translateX(0); }

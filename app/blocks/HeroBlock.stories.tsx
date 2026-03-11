@@ -25,7 +25,7 @@ export const Stacked: Story = {
   args: {
     ...defaultArgs,
     contentLayout: 'stacked',
-    blockSurface: 'bold',
+    emphasis: 'bold',
   },
 }
 
@@ -33,7 +33,7 @@ export const StackedGhost: Story = {
   args: {
     ...defaultArgs,
     contentLayout: 'stacked',
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
   },
 }
 
@@ -42,7 +42,7 @@ export const SideBySide: Story = {
     ...defaultArgs,
     contentLayout: 'sideBySide',
     containerLayout: 'edgeToEdge',
-    blockSurface: 'bold',
+    emphasis: 'bold',
     headline: 'Side by side hero',
   },
 }

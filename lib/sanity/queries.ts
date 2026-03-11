@@ -7,8 +7,8 @@ const PAGE_SECTIONS_PROJECTION = `{
     containerLayout,
     imageAnchor,
     textAlign,
-    "blockSurface": coalesce(blockSurface, "minimal"),
-    "blockAccent": coalesce(blockAccent, "primary"),
+    emphasis,
+    surfaceColour,
     spacingTop,
     spacingBottom,
     spacing,
@@ -28,9 +28,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     spacing,
     columns,
     title,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       _type,
       _key,
@@ -68,9 +68,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     "image": coalesce(imageUrl, image.asset->url),
     "video": coalesce(videoUrl, video.asset->url),
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "mediaTextStacked" => {
     spacingTop,
@@ -96,9 +96,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     descriptionBody,
     stackedMediaWidth,
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "mediaTextBlock" => {
     spacingTop,
@@ -124,9 +124,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     descriptionBody,
     stackedMediaWidth,
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "carousel" => {
     spacingTop,
@@ -134,9 +134,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     spacing,
     title,
     cardSize,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       cardType,
       title,
@@ -154,9 +154,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     spacing,
     title,
     variant,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       title,
       description,
@@ -167,8 +167,8 @@ const PAGE_SECTIONS_PROJECTION = `{
     spacingTop,
     spacingBottom,
     spacing,
-    blockSurface,
-    blockAccent,
+    emphasis,
+    surfaceColour,
     minimalBackgroundStyle,
     columns,
     items[]{
@@ -184,9 +184,9 @@ const PAGE_SECTIONS_PROJECTION = `{
     spacingBottom,
     blockTitle,
     listVariant,
-    blockSurface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       title,
       body,
@@ -244,9 +244,9 @@ const LAB_SECTIONS_PROJECTION = `{
     descriptionBody,
     stackedMediaWidth,
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "mediaTextBlock" => {
     spacingTop,
@@ -272,9 +272,9 @@ const LAB_SECTIONS_PROJECTION = `{
     descriptionBody,
     stackedMediaWidth,
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "mediaText5050" => {
     spacingTop,
@@ -289,9 +289,9 @@ const LAB_SECTIONS_PROJECTION = `{
     "image": coalesce(imageUrl, image.asset->url),
     "video": coalesce(videoUrl, video.asset->url),
     imageAspectRatio,
-    blockBackground,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent
+    surfaceColour
   },
   _type == "cardGrid" => {
     spacingTop,
@@ -299,9 +299,9 @@ const LAB_SECTIONS_PROJECTION = `{
     spacing,
     columns,
     title,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       _type,
       _key,
@@ -332,9 +332,9 @@ const LAB_SECTIONS_PROJECTION = `{
     spacing,
     columns,
     title,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       _type,
       _key,
@@ -365,9 +365,9 @@ const LAB_SECTIONS_PROJECTION = `{
     spacing,
     title,
     cardSize,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       cardType,
       title,
@@ -393,12 +393,12 @@ const LAB_SECTIONS_PROJECTION = `{
     containerLayout,
     imageAnchor,
     textAlign,
-    "blockSurface": coalesce(blockSurface, "minimal"),
-    "blockAccent": coalesce(blockAccent, "primary")
+    emphasis,
+    surfaceColour
   },
   _type == "fullBleedVerticalCarousel" => {
-    surface,
-    blockAccent,
+    emphasis,
+    surfaceColour,
     minimalBackgroundStyle,
     items[]{
       title,
@@ -409,8 +409,8 @@ const LAB_SECTIONS_PROJECTION = `{
   },
   _type == "rotatingMedia" => {
     variant,
-    surface,
-    blockAccent,
+    emphasis,
+    surfaceColour,
     minimalBackgroundStyle,
     items[]{
       "image": coalesce(imageUrl, image.asset->url),
@@ -431,14 +431,17 @@ const LAB_SECTIONS_PROJECTION = `{
       accentColor,
       spectrum
     },
+    emphasis,
+    surfaceColour,
+    minimalBackgroundStyle,
     columns
   },
   _type == "proofPoints" => {
     title,
     variant,
-    surface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       title,
       description,
@@ -450,9 +453,9 @@ const LAB_SECTIONS_PROJECTION = `{
     spacingBottom,
     blockTitle,
     listVariant,
-    blockSurface,
+    emphasis,
     minimalBackgroundStyle,
-    blockAccent,
+    surfaceColour,
     items[]{
       title,
       body,

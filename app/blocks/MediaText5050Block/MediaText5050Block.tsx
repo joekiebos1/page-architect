@@ -157,9 +157,9 @@ function AccordionItem({
 export function MediaText5050Block({
   variant,
   imagePosition = 'right',
-  blockBackground,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   spacingTop: _spacingTop,
   spacingBottom: _spacingBottom,
   headline,
@@ -181,7 +181,7 @@ export function MediaText5050Block({
 
   const hasMedia = media?.src && media.src.trim() !== ''
   const mediaFirst = imagePosition === 'left'
-  const surfaceProps = getSurfaceProviderProps(blockBackground)
+  const surfaceProps = getSurfaceProviderProps(emphasis)
   const cell = useGridCell('Default')
   const { columns } = useGridBreakpoint()
   const isStacked = columns < 8
@@ -279,8 +279,8 @@ export function MediaText5050Block({
         : { paddingRight: 'var(--ds-spacing-2xl)' })),
   }
 
-  const bgColor = useBlockBackgroundColor(blockBackground, blockAccent)
-  const useGradient = blockBackground === 'minimal' && minimalBackgroundStyle === 'gradient'
+  const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
+  const useGradient = emphasis === 'minimal' && minimalBackgroundStyle === 'gradient'
   const background = bgColor
     ? useGradient
       ? `linear-gradient(to bottom, white 0%, ${bgColor} 100%)`

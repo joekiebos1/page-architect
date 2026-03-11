@@ -50,7 +50,7 @@ export const TextOnColour: Story = {
   args: {
     title: 'Business solutions tailored for your growth',
     columns: 3,
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items: textOnColourItems,
   },
 }
@@ -59,7 +59,7 @@ export const TextOnColourLarge: Story = {
   args: {
     title: 'Simple headlines',
     columns: 2,
-    blockSurface: 'ghost',
+    emphasis: 'ghost',
     items: [
       {
         _type: 'textOnColourCardItem' as const,

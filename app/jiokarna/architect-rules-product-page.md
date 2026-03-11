@@ -151,7 +151,7 @@ For 50/50 (text and image side by side) layouts, use **mediaText5050** instead.
 **Valid size values:** `hero` | `feature` | `editorial`
 **Valid align values:** `left` | `center`
 **Valid mediaStyle values:** `contained` | `overflow`
-**Valid blockBackground values:** `ghost` | `minimal` | `subtle` | `bold`
+**Valid emphasis values:** `ghost` | `minimal` | `subtle` | `bold`
 **Valid stackImagePosition values (Stacked only):** `top` | `bottom`
 
 ### Carousel
@@ -180,7 +180,7 @@ blocks when you have 4+ related items to show.
 - Never use carousel in Resolve.
 
 **Valid cardSize values:** `compact` | `medium` | `large`
-**Valid surface values:** `ghost` | `minimal` | `subtle` | `bold`
+**Valid emphasis values:** `ghost` | `minimal` | `subtle` | `bold`
 
 ### CardGrid
 Same purpose as carousel — grouping benefits or features — with more visual
@@ -216,7 +216,7 @@ Elements get progressively smaller and more detailed as the page scrolls down.
 - Resolve: compact elements only. No hero or feature-size blocks.
 
 **Contrast rule:**
-After a bold coloured surface block → follow with ghost.
+After a bold coloured emphasis block → follow with ghost.
 After a large cinematic moment → follow with something precise and detailed.
 After a text-heavy block → follow with a primarily visual block.
 
@@ -245,7 +245,7 @@ Prefer depth within a block over adding more blocks.
 - Default: `large` between all blocks.
 - `small` when two blocks are tightly related and should feel like one unit.
 - `medium` for general rhythm variation mid-page.
-- Never `small` after a coloured surface block.
+- Never `small` after a coloured emphasis block.
 - Resolve always uses `large`.
 - Valid values: `small` | `medium` | `large`
 

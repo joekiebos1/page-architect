@@ -108,8 +108,8 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         return {
           ...base,
           contentLayout: opts.contentLayout ?? 'stacked',
-          blockSurface: opts.blockSurface ?? 'minimal',
-          blockAccent: opts.blockAccent ?? 'primary',
+          emphasis: opts.emphasis,
+          surfaceColour: opts.surfaceColour,
           productName: brief.meta.pageName,
           headline: slots.headline ?? brief.meta.pageName,
           subheadline: slots.subhead ?? brief.meta.keyMessage,
@@ -128,8 +128,8 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
           template: hasMedia ? template : 'TextOnly',
           size: opts.size ?? 'feature',
           stackImagePosition: (opts.stackImagePosition as 'top' | 'bottom') ?? 'top',
-          blockAccent: opts.blockAccent ?? 'primary',
-          blockBackground: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           contentWidth: 'Default',
           mediaStyle: opts.mediaStyle ?? 'contained',
           title: slots.headline ?? s.sectionName,
@@ -176,8 +176,8 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         return {
           ...base,
           columns: String(opts.columns ?? 3),
-          blockAccent: opts.blockAccent ?? 'primary',
-          surface: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           title: slots.headline ?? s.sectionName,
           items,
         }
@@ -205,8 +205,8 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         return {
           ...base,
           cardSize: carouselCardSize,
-          blockAccent: opts.blockAccent ?? 'primary',
-          surface: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           title: slots.headline ?? s.sectionName,
           items,
         }
@@ -224,8 +224,8 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         }
         return {
           ...base,
-          blockAccent: opts.blockAccent ?? 'primary',
-          surface: opts.blockSurface ?? 'ghost',
+          surfaceColour: opts.surfaceColour,
+          emphasis: opts.emphasis,
           title: slots.headline ?? s.sectionName,
           items,
         }

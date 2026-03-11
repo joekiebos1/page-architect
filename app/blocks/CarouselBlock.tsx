@@ -33,16 +33,16 @@ type CarouselItem = {
 
 type CarouselCardSize = 'compact' | 'medium' | 'large'
 
-type CarouselSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+type CarouselEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
 
-type CarouselBlockAccent = 'primary' | 'secondary' | 'neutral'
+type CarouselSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 type CarouselBlockProps = {
   title?: string | null
   cardSize?: CarouselCardSize
-  surface?: CarouselSurface
+  emphasis?: CarouselEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: CarouselBlockAccent
+  surfaceColour?: CarouselSurfaceColour
   items?: CarouselItem[] | null
   /** JioKarna preview: progressive image stream state keyed by slot. */
   images?: Record<string, { url: string; alt: string; source: 'database' | 'generated'; ready: boolean }>
@@ -125,9 +125,9 @@ function NavButton({
 export function CarouselBlock({
   title,
   cardSize,
-  surface,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   items,
   images,
 }: CarouselBlockProps) {
@@ -305,7 +305,7 @@ export function CarouselBlock({
         : `calc((${contentMaxDefault} - 2 * var(--ds-spacing-l)) * 5 / 24 - ${halfBtn})`
 
   return (
-    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'} fullWidth>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'} fullWidth>
       <GridBlock as="section">
         <div
           ref={revealRef}
@@ -362,7 +362,7 @@ export function CarouselBlock({
                     disabled={!canScrollLeft}
                     onPress={() => scroll('left')}
                     size="M"
-                    surface={surface}
+                    surface={emphasis}
                   />
                 </div>
                 <div
@@ -495,7 +495,7 @@ export function CarouselBlock({
                     disabled={!canScrollRight}
                     onPress={() => scroll('right')}
                     size="M"
-                    surface={surface}
+                    surface={emphasis}
                   />
                 </div>
               </div>

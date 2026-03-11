@@ -1,8 +1,8 @@
-/** Block surface: ghost, minimal, subtle, bold. Maps to SurfaceProvider + background. */
-export type BlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+/** Block emphasis: ghost, minimal, subtle, bold. Maps to SurfaceProvider + background. */
+export type HeroColourEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
 
-/** Block accent: primary, secondary, neutral. Maps to DS appearance tokens. */
-export type BlockAccent = 'primary' | 'secondary' | 'neutral'
+/** Surface colour: primary, secondary, sparkle, neutral. Maps to DS appearance tokens. */
+export type HeroColourSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type HeroColourContentLayout = 'stacked' | 'sideBySide' | 'mediaOverlay'
 export type HeroColourContainerLayout = 'edgeToEdge' | 'contained'
@@ -23,6 +23,6 @@ export type HeroColourProps = {
   containerLayout?: HeroColourContainerLayout | null
   imageAnchor?: HeroColourImageAnchor | null
   textAlign?: HeroColourTextAlign | null
-  blockSurface?: BlockSurface | null
-  blockAccent?: BlockAccent | null
+  emphasis?: HeroColourEmphasis | null
+  surfaceColour?: HeroColourSurfaceColour | null
 }

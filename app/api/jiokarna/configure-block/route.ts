@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 const BLOCK_DESCRIPTIONS: Record<string, string> = {
-  hero: 'Hero block: contentLayout (stacked|sideBySide|mediaOverlay), blockSurface, blockAccent, productName, headline, subheadline, ctaText, ctaLink, cta2Text, cta2Link, image',
+  hero: 'Hero block: contentLayout (stacked|sideBySide|mediaOverlay), emphasis, surfaceColour, productName, headline, subheadline, ctaText, ctaLink, cta2Text, cta2Link, image',
   mediaTextStacked:
-    'Media+Text block: template, size, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, blockBackground, contentWidth, image',
+    'Media+Text block: template, size, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, emphasis, contentWidth, image',
   mediaTextBlock:
-    'Media+Text block: template, size, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, blockBackground, contentWidth, image',
-  cardGrid: 'Card grid: columns, title, items (cardStyle, title, description, image, ctaText, ctaLink, surface)',
-  carousel: 'Carousel: cardSize (compact|medium|large), surface (Emphasis), title, items (title, description, image, link, ctaText, aspectRatio)',
+    'Media+Text block: template, size, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, emphasis, contentWidth, image',
+  cardGrid: 'Card grid: columns, title, items (cardStyle, title, description, image, ctaText, ctaLink, backgroundColor)',
+  carousel: 'Carousel: cardSize (compact|medium|large), emphasis, title, items (title, description, image, link, ctaText, aspectRatio)',
   proofPoints: 'Proof points: title, items (title, description, icon)',
 }
 

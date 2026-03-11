@@ -121,9 +121,9 @@ function IconGridCard({ item }: { item: IconGridItem }) {
 export function IconGridBlock({
   items,
   columns,
-  blockSurface,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
 }: IconGridBlockProps) {
   const { columns: gridColumns } = useGridBreakpoint()
   const items_ = (items ?? []).filter((i) => i?.title).slice(0, 20)
@@ -152,11 +152,11 @@ export function IconGridBlock({
     </BlockContainer>
   )
 
-  if (blockSurface && blockSurface !== 'ghost') {
+  if (emphasis && emphasis !== 'ghost') {
     return (
       <BlockSurfaceProvider
-        blockSurface={blockSurface}
-        blockAccent={blockAccent}
+        emphasis={emphasis}
+        surfaceColour={surfaceColour}
         minimalBackgroundStyle={minimalBackgroundStyle}
         fullWidth
       >

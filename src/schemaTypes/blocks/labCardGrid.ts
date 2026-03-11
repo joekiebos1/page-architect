@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
+import { surfaceColourField, emphasisField } from '../shared/blockColourFields'
 import { minimalBackgroundStyleField } from '../shared/minimalBackgroundStyleField'
 
 /**
@@ -41,36 +42,9 @@ export const labCardGridBlock = defineType({
       },
       initialValue: DS_THEME_DEFAULT,
     }),
-    defineField({
-      name: 'blockAccent',
-      type: 'string',
-      title: 'Theming',
-      options: {
-        list: [
-          { value: 'primary', title: 'Primary' },
-          { value: 'secondary', title: 'Secondary' },
-          { value: 'neutral', title: 'Neutral' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'primary',
-    }),
-    defineField({
-      name: 'surface',
-      type: 'string',
-      title: 'Emphasis',
-      options: {
-        list: [
-          { value: 'ghost', title: 'Ghost' },
-          { value: 'minimal', title: 'Minimal' },
-          { value: 'subtle', title: 'Subtle' },
-          { value: 'bold', title: 'Bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'ghost',
-    }),
-    minimalBackgroundStyleField('surface'),
+    surfaceColourField(),
+    emphasisField(),
+    minimalBackgroundStyleField('emphasis'),
     defineField({
       name: 'title',
       type: 'text',

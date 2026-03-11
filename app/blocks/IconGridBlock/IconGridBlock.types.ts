@@ -32,13 +32,13 @@ export type IconGridItem = {
   spectrum?: IconGridSpectrum | null
 }
 
-export type IconGridBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
-export type IconGridBlockAccent = 'primary' | 'secondary' | 'neutral'
+export type IconGridBlockEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
+export type IconGridBlockSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type IconGridBlockProps = {
   items: IconGridItem[]
   columns?: 3 | 4 | 5 | 6
-  blockSurface?: IconGridBlockSurface
+  emphasis?: IconGridBlockEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: IconGridBlockAccent
+  surfaceColour?: IconGridBlockSurfaceColour
 }

@@ -7,7 +7,6 @@ import React from 'react'
  */
 
 import {
-  IconGridBlock,
   LabCardGridBlock,
   MediaZoomOutOnScroll,
   FullBleedVerticalCarousel,
@@ -16,7 +15,7 @@ import {
   MediaText5050Block,
   TopNavBlock,
 } from './blocks'
-import { HeroBlock, MediaTextBlock, ProofPointsBlock, ListBlock } from '../blocks'
+import { HeroBlock, MediaTextBlock, ProofPointsBlock, ListBlock, IconGridBlock } from '../blocks'
 import { BlockContainer } from '../blocks/BlockContainer'
 import type { HeroBlockProps } from '../blocks/HeroBlock'
 import type { MediaTextBlockProps, MediaText5050BlockProps } from '../blocks'
@@ -51,7 +50,7 @@ export function getBlockSettings(block: LabBlock): string {
     case 'hero': {
       const contentLayout = ((block.contentLayout as string) ?? 'sideBySide').toLowerCase()
       const containerLayout = (block.containerLayout as string) ?? (block.layout as string) ?? 'edgeToEdge'
-      const surface = (block.blockSurface as string) ?? 'bold'
+      const surface = String(block.emphasis ?? 'bold')
       const anchor = (block.imageAnchor as string) ?? 'center'
       const textAlign = (block.textAlign as string) ?? 'left'
       const hasVideo = Boolean((block.videoUrl as string)?.trim())
@@ -74,24 +73,24 @@ export function getBlockSettings(block: LabBlock): string {
             ? 'Bold'
             : surface === 'ghost'
             ? 'No colour'
-            : surface.charAt(0).toUpperCase() + surface.slice(1)
+            : (surface && typeof surface === 'string' ? surface.charAt(0).toUpperCase() + surface.slice(1) : 'Minimal')
       const parts = [layoutLabel, surfaceLabel]
       if (contentLayout === 'sidebyside' && anchor === 'bottom') parts.push('Top to bottom')
       if (hasVideo) parts.push('Video')
       return parts.join(' · ')
     }
     case 'fullBleedVerticalCarousel':
-      return `Surface: ${(block.surface as string) ?? 'ghost'}`
+      return `Emphasis: ${block.emphasis ?? ''}`
     case 'rotatingMedia':
-      return `Variant: ${(block.variant as string) ?? 'small'} · Surface: ${(block.surface as string) ?? 'ghost'}`
+      return `Variant: ${(block.variant as string) ?? 'small'} · Emphasis: ${block.emphasis ?? ''}`
     case 'labCardGrid':
-      return `Columns: ${(block.columns as string) ?? '3'} · Surface: ${(block.surface as string) ?? 'ghost'} · Accent: ${(block.blockAccent as string) ?? 'primary'}`
+      return `Columns: ${(block.columns as string) ?? '3'} · Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''}`
     case 'mediaZoomOutOnScroll':
       return block.videoUrl ? 'With video' : 'Image only'
     case 'iconGrid':
       return `Items: ${Array.isArray(block.items) ? block.items.length : 0} · Columns: ${(block.columns as number) ?? 'auto'}`
     case 'proofPoints':
-      return `Variant: ${(block.variant as string) ?? 'icon'} · Surface: ${(block.surface as string) ?? 'ghost'} · Items: ${Array.isArray(block.items) ? block.items.length : 0}`
+      return `Variant: ${(block.variant as string) ?? 'icon'} · Emphasis: ${block.emphasis ?? ''} · Items: ${Array.isArray(block.items) ? block.items.length : 0}`
     case 'mediaText5050': {
       const variant = (block.variant as string) ?? 'paragraphs'
       const variantLabels: Record<string, string> = {
@@ -107,8 +106,8 @@ export function getBlockSettings(block: LabBlock): string {
       const rawTemplate = (block.template as string) ?? 'Stacked'
       /** Legacy: SideBySide is now mediaText5050; treat as Stacked for display. */
       const template = (rawTemplate === 'SideBySide' || rawTemplate === 'sideBySide') ? 'Stacked' : rawTemplate
-      const bg = (block.blockBackground as string) ?? 'ghost'
-      const parts = [`Template: ${template}`, `Background: ${bg}`]
+      const bg = block.emphasis ?? 'ghost'
+      const parts = [`Template: ${template}`, `Emphasis: ${bg}`]
       if (template === 'HeroOverlay') {
         parts.push(`Align: ${(block.overlayAlignment as string) ?? 'left'}`)
       }
@@ -122,12 +121,10 @@ export function getBlockSettings(block: LabBlock): string {
       }
       return parts.join(' · ')
     }
-    case 'labCardGrid':
-      return `Columns: ${(block.columns as string) ?? '4'} · Surface: ${(block.surface as string) ?? 'ghost'}`
     case 'carousel':
-      return `Responsive · Card size: ${(block.cardSize as string) ?? 'medium'} · Surface: ${(block.surface as string) ?? 'ghost'}`
+      return `Responsive · Card size: ${(block.cardSize as string) ?? 'medium'} · Emphasis: ${block.emphasis ?? ''}`
     case 'list':
-      return `Variant: ${(block.listVariant as string) ?? 'textList'} · Surface: ${(block.blockSurface as string) ?? 'ghost'} · Items: ${Array.isArray(block.items) ? block.items.length : 0}`
+      return `Variant: ${(block.listVariant as string) ?? 'textList'} · Emphasis: ${block.emphasis ?? ''} · Items: ${Array.isArray(block.items) ? block.items.length : 0}`
     case 'topNavBlock':
       return 'Mega menu with L1/L2/L3 navigation'
     default:
@@ -222,16 +219,15 @@ function mapMediaTextBlock(block: LabBlock): MediaTextBlockProps {
         : undefined,
     media,
     variant,
-    blockBackground: block.blockBackground as MediaTextBlockProps['blockBackground'],
+    emphasis: block.emphasis as MediaTextBlockProps['emphasis'],
     minimalBackgroundStyle: block.minimalBackgroundStyle as 'block' | 'gradient' | undefined,
-    blockAccent: block.blockAccent as MediaTextBlockProps['blockAccent'] | undefined,
+    surfaceColour: block.surfaceColour as MediaTextBlockProps['surfaceColour'] | undefined,
     spacing: normalizeSpacing(block.spacing) as MediaTextBlockProps['spacing'],
     spacingTop: block.spacingTop ? (normalizeSpacing(block.spacingTop) as MediaTextBlockProps['spacingTop']) : undefined,
     spacingBottom: block.spacingBottom ? (normalizeSpacing(block.spacingBottom) as MediaTextBlockProps['spacingBottom']) : undefined,
     width,
     align: alignSource === 'center' || alignSource === 'left' ? alignSource : undefined,
     mediaStyle: 'contained',
-    stackImagePosition: (block.stackImagePosition as 'top' | 'bottom') ?? 'top',
     descriptionTitle: block.descriptionTitle as string | undefined,
     descriptionBody: block.descriptionBody as string | undefined,
   }
@@ -269,7 +265,10 @@ function mapMediaText5050Block(block: LabBlock): MediaText5050BlockProps {
   const videoUrl = block.video as string | undefined
   const hasVideo = videoUrl && typeof videoUrl === 'string' && videoUrl.trim() !== ''
   const hasImage = imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== ''
-  const aspectRatio = (block.imageAspectRatio as string) || undefined
+  const rawAspectRatio = (block.imageAspectRatio as string) || undefined
+  const aspectRatio = rawAspectRatio && ['5:4', '1:1', '4:5'].includes(rawAspectRatio)
+    ? (rawAspectRatio as '5:4' | '1:1' | '4:5')
+    : undefined
   const media =
     hasVideo
       ? { type: 'video' as const, src: videoUrl!, poster: hasImage ? imageUrl : undefined, alt: '', aspectRatio }
@@ -282,9 +281,9 @@ function mapMediaText5050Block(block: LabBlock): MediaText5050BlockProps {
   return {
     variant,
     imagePosition: (block.imagePosition as 'left' | 'right') ?? 'right',
-    blockBackground: block.blockBackground as MediaText5050BlockProps['blockBackground'],
+    emphasis: block.emphasis as MediaText5050BlockProps['emphasis'],
     minimalBackgroundStyle: (block.minimalBackgroundStyle as 'block' | 'gradient') ?? 'block',
-    blockAccent: block.blockAccent as MediaText5050BlockProps['blockAccent'],
+    surfaceColour: block.surfaceColour as MediaText5050BlockProps['surfaceColour'],
     spacingTop: block.spacingTop ? (normalizeSpacing(block.spacingTop) as MediaText5050BlockProps['spacingTop']) : undefined,
     spacingBottom: block.spacingBottom ? (normalizeSpacing(block.spacingBottom) as MediaText5050BlockProps['spacingBottom']) : undefined,
     headline: block.headline as string | undefined,
@@ -311,8 +310,8 @@ function mapHeroBlockProps(block: LabBlock) {
     containerLayout: (containerLayout === 'contained' ? 'contained' : 'edgeToEdge') as HeroBlockProps['containerLayout'],
     imageAnchor: ((block.imageAnchor as string) === 'bottom' ? 'bottom' : 'center') as HeroBlockProps['imageAnchor'],
     textAlign: ((block.textAlign as string) === 'center' ? 'center' : 'left') as HeroBlockProps['textAlign'],
-    blockSurface: ((block.blockSurface as string) ?? 'minimal') as HeroBlockProps['blockSurface'],
-    blockAccent: ((block.blockAccent as string) ?? 'primary') as HeroBlockProps['blockAccent'],
+    emphasis: block.emphasis as HeroBlockProps['emphasis'],
+    surfaceColour: block.surfaceColour as HeroBlockProps['surfaceColour'],
   }
 }
 
@@ -335,8 +334,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
         ? undefined
         : (block.spacingTop ? normalizeSpacing(block.spacingTop) : block.spacing ? normalizeSpacing(block.spacing) : undefined) as BlockSpacingValue | undefined
     const spacingBottom = (block.spacingBottom ? normalizeSpacing(block.spacingBottom) : block.spacing ? normalizeSpacing(block.spacing) : undefined) as BlockSpacingValue | undefined
-    const blockBg = (block.blockBackground as string)?.toLowerCase?.()
-    const blockSurf = ((block.surface ?? block.blockSurface) as string)?.toLowerCase?.()
+    const blockBg = (block.emphasis as string)?.toLowerCase?.()
+    const blockSurf = (block.emphasis as string)?.toLowerCase?.()
     const hasColouredBackground = Boolean(
       ((block._type === 'mediaTextStacked' || block._type === 'mediaTextBlock' || block._type === 'mediaText5050') && blockBg && !['ghost', 'none'].includes(blockBg)) ||
       (['carousel', 'labCardGrid', 'proofPoints', 'iconGrid', 'list', 'fullBleedVerticalCarousel', 'rotatingMedia'].includes(block._type) && blockSurf && blockSurf !== 'ghost')
@@ -411,7 +410,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
                     style: (btn.style === 'filled' || btn.style === 'outlined' ? btn.style : 'filled') as 'filled' | 'outlined',
                   })),
                   features: c.features as string[] | undefined,
-                  backgroundColor: (c.backgroundColor as string) ?? 'primary-bold',
+                  backgroundColor: c.backgroundColor as string,
                 }
               }
               return {
@@ -427,9 +426,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               <LabCardGridBlock
                 columns={parseInt(cols, 10) as 2 | 3 | 4}
                 title={block.title as string}
-                blockSurface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={(block.blockAccent as 'primary' | 'secondary' | 'neutral') ?? 'primary'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={items}
               />,
               block,
@@ -446,9 +445,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               <ResponsiveCarouselBlock
                 title={block.title as string}
                 cardSize={(block.cardSize as 'compact' | 'medium' | 'large') ?? 'medium'}
-                surface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={(block.blockAccent as 'primary' | 'secondary' | 'neutral') ?? 'primary'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={carouselItems}
               />,
               block,
@@ -458,7 +457,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
           case 'fullBleedVerticalCarousel': {
             return wrapSection(
               <FullBleedVerticalCarousel
-                surface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={block.items as { title?: string; description?: string; image?: string; video?: string }[]}
               />,
               block,
@@ -469,7 +469,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
             return wrapSection(
               <RotatingMediaBlock
                 variant={(block.variant as 'small' | 'large' | 'combined') ?? 'small'}
-                surface={(block.surface as 'ghost' | 'minimal' | 'subtle' | 'bold') ?? 'ghost'}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={(block.items as { image?: string; title?: string; label?: string }[]).map((i) => ({
                   image: i.image ?? '/placeholder-preview.svg',
                   title: i.title,
@@ -495,24 +496,26 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               <IconGridBlock
                 items={items}
                 columns={(block.columns as 3 | 4 | 5 | 6) ?? undefined}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
               />,
               block,
               i,
             )
           }
           case 'proofPoints': {
-            const ppSurf = (block.surface as string)?.toLowerCase?.()
-            const ppSurfValid = ppSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(ppSurf) ? ppSurf : 'ghost'
-            const ppAcc = (block.blockAccent as string)?.toLowerCase?.()
-            const ppAccValid = ppAcc && ['primary', 'secondary', 'neutral'].includes(ppAcc) ? ppAcc : 'primary'
+            const ppSurf = String(block.emphasis ?? '').toLowerCase()
+            const ppSurfValid = ppSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(ppSurf) ? ppSurf : undefined
+            const ppAcc = String(block.surfaceColour ?? '').toLowerCase()
+            const ppAccValid = ppAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(ppAcc) ? ppAcc : undefined
             const ppVariant = (block.variant as string)?.toLowerCase?.() === 'stat' ? 'stat' : 'icon'
             return wrapSection(
               <ProofPointsBlock
                 title={block.title as string | null}
                 variant={ppVariant}
-                blockSurface={ppSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={ppSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={ppAccValid as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={ppAccValid as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={block.items as { title?: string; description?: string; icon?: string }[]}
               />,
               block,
@@ -543,19 +546,19 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
                   subtitle: i.subtitle,
                 }))
               : []
-            const listSurf = (block.blockSurface as string)?.toLowerCase?.()
-            const listSurfValid = listSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(listSurf) ? listSurf : 'ghost'
-            const listAcc = (block.blockAccent as string)?.toLowerCase?.()
-            const listAccValid = listAcc && ['primary', 'secondary', 'neutral'].includes(listAcc) ? listAcc : 'primary'
+            const listSurf = String(block.emphasis ?? '').toLowerCase()
+            const listSurfValid = listSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(listSurf) ? listSurf : undefined
+            const listAcc = String(block.surfaceColour ?? '').toLowerCase()
+            const listAccValid = listAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(listAcc) ? listAcc : undefined
             return wrapSection(
               <ListBlock
                 blockTitle={block.blockTitle as string | null}
                 listVariant={(block.listVariant as 'textList' | 'faq' | 'links') ?? 'textList'}
                 items={listItems}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
-                blockSurface={listSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={listSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                blockAccent={listAccValid as 'primary' | 'secondary' | 'neutral'}
+                surfaceColour={listAccValid as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 openLinksInNewTab={listBlockOpenLinksInNewTab}
               />,
               block,

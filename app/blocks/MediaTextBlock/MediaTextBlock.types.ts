@@ -12,9 +12,9 @@ export type MediaTextBlockSpacing = 'none' | 'medium' | 'large'
 
 export type MediaTextBlockAspectRatio = '16:9' | '4:3' | '1:1' | '3:4' | '2:1' | 'auto'
 /** Block emphasis: content author chooses this; DS components adapt automatically. */
-export type BlockBackgroundMode = 'ghost' | 'none' | 'minimal' | 'subtle' | 'bold'
-/** Block accent/colour theme: primary, secondary, neutral. DS appearance tokens. */
-export type BlockAccent = 'primary' | 'secondary' | 'neutral'
+export type MediaTextBlockEmphasis = 'ghost' | 'none' | 'minimal' | 'subtle' | 'bold'
+/** Surface colour: primary, secondary, sparkle, neutral. DS appearance tokens. */
+export type MediaTextBlockSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export interface MediaTextBlockMedia {
   type: 'image' | 'video'
@@ -35,9 +35,9 @@ export interface MediaTextBlockProps {
   variant?: MediaTextBlockVariant
   width?: MediaTextBlockWidth
   mediaStyle?: MediaTextBlockMediaStyle
-  blockBackground?: BlockBackgroundMode
+  emphasis?: MediaTextBlockEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: BlockAccent
+  surfaceColour?: MediaTextBlockSurfaceColour
   spacing?: MediaTextBlockSpacing
   spacingTop?: MediaTextBlockSpacing
   spacingBottom?: MediaTextBlockSpacing

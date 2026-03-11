@@ -3,6 +3,7 @@ import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { IconPickerInput } from '../../components/IconPickerInput'
 import { ColorPickerInput } from '../../components/ColorPickerInput'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
+import { surfaceColourField, emphasisField } from '../shared/blockColourFields'
 
 /** Lab: Text inside cards – large (headline + description) or small (icon, CTAs, features). Both with background colour. */
 export const labGridBlockCardItem = defineType({
@@ -146,36 +147,8 @@ export const labGridBlockCardBlock = defineType({
       },
       initialValue: DS_THEME_DEFAULT,
     }),
-    defineField({
-      name: 'blockSurface',
-      type: 'string',
-      title: 'Emphasis',
-      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint.',
-      options: {
-        list: [
-          { value: 'ghost', title: 'Ghost' },
-          { value: 'minimal', title: 'Minimal' },
-          { value: 'subtle', title: 'Subtle' },
-          { value: 'bold', title: 'Bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'ghost',
-    }),
-    defineField({
-      name: 'blockAccent',
-      type: 'string',
-      title: 'Theming',
-      options: {
-        list: [
-          { value: 'primary', title: 'Primary' },
-          { value: 'secondary', title: 'Secondary' },
-          { value: 'neutral', title: 'Neutral' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'primary',
-    }),
+    surfaceColourField(),
+    emphasisField(),
     // Content
     defineField({
       name: 'sectionTitle',

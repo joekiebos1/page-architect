@@ -2,8 +2,8 @@ export type MediaText5050Variant = 'paragraphs' | 'accordion'
 
 export type MediaText5050ImagePosition = 'left' | 'right'
 
-export type BlockBackgroundMode = 'ghost' | 'none' | 'minimal' | 'subtle' | 'bold'
-export type BlockAccent = 'primary' | 'secondary' | 'neutral'
+export type MediaText5050Emphasis = 'ghost' | 'none' | 'minimal' | 'subtle' | 'bold'
+export type MediaText5050SurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export interface MediaText5050Media {
   type: 'image' | 'video'
@@ -21,9 +21,9 @@ export interface MediaText5050Item {
 export interface MediaText5050BlockProps {
   variant: MediaText5050Variant
   imagePosition?: MediaText5050ImagePosition
-  blockBackground?: BlockBackgroundMode
+  emphasis?: MediaText5050Emphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: BlockAccent
+  surfaceColour?: MediaText5050SurfaceColour
   spacingTop?: 'none' | 'medium' | 'large'
   spacingBottom?: 'none' | 'medium' | 'large'
   /** Block-level heading above all content */

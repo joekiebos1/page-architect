@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
+import { surfaceColourField, emphasisField } from '../shared/blockColourFields'
 import { minimalBackgroundStyleField } from '../shared/minimalBackgroundStyleField'
 
 /** Helper to get the list block from document and path (for array item fields). */
@@ -105,38 +106,9 @@ export const listBlock = defineType({
       },
       initialValue: DS_THEME_DEFAULT,
     }),
-    defineField({
-      name: 'blockSurface',
-      type: 'string',
-      title: 'Emphasis',
-      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint.',
-      options: {
-        list: [
-          { value: 'ghost', title: 'Ghost (no background)' },
-          { value: 'minimal', title: 'Minimal' },
-          { value: 'subtle', title: 'Subtle' },
-          { value: 'bold', title: 'Bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'ghost',
-    }),
-    defineField({
-      name: 'blockAccent',
-      type: 'string',
-      title: 'Theming',
-      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
-      options: {
-        list: [
-          { value: 'primary', title: 'Primary (brand)' },
-          { value: 'secondary', title: 'Secondary' },
-          { value: 'neutral', title: 'Neutral (grey)' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'primary',
-    }),
-    minimalBackgroundStyleField('blockSurface'),
+    surfaceColourField(),
+    emphasisField(),
+    minimalBackgroundStyleField('emphasis'),
     // Content
     defineField({
       name: 'blockTitle',

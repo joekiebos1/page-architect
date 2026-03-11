@@ -79,8 +79,8 @@ export const PAGE_BRIEF_SCHEMA = {
           blockOptions: {
             type: ['object', 'null'],
             properties: {
-              blockSurface: { type: ['string', 'null'] },
-              blockAccent: { type: ['string', 'null'] },
+              emphasis: { type: ['string', 'null'] },
+              surfaceColour: { type: ['string', 'null'] },
               variant: { type: ['string', 'null'] },
               size: { type: ['string', 'null'] },
               template: { type: ['string', 'null'] },

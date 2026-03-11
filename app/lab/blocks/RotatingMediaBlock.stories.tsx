@@ -20,7 +20,7 @@ const items = [
 export const Small: Story = {
   args: {
     variant: 'small',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -28,7 +28,7 @@ export const Small: Story = {
 export const Large: Story = {
   args: {
     variant: 'large',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }
@@ -36,7 +36,7 @@ export const Large: Story = {
 export const Combined: Story = {
   args: {
     variant: 'combined',
-    surface: 'ghost',
+    emphasis: 'ghost',
     items,
   },
 }

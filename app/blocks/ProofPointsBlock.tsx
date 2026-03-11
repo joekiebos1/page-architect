@@ -19,17 +19,17 @@ type ProofPointItem = {
   icon?: string | null
 }
 
-type ProofPointsBlockSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
-type ProofPointsBlockAccent = 'primary' | 'secondary' | 'neutral'
+type ProofPointsBlockEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
+type ProofPointsBlockSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 type ProofPointsBlockVariant = 'icon' | 'stat'
 
 type ProofPointsBlockProps = {
   title?: string | null
   variant?: ProofPointsBlockVariant
-  blockSurface?: ProofPointsBlockSurface
+  emphasis?: ProofPointsBlockEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: ProofPointsBlockAccent
+  surfaceColour?: ProofPointsBlockSurfaceColour
   items?: ProofPointItem[] | null
 }
 
@@ -95,9 +95,9 @@ function ProofPointStatItem({ item }: { item: ProofPointItem }) {
 export function ProofPointsBlock({
   title,
   variant,
-  blockSurface,
+  emphasis,
   minimalBackgroundStyle,
-  blockAccent,
+  surfaceColour,
   items,
 }: ProofPointsBlockProps) {
   const level = normalizeHeadingLevel('h2')
@@ -116,7 +116,7 @@ export function ProofPointsBlock({
   if (items_.length === 0) return null
 
   return (
-    <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'} fullWidth>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} minimalBackgroundStyle={minimalBackgroundStyle ?? 'block'} fullWidth>
       <GridBlock as="section">
         <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-2xl)' }}>
           {title && (

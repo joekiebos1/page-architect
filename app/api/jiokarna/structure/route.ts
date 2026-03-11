@@ -26,20 +26,20 @@ Media + text stacked. Flexible layout for features, intros, CTAs.
 Options:
 - template: HeroOverlay (full bleed), Stacked (image above/below), TextOnly (no media — use for CTA banners)
 - size: hero (largest), feature (standard), editorial (compact)
-- blockBackground: ghost | minimal | subtle | bold
-- blockAccent: primary | secondary | neutral
+- emphasis: ghost | minimal | subtle | bold
+- surfaceColour: primary | secondary | neutral
 - contentWidth: XS | S | M | Default | Wide | edgeToEdge
 - stackImagePosition: top | bottom (for Stacked)
 Slots: eyebrow, title, subhead, body, descriptionTitle, descriptionBody, ctaText, ctaLink, cta2Text, cta2Link, image, video.
 
 ### mediaText5050
 Media + Text: 50/50. Text and image side by side. Use for feature comparisons, accordions, multi-paragraph content.
-Options: variant (paragraphs | accordion), imagePosition (left | right), blockBackground, blockAccent.
+Options: variant (paragraphs | accordion), imagePosition (left | right), emphasis, surfaceColour.
 Slots: headline, items[] (subtitle, body), image, video.
 
 ### cardGrid
 Grid of 2, 3, or 4 cards. Use for feature comparison, benefits, product highlights.
-Options: columns (2 | 3 | 4), blockSurface (ghost | minimal | subtle | bold), blockAccent (primary | secondary | neutral).
+Options: columns (2 | 3 | 4), emphasis (ghost | minimal | subtle | bold), surfaceColour (primary | secondary | sparkle | neutral).
 Per card: cardStyle (image-above | text-on-colour | text-on-image), title, description, image, video, ctaText, ctaLink.
 Slots: title, items[].
 
@@ -47,18 +47,18 @@ Slots: title, items[].
 Horizontal carousel of cards. Use for product features, testimonials, media showcases.
 Options:
 - cardSize: compact (3 per row) | medium (2 per row, 4:5) | large (1 per row, 2:1)
-- surface: ghost | minimal | subtle | bold
-- blockAccent: primary | secondary | neutral
+- emphasis: ghost | minimal | subtle | bold
+- surfaceColour: primary | secondary | neutral
 Slots: title, items[] (each: title, description, image, video, link, ctaText, aspectRatio 4:5 | 8:5 | 2:1).
 
 ### proofPoints
 Text + icon strip. Use for top-of-page reasons to believe, trust signals.
-Options: blockSurface (ghost | minimal | subtle | bold), blockAccent (primary | secondary | neutral).
+Options: emphasis (ghost | minimal | subtle | bold), surfaceColour (primary | secondary | sparkle | neutral).
 Slots: title, items[] (title, description, icon).
 
 ## Block-level options (apply to blocks that support them)
-- blockSurface / surface: ghost (no background) | minimal (neutral grey) | subtle (primary tint) | bold (brand colour)
-- blockAccent: primary (brand) | secondary (brand secondary) | neutral (grey)
+- emphasis: ghost (no background) | minimal (neutral grey) | subtle (primary tint) | bold (brand colour)
+- surfaceColour: primary (brand) | secondary (brand secondary) | neutral (grey)
 `
 
 // Product graph derived from site navigation XML.
@@ -165,8 +165,8 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
         "items": "array or null"
       },
       "blockOptions": {
-        "blockSurface": "ghost | minimal | subtle | bold | null",
-        "blockAccent": "primary | secondary | neutral | null",
+        "emphasis": "ghost | minimal | subtle | bold | null",
+        "surfaceColour": "primary | secondary | neutral | null",
         "variant": "string or null (block-specific)",
         "size": "hero | feature | editorial | null (mediaTextStacked)",
         "template": "HeroOverlay | Stacked | TextOnly | null (mediaTextStacked)",
@@ -197,7 +197,7 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
 9. CTA destinations must come from the product graph — never invent a product name that isn't in it.
 10. Cross-linking is a CTA decision. A section about music on a glasses page should CTA to the music product, not back to the glasses.
 11. For modules with multiple items (cardGrid, carousel, proofPoints, etc.), use crossLinks to suggest per-item destinations from the product graph. Omit crossLinks when not relevant.
-12. Use blockOptions to specify blockSurface, blockAccent, variant, size, template, etc. when relevant. Omit blockOptions when defaults are fine.`
+12. Use blockOptions to specify emphasis, surfaceColour, variant, size, template, etc. when relevant. Omit blockOptions when defaults are fine.`
 
 export async function POST(req: NextRequest) {
   try {

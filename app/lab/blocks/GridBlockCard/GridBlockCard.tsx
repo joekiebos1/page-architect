@@ -35,8 +35,8 @@ type GridBlockCardItem = {
 
 type GridBlockCardProps = {
   sectionTitle?: string | null
-  blockSurface?: 'ghost' | 'minimal' | 'subtle' | 'bold'
-  blockAccent?: 'primary' | 'secondary' | 'neutral'
+  emphasis?: 'ghost' | 'minimal' | 'subtle' | 'bold'
+  surfaceColour?: 'primary' | 'secondary' | 'sparkle' | 'neutral'
   cards?: GridBlockCardItem[] | null
 }
 
@@ -160,8 +160,8 @@ function GridBlockCardItemCard({ card }: { card: GridBlockCardItem }) {
 
 export function GridBlockCard({
   sectionTitle,
-  blockSurface = 'ghost',
-  blockAccent = 'primary',
+  emphasis = 'ghost',
+  surfaceColour = 'primary',
   cards = [],
 }: GridBlockCardProps) {
   const cell = useGridCell('Wide')
@@ -170,7 +170,7 @@ export function GridBlockCard({
   if (cards_.length === 0) return null
 
   return (
-    <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent}>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour}>
       <GridBlock as="section">
         <div
           style={{

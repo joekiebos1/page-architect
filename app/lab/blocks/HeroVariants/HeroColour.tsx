@@ -8,7 +8,7 @@
  * - sideBySide: text left, image right (containerLayout, imageAnchor)
  * - mediaOverlay: image as background, content overlaid (textAlign)
  *
- * blockSurface (ghost, minimal, subtle, bold) applies at surface level.
+ * emphasis (ghost, minimal, subtle, bold) applies at surface level.
  */
 
 import { useRouter } from 'next/navigation'
@@ -38,8 +38,8 @@ export function HeroColour({
   containerLayout = 'edgeToEdge',
   imageAnchor = 'center',
   textAlign = 'left',
-  blockSurface = 'ghost',
-  blockAccent = 'primary',
+  emphasis = 'ghost',
+  surfaceColour = 'primary',
 }: HeroColourProps) {
   const router = useRouter()
   const { columns } = useGridBreakpoint()
@@ -52,9 +52,9 @@ export function HeroColour({
   const isEdgeToEdge = containerLayout === 'edgeToEdge'
   const isContained = containerLayout === 'contained'
   /** Top to bottom: no Ghost (force minimal). */
-  const effectiveSurface = imageAnchor === 'bottom' && blockSurface === 'ghost' ? 'minimal' : blockSurface
+  const effectiveSurface = imageAnchor === 'bottom' && emphasis === 'ghost' ? 'minimal' : emphasis
   const surfaceProps = getSurfaceProviderProps(effectiveSurface)
-  const bgColor = useBlockBackgroundColor(effectiveSurface, blockAccent)
+  const bgColor = useBlockBackgroundColor(effectiveSurface, surfaceColour)
 
   const handleCtaPress = (href: string) => {
     if (href.startsWith('/')) router.push(href)
@@ -97,7 +97,7 @@ export function HeroColour({
 
   if (isStackedLayout) {
     return (
-      <BlockSurfaceProvider blockSurface={blockSurface} blockAccent={blockAccent} fullWidth>
+      <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth>
         <section ref={revealRef} style={{ width: '100%' }}>
           <GridBlock as="div">
             <div style={{ ...cell, display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -312,7 +312,7 @@ export function HeroColour({
 
   if (isEdgeToEdge) {
     return (
-      <BlockSurfaceProvider blockSurface={effectiveSurface} blockAccent={blockAccent} fullWidth>
+      <BlockSurfaceProvider emphasis={effectiveSurface} surfaceColour={surfaceColour} fullWidth>
         <div ref={revealRef}>
           <GridBlock as="section">{gridContent}</GridBlock>
         </div>

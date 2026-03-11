@@ -37,16 +37,16 @@ type CarouselItem = {
 
 type CarouselCardSize = 'compact' | 'medium' | 'large'
 
-type CarouselSurface = 'ghost' | 'minimal' | 'subtle' | 'bold'
+type CarouselEmphasis = 'ghost' | 'minimal' | 'subtle' | 'bold'
 
-type CarouselBlockAccent = 'primary' | 'secondary' | 'neutral'
+type CarouselSurfaceColour = 'primary' | 'secondary' | 'sparkle' | 'neutral'
 
 export type ResponsiveCarouselBlockProps = {
   title?: string | null
   cardSize?: CarouselCardSize
-  surface?: CarouselSurface
+  emphasis?: CarouselEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
-  blockAccent?: CarouselBlockAccent
+  surfaceColour?: CarouselSurfaceColour
   items?: CarouselItem[] | null
   images?: Record<string, { url: string; alt: string; source: 'database' | 'generated'; ready: boolean }>
 }
@@ -129,9 +129,9 @@ function NavButton({
 export function ResponsiveCarouselBlock({
   title,
   cardSize = 'medium',
-  surface = 'ghost',
+  emphasis = 'ghost',
   minimalBackgroundStyle = 'block',
-  blockAccent = 'primary',
+  surfaceColour = 'primary',
   items,
   images,
 }: ResponsiveCarouselBlockProps) {
@@ -312,7 +312,7 @@ export function ResponsiveCarouselBlock({
       : undefined
 
   return (
-    <BlockSurfaceProvider blockSurface={surface} blockAccent={blockAccent} minimalBackgroundStyle={minimalBackgroundStyle} fullWidth>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} minimalBackgroundStyle={minimalBackgroundStyle} fullWidth>
       <GridBlock as="section">
         <div
           ref={revealRef}
@@ -371,7 +371,7 @@ export function ResponsiveCarouselBlock({
                     disabled={!canScrollLeft}
                     onPress={() => scroll('left')}
                     size={navButtonSize}
-                    surface={surface}
+                    surface={emphasis}
                   />
                 </div>
                 <div
@@ -506,7 +506,7 @@ export function ResponsiveCarouselBlock({
                     disabled={!canScrollRight}
                     onPress={() => scroll('right')}
                     size={navButtonSize}
-                    surface={surface}
+                    surface={emphasis}
                   />
                 </div>
               </div>

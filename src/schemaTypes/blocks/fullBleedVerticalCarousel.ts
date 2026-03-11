@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { DS_THEMES, DS_THEME_DEFAULT } from '../shared/dsThemes'
 import { spacingTopField, spacingBottomField } from '../shared/spacingFields'
+import { surfaceColourField, emphasisField } from '../shared/blockColourFields'
 import { minimalBackgroundStyleField } from '../shared/minimalBackgroundStyleField'
 
 export const fullBleedVerticalCarouselItem = defineType({
@@ -79,38 +80,9 @@ export const fullBleedVerticalCarouselBlock = defineType({
       },
       initialValue: DS_THEME_DEFAULT,
     }),
-    defineField({
-      name: 'blockAccent',
-      type: 'string',
-      title: 'Theming',
-      description: 'Primary = brand, Secondary = brand secondary, Neutral = grey.',
-      options: {
-        list: [
-          { value: 'primary', title: 'Primary (brand)' },
-          { value: 'secondary', title: 'Secondary' },
-          { value: 'neutral', title: 'Neutral (grey)' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'primary',
-    }),
-    defineField({
-      name: 'surface',
-      type: 'string',
-      title: 'Emphasis',
-      description: 'Ghost = no background. Minimal = light tint, Subtle = medium tint, Bold = strong tint. Colour comes from Theming.',
-      options: {
-        list: [
-          { value: 'ghost', title: 'Ghost (no background)' },
-          { value: 'minimal', title: 'Minimal' },
-          { value: 'subtle', title: 'Subtle' },
-          { value: 'bold', title: 'Bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'ghost',
-    }),
-    minimalBackgroundStyleField('surface'),
+    surfaceColourField(),
+    emphasisField(),
+    minimalBackgroundStyleField('emphasis'),
     // Content
     defineField({
       name: 'items',
@@ -126,12 +98,12 @@ export const fullBleedVerticalCarouselBlock = defineType({
     }),
   ],
   preview: {
-    select: { 'firstItemTitle': 'items.0.title', surface: 'surface', items: 'items' },
-    prepare: ({ firstItemTitle, surface, items }) => {
+    select: { 'firstItemTitle': 'items.0.title', emphasis: 'emphasis', items: 'items' },
+    prepare: ({ firstItemTitle, emphasis, items }) => {
       const inferredTitle = (firstItemTitle || '').toString().trim() || 'Full bleed vertical carousel'
       return {
         title: inferredTitle,
-        subtitle: `Full bleed vertical carousel · ${surface ?? 'ghost'} · ${items?.length ?? 0} item(s)`,
+        subtitle: `Full bleed vertical carousel · ${emphasis ?? ''} · ${items?.length ?? 0} item(s)`,
       }
     },
   },

@@ -25,8 +25,8 @@ export const Stacked: Story = {
   args: {
     ...defaultArgs,
     contentLayout: 'stacked',
-    blockSurface: 'bold',
-    blockAccent: 'primary',
+    emphasis: 'bold',
+    surfaceColour: 'primary',
   },
 }
 
@@ -36,8 +36,8 @@ export const SideBySideEdgeToEdge: Story = {
     contentLayout: 'sideBySide',
     containerLayout: 'edgeToEdge',
     imageAnchor: 'center',
-    blockSurface: 'bold',
-    blockAccent: 'primary',
+    emphasis: 'bold',
+    surfaceColour: 'primary',
   },
 }
 
@@ -47,7 +47,7 @@ export const SideBySideEdgeToEdgeImageBottom: Story = {
     contentLayout: 'sideBySide',
     containerLayout: 'edgeToEdge',
     imageAnchor: 'bottom',
-    blockSurface: 'bold',
+    emphasis: 'bold',
   },
 }
 
@@ -56,8 +56,8 @@ export const SideBySideContained: Story = {
     ...defaultArgs,
     contentLayout: 'sideBySide',
     containerLayout: 'contained',
-    blockSurface: 'subtle',
-    blockAccent: 'primary',
+    emphasis: 'subtle',
+    surfaceColour: 'primary',
   },
 }
 
@@ -66,7 +66,7 @@ export const MediaOverlayLeft: Story = {
     ...defaultArgs,
     contentLayout: 'mediaOverlay',
     textAlign: 'left',
-    blockAccent: 'primary',
+    surfaceColour: 'primary',
   },
 }
 
@@ -75,6 +75,6 @@ export const MediaOverlayCenter: Story = {
     ...defaultArgs,
     contentLayout: 'mediaOverlay',
     textAlign: 'center',
-    blockAccent: 'primary',
+    surfaceColour: 'primary',
   },
 }

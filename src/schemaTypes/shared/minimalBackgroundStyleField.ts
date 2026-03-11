@@ -2,9 +2,9 @@ import { defineField } from 'sanity'
 
 /**
  * Minimal background style: block (solid) or gradient (white to minimal).
- * Only shown when surface/blockBackground is 'minimal'.
+ * Only shown when emphasis is 'minimal'.
  */
-export function minimalBackgroundStyleField(surfaceFieldName: 'surface' | 'blockBackground' | 'blockSurface' = 'surface') {
+export function minimalBackgroundStyleField(emphasisFieldName: 'emphasis' = 'emphasis') {
   return defineField({
     name: 'minimalBackgroundStyle',
     type: 'string',
@@ -18,6 +18,6 @@ export function minimalBackgroundStyleField(surfaceFieldName: 'surface' | 'block
       layout: 'radio',
     },
     initialValue: 'block',
-    hidden: ({ parent }) => (parent as Record<string, string>)?.[surfaceFieldName] !== 'minimal',
+    hidden: ({ parent }) => (parent as Record<string, string>)?.[emphasisFieldName] !== 'minimal',
   })
 }
