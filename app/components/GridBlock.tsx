@@ -4,14 +4,15 @@ import { useGridBreakpoint } from '../lib/use-grid-breakpoint'
 
 type GridBlockProps = {
   children: React.ReactNode
-  as?: 'section' | 'div'
+  as?: 'section' | 'div' | 'main'
+  style?: React.CSSProperties
 }
 
 /**
  * Shared grid wrapper – same logic as Hero block.
  * Uses foundation grid (columns, margin, gutter) from useGridBreakpoint.
  */
-export function GridBlock({ children, as: Component = 'section' }: GridBlockProps) {
+export function GridBlock({ children, as: Component = 'section', style }: GridBlockProps) {
   const { columns, marginPx, gutterPx, gridMaxWidth } = useGridBreakpoint()
   return (
     <Component
@@ -25,6 +26,7 @@ export function GridBlock({ children, as: Component = 'section' }: GridBlockProp
         paddingLeft: marginPx,
         paddingRight: marginPx,
         boxSizing: 'border-box',
+        ...style,
       }}
     >
       {children}

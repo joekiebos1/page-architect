@@ -170,7 +170,7 @@ export function GridBlockCard({
   if (cards_.length === 0) return null
 
   return (
-    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour}>
+    <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth>
       <GridBlock as="section">
         <div
           style={{

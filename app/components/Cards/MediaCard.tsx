@@ -49,8 +49,20 @@ export function MediaCard({
   imageSlot,
 }: MediaCardProps) {
   const router = useRouter()
-  const { layout, imageHeight4_5 } = config
+  const { layout, cardSize, imageHeight4_5, imageHeight8_5 } = config
   const isLarge = layout === 'large' || layout === 'medium'
+
+  /** Typography per card size (grid). Compact layout uses cardSize when provided. */
+  const gridTypography = cardSize
+    ? {
+        large: { title: 'var(--ds-typography-h4)', desc: 'var(--ds-typography-label-m)' },
+        medium: { title: 'var(--ds-typography-h5)', desc: 'var(--ds-typography-label-s)' },
+        small: { title: 'var(--ds-typography-label-l)', desc: 'var(--ds-typography-label-s)' },
+      }[cardSize]
+    : null
+  const titleFontSize = gridTypography?.title ?? (isLarge ? 'var(--ds-typography-h5)' : 'var(--ds-typography-label-s)')
+  const descFontSize = gridTypography?.desc ?? 'var(--ds-typography-label-s)'
+  const titleWeight = 'var(--ds-typography-weight-medium)'
 
   const handleCtaPress = (href: string) => {
     if (href.startsWith('/')) router.push(href)
@@ -60,18 +72,23 @@ export function MediaCard({
   const hasVideo = video && typeof video === 'string' && video.trim() !== ''
   const hasImage = (image && typeof image === 'string' && image.trim() !== '') || (imageState && imageSlot)
 
-  // Large: 2:1 only. Medium: 4:5 only. Compact: 4:5 and 8:5 (2:1 falls back to 8:5).
+  // Large: aspectRatio prop (default 2:1). Medium: 4:5 only. Compact: 4:5 and 8:5 (2:1 falls back to 8:5).
   const effectiveRatio =
     layout === 'medium'
       ? '4:5'
       : layout === 'large'
-        ? '2:1'
+        ? (aspectRatio ?? '2:1')
         : (aspectRatio === '2:1' ? '8:5' : (aspectRatio ?? '4:5'))
 
   const mediaAspectMap = { '4:5': '4/5' as const, '8:5': '8/5' as const, '2:1': '2/1' as const }
   const mediaAspectRatio = mediaAspectMap[effectiveRatio] ?? '4/5'
+  /** Use heightCss only when it's a calc() from carousel; 'auto' would collapse the card. */
   const heightCss =
-    effectiveRatio === '4:5' && imageHeight4_5 ? imageHeight4_5 : undefined
+    effectiveRatio === '4:5' && imageHeight4_5 && imageHeight4_5 !== 'auto'
+      ? imageHeight4_5
+      : effectiveRatio === '8:5' && imageHeight8_5 && imageHeight8_5 !== 'auto'
+        ? imageHeight8_5
+        : undefined
 
   const imageBlock = (
     <div
@@ -137,8 +154,8 @@ export function MediaCard({
                 style={{
                   margin: 0,
                   width: '100%',
-                  fontSize: 'var(--ds-typography-h5)',
-                  fontWeight: 'var(--ds-typography-weight-medium)',
+                  fontSize: titleFontSize,
+                  fontWeight: titleWeight,
                   color: 'var(--ds-color-text-high)',
                   lineHeight: 1.4,
                   whiteSpace: 'pre-line',
@@ -152,7 +169,7 @@ export function MediaCard({
                 style={{
                   margin: 0,
                   width: '100%',
-                  fontSize: 'var(--ds-typography-label-s)',
+                  fontSize: descFontSize,
                   lineHeight: 1.4,
                   color: 'var(--ds-color-text-low)',
                   fontWeight: 'var(--ds-typography-weight-low)',
@@ -168,12 +185,12 @@ export function MediaCard({
             style={{
               margin: 0,
               width: '100%',
-              fontSize: 'var(--ds-typography-label-s)',
+              fontSize: titleFontSize,
               lineHeight: 1.4,
             }}
           >
             {title && (
-              <span style={{ color: 'var(--ds-color-text-high)', fontWeight: 'var(--ds-typography-weight-high)', whiteSpace: 'pre-line' }}>
+              <span style={{ color: 'var(--ds-color-text-high)', fontWeight: titleWeight, whiteSpace: 'pre-line' }}>
                 {title}
               </span>
             )}

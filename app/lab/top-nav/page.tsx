@@ -13,8 +13,9 @@ import Link from 'next/link'
 export default function LabTopNavPage() {
   return (
     <DsProvider platform="Desktop (1440)" colorMode="Light" density="Default" theme="MyJio">
-      <TopNavBlock />
-      <main className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
+      <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+        <TopNavBlock />
+        <main className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
         <div style={{ marginBottom: 'var(--ds-spacing-3xl)' }}>
           <Link
             href="/lab"
@@ -58,6 +59,7 @@ export default function LabTopNavPage() {
           The mega menu is rendered above. Use the nav items to explore the dropdown behaviour.
         </p>
       </main>
+      </div>
     </DsProvider>
   )
 }

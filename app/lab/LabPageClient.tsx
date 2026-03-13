@@ -44,14 +44,16 @@ export function LabPageClient({ sections }: LabPageClientProps) {
 
   return (
     <DsProvider platform="Desktop (1440)" colorMode="Light" density="Default" theme="MyJio">
-      <TopNavBlock />
-      <main className="ds-container" style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
+      <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+        <TopNavBlock />
+        <main style={{ paddingBlock: 'var(--ds-spacing-2xl)' }}>
         <LabBlockRenderer
           blocks={blocks as { _type: string; _key?: string; [key: string]: unknown }[]}
           clean
           listBlockOpenLinksInNewTab
         />
       </main>
+      </div>
     </DsProvider>
   )
 }

@@ -69,6 +69,7 @@ export function CardGridBlock({
                     key={(item as { _key?: string })._key ?? i}
                     item={item}
                     prefersReducedMotion={prefersReducedMotion}
+                    gridColumns={cols}
                     imageState={(item as { imageSlot?: string }).imageSlot && images
                       ? images[(item as { imageSlot: string }).imageSlot]
                       : undefined}

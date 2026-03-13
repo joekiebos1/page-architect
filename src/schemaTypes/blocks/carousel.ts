@@ -17,7 +17,7 @@ export const carouselBlock = defineType({
       name: 'cardSize',
       type: 'string',
       title: 'Card size',
-      description: 'Compact: 3 cards per row. Medium: 2 cards per row (4:5). Large: 1 card per row (2:1).',
+      description: 'Compact: 3 cards per row. Medium: 2 cards per row (4:5). Large: 3 cards visible (center full, sides clipped), min 3 cards required.',
       options: {
         list: [
           { value: 'compact', title: 'Compact' },
@@ -59,7 +59,14 @@ export const carouselBlock = defineType({
       validation: (Rule) =>
         Rule.required()
           .min(1)
-          .error('Add at least one card'),
+          .error('Add at least one card')
+          .custom((items, context) => {
+            const parent = context.parent as { cardSize?: string }
+            if (parent?.cardSize === 'large' && (items?.length ?? 0) < 3) {
+              return 'Large carousel requires at least 3 cards'
+            }
+            return true
+          }),
     }),
   ],
   preview: {

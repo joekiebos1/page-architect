@@ -344,6 +344,7 @@ export function MediaTextBlock({
   /** Internal vertical padding for background colour: always Large (4xl) per spec. */
   const internalPaddingLarge = SPACING_VAR.large
   const cellMedia = useGridCell('Default')
+  const cellWide = useGridCell('Wide')
 
   const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
   const useGradient =
@@ -357,25 +358,35 @@ export function MediaTextBlock({
         : bgColor
       : undefined
 
-  /** Full-width background band. Coloured padding: always Large (top and bottom) for all blocks. Capped at 1920px on large screens. */
+  /** Full-width background band. Band spans full viewport (100vw); content inside capped at 1920px. */
   const blockBgWrapper = (children: ReactNode) =>
     background ? (
-      <div style={{ ...EDGE_TO_EDGE_BREAKOUT }}>
-        <div
-          style={{
-            ...edgeStyles.innerContainer,
-            background,
-            paddingBlockStart: internalPaddingLarge,
-            paddingBlockEnd: internalPaddingLarge,
-            minHeight: 1,
-          }}
-        >
+      <div
+        style={{
+          ...EDGE_TO_EDGE_BREAKOUT,
+          background,
+          paddingBlockStart: internalPaddingLarge,
+          paddingBlockEnd: internalPaddingLarge,
+          minHeight: 1,
+        }}
+      >
+        <div style={edgeStyles.inner}>
           {children}
         </div>
       </div>
     ) : (
       children
     )
+
+  /** Edge-to-edge overlay/stacked media: wrap in capped container when no band (so media caps at 1920px). */
+  const edgeToEdgeCappedWrapper = (children: ReactNode) =>
+    !background && ((variant === 'full-bleed' && width === 'edgeToEdge') || (variant === 'centered-media-below' && width === 'edgeToEdge'))
+      ? (
+          <div style={EDGE_TO_EDGE_BREAKOUT}>
+            <div style={edgeStyles.inner}>{children}</div>
+          </div>
+        )
+      : children
 
   if (isNarrow) {
     return blockBgWrapper(
@@ -406,8 +417,8 @@ export function MediaTextBlock({
         <BlockReveal>
           <SurfaceProvider {...surfaceProps}>
             <GridBlock as="section">
-              <div style={{ ...cellMedia }}>
-                <BlockContainer contentWidth="Default" style={{ width: '100%' }}>
+              <div style={{ ...cellWide }}>
+                <BlockContainer contentWidth="Wide" style={{ width: '100%' }}>
                   <div
                     style={{
                       position: 'relative',
@@ -459,48 +470,50 @@ export function MediaTextBlock({
       )
     }
 
-    return blockBgWrapper(
-      <BlockReveal>
-        <SurfaceProvider {...surfaceProps}>
-          <section style={{ position: 'relative', width: '100%', aspectRatio, overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0 }}>
-              {isVideo ? (
-                <VideoWithControls
-                  src={media.src}
-                  poster={media.poster}
-                  prefersReducedMotion={prefersReducedMotion}
-                />
-              ) : (
-                <Image src={media.src} alt={media.alt ?? ''} fill style={{ objectFit: 'cover' }} sizes="100vw" />
-              )}
-            </div>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to top, var(--local-color-overlay-dark) 0%, transparent 60%)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                paddingBlock: 'var(--ds-spacing-3xl)',
-                paddingInline: 0,
-              }}
-            >
-              {align === 'left' ? (
-                <GridBlock as="div">
-                  <div style={{ ...cellMedia, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)', alignItems: 'flex-start', paddingInlineStart: 'var(--ds-spacing-3xl)' }}>
+    return edgeToEdgeCappedWrapper(
+      blockBgWrapper(
+        <BlockReveal>
+          <SurfaceProvider {...surfaceProps}>
+            <section style={{ position: 'relative', width: '100%', aspectRatio, overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', inset: 0 }}>
+                {isVideo ? (
+                  <VideoWithControls
+                    src={media.src}
+                    poster={media.poster}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                ) : (
+                  <Image src={media.src} alt={media.alt ?? ''} fill style={{ objectFit: 'cover' }} sizes="100vw" />
+                )}
+              </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, var(--local-color-overlay-dark) 0%, transparent 60%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  paddingBlock: 'var(--ds-spacing-3xl)',
+                  paddingInline: 0,
+                }}
+              >
+                {align === 'left' ? (
+                  <GridBlock as="div">
+                    <div style={{ ...cellMedia, display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)', alignItems: 'flex-start', paddingInlineStart: 'var(--ds-spacing-3xl)' }}>
+                      {textContent}
+                    </div>
+                  </GridBlock>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)', alignItems: 'center', width: '100%' }}>
                     {textContent}
                   </div>
-                </GridBlock>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)', alignItems: 'center', width: '100%' }}>
-                  {textContent}
-                </div>
-              )}
-            </div>
-          </section>
-        </SurfaceProvider>
-      </BlockReveal>
+                )}
+              </div>
+            </section>
+          </SurfaceProvider>
+        </BlockReveal>
+      )
     )
   }
 

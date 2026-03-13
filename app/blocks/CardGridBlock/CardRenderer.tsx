@@ -23,17 +23,28 @@ function getCardType(item: CardGridBlockItem): string {
   return CARD_TYPE_MEDIA_BELOW
 }
 
+/** Derive card size from grid columns: 1 = large, 2 = medium, 3–4 = small. */
+function getCardSizeFromColumns(cols: number): 'large' | 'medium' | 'small' {
+  if (cols <= 1) return 'large'
+  if (cols <= 2) return 'medium'
+  return 'small'
+}
+
 export function CardRenderer({
   item,
   prefersReducedMotion,
   imageState,
+  gridColumns,
 }: {
   item: CardGridBlockItem
   prefersReducedMotion: boolean
   imageState?: ImageSlotState
+  /** Grid columns (1–4). Drives card typography size. */
+  gridColumns?: number
 }) {
   const title = item.title ?? ''
   const cardType = getCardType(item)
+  const cardSize = gridColumns != null ? getCardSizeFromColumns(gridColumns) : 'medium'
 
   // Text inside: TextOnColourCardGrid (unified cardGridItem or legacy textOnColourCardItem / cardStyle text-on-colour)
   if (cardType === CARD_TYPE_TEXT_INSIDE) {
@@ -53,6 +64,7 @@ export function CardRenderer({
     return (
       <TextOnColourCardGrid
         size={size}
+        cardSize={cardSize}
         icon={t.icon}
         iconImage={t.iconImage}
         title={t.title}
@@ -74,7 +86,7 @@ export function CardRenderer({
           title={title}
           description={m.description}
           image={img}
-          config={{ aspectRatio: '4/5' }}
+          config={{ aspectRatio: '4/5', cardSize }}
           imageState={imageState}
           imageSlot={m.imageSlot}
         />
@@ -103,7 +115,7 @@ export function CardRenderer({
       ctaText={m.ctaText}
       aspectRatio="4:5"
       prefersReducedMotion={prefersReducedMotion}
-      config={{ layout: 'compact' }}
+      config={{ layout: 'compact', cardSize }}
       imageState={imageState}
       imageSlot={m.imageSlot}
     />

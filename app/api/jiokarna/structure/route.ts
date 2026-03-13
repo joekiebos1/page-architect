@@ -169,7 +169,9 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
         "surfaceColour": "primary | secondary | neutral | null",
         "variant": "string or null (block-specific)",
         "size": "hero | feature | editorial | null (mediaTextStacked)",
-        "template": "TextOnly | Stacked | Overlay | null (mediaTextStacked)",
+        "template": "TextOnly | Stacked | Overlay (mediaTextStacked, required)",
+        "alignment": "left | center (mediaTextStacked, required)",
+        "mediaSize": "edgeToEdge | default (mediaTextStacked Stacked/Overlay, required)",
         "cardSize": "compact | medium | large | null (carousel)",
         "columns": "2 | 3 | 4 | null (cardGrid)"
       } | null,

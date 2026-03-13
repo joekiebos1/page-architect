@@ -10,7 +10,7 @@ import {
   LabCardGridBlock,
   MediaZoomOutOnScroll,
   FullBleedVerticalCarousel,
-  ResponsiveCarouselBlock,
+  CarouselBlock,
   RotatingMediaBlock,
   MediaText5050Block,
   TopNavBlock,
@@ -99,11 +99,11 @@ export function getBlockLayoutTitle(block: LabBlock): string {
     case 'mediaTextBlock': {
       const rawTemplate = (block.template as string) ?? 'Stacked'
       const template = (rawTemplate === 'SideBySide' || rawTemplate === 'sideBySide') ? 'Stacked' : rawTemplate === 'MediaOverlay' ? 'Overlay' : rawTemplate
-      if (template === 'TextOnly') return `Text only · Align ${(block.alignment as string) ?? 'left'}`
-      const mediaSize = (block.mediaSize as string) ?? 'edgeToEdge'
+      if (template === 'TextOnly') return `Text only · Align ${block.alignment as string}`
+      const mediaSize = block.mediaSize as string
       const sizeLabel = mediaSize === 'edgeToEdge' ? 'Edge to edge' : 'Contained'
-      if (template === 'Overlay') return `Overlay · ${sizeLabel} · Align ${(block.alignment as string) ?? block.overlayAlignment ?? 'left'}`
-      return `Stacked · ${sizeLabel} · Align ${(block.alignment as string) ?? block.stackAlignment ?? 'left'}`
+      if (template === 'Overlay') return `Overlay · ${sizeLabel} · Align ${block.alignment as string}`
+      return `Stacked · ${sizeLabel} · Align ${block.alignment as string}`
     }
     case 'carousel': {
       const size = (block.cardSize as string) ?? 'medium'
@@ -228,7 +228,7 @@ function mapMediaTextBlock(block: LabBlock): MediaTextBlockProps {
         ? 'left'
         : undefined
 
-  const mediaSize = (block.mediaSize as string) ?? 'edgeToEdge'
+  const mediaSize = block.mediaSize as string
   /** Stacked and Overlay: edge to edge or contained based on mediaSize. */
   const width =
     (template === 'Stacked' || template === 'Overlay') && mediaSize === 'edgeToEdge'
@@ -391,16 +391,23 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
     if (clean) return <React.Fragment key={block._key}>{blockContent}</React.Fragment>
     const layoutTitle = variantLabels?.[i] ?? getBlockLayoutTitle(block)
     const otherSettings = getBlockOtherSettings(block)
+    const helperInfo = (
+      <div style={{ marginBottom: 'var(--ds-spacing-l)' }}>
+        <MediaTextBlock
+          variant="text-only"
+          align="left"
+          size="editorial"
+          emphasis="ghost"
+          headline={layoutTitle}
+          body={otherSettings ?? undefined}
+          spacingTop="none"
+          spacingBottom="none"
+        />
+      </div>
+    )
     return (
       <section key={block._key}>
-        <h2 style={{ fontSize: 'var(--ds-typography-h4)', fontWeight: 'var(--ds-typography-weight-medium)', marginBottom: 'var(--ds-spacing-xs)' }}>
-          {layoutTitle}
-        </h2>
-        {otherSettings && (
-          <p style={{ fontSize: 'var(--ds-typography-body-xs)', color: 'var(--ds-color-text-low)', margin: 0, marginBottom: 'var(--ds-spacing-l)' }}>
-            {otherSettings}
-          </p>
-        )}
+        {helperInfo}
         {blockContent}
       </section>
     )
@@ -476,7 +483,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               aspectRatio: it.aspectRatio as '4:5' | '8:5' | '2:1',
             }))
             return wrapSection(
-              <ResponsiveCarouselBlock
+              <CarouselBlock
                 title={block.title as string}
                 cardSize={(block.cardSize as 'compact' | 'medium' | 'large') ?? 'medium'}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}

@@ -123,10 +123,12 @@ export function briefToSanityBlocks(brief: PageBrief, assetIds: string[]): Sanit
         const template = opts.template ?? 'Stacked'
         const hasMedia = slots.mediaType === 'image' || slots.mediaType === 'video'
         const assetId = hasMedia ? getAsset(assetIds, i) : null
+        const effectiveTemplate = hasMedia ? template : 'TextOnly'
         return {
           ...base,
-          template: hasMedia ? template : 'TextOnly',
-          alignment: (opts.alignment as 'left' | 'center') ?? 'left',
+          template: effectiveTemplate,
+          alignment: opts.alignment as 'left' | 'center',
+          ...(effectiveTemplate !== 'TextOnly' && opts.mediaSize && { mediaSize: opts.mediaSize as 'edgeToEdge' | 'default' }),
           surfaceColour: opts.surfaceColour,
           emphasis: opts.emphasis,
           contentWidth: 'Default',

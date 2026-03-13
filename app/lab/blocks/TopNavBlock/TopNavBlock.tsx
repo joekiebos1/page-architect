@@ -86,7 +86,7 @@ export function TopNavBlock() {
   const [businessHoverL3, setBusinessHoverL3] = useState<string | null>(null)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const { contentMaxDefault } = useGridBreakpoint()
+  const { contentMaxDefault, columns } = useGridBreakpoint()
 
   const navTransition = prefersReducedMotion ? undefined : createTransition('color', 's', 'transition', 'subtle')
   const navTextTransition = prefersReducedMotion ? undefined : createTransition(['color', 'transform'], 's', 'transition', 'subtle')
@@ -138,13 +138,28 @@ export function TopNavBlock() {
   const l2 = businessHoverL2 ? BUSINESS_L2.find((x) => x.id === businessHoverL2) : null
   const l3 = l2?.l3.find((x) => x.id === businessHoverL3)
 
+  const isMobile = columns <= 4
+  const headerPadding = isMobile ? 'var(--ds-grid-margin)' : 'var(--ds-spacing-l)'
+
   return (
-    <div ref={containerRef} style={{ position: 'relative', fontFamily: 'var(--ds-font-family)' }}>
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        fontFamily: 'var(--ds-font-family)',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
+      }}
+    >
       {/* Header bar */}
       <header
         style={{
           backgroundColor: 'white',
           borderBottom: '1px solid var(--ds-color-stroke-divider)',
+          width: '100%',
+          overflow: 'hidden',
         }}
       >
         <div
@@ -152,15 +167,17 @@ export function TopNavBlock() {
             maxWidth: contentMaxDefault,
             width: '100%',
             margin: '0 auto',
-            paddingLeft: 'var(--ds-spacing-l)',
-            paddingRight: 'var(--ds-spacing-l)',
+            paddingLeft: headerPadding,
+            paddingRight: headerPadding,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             height: 'var(--ds-spacing-3xl)',
+            minWidth: 0,
+            boxSizing: 'border-box',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-2xl)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 'var(--ds-spacing-m)' : 'var(--ds-spacing-2xl)', minWidth: 0, flex: '1 1 0', overflow: 'hidden' }}>
             <a
               href="#"
               style={{
@@ -170,15 +187,18 @@ export function TopNavBlock() {
                 textDecoration: 'none',
               }}
             >
-              <img src="/logo.png" alt="Jio" style={{ height: 'var(--ds-spacing-xl)', width: 'auto' }} />
+              <img src="/logo.png" alt="Jio" style={{ height: 'var(--ds-spacing-xl)', width: 'auto', flexShrink: 0 }} />
             </a>
-            <nav style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-l)' }}>
+            <nav style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 'var(--ds-spacing-xs)' : 'var(--ds-spacing-l)', minWidth: 0, flexWrap: 'wrap' }}>
               {L1_CONFIG.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setOpenL1(openL1 === item.id ? null : item.id)}
-                  style={openL1 === item.id ? navLinkActiveStyle : navLinkStyle}
+                  style={{
+                    ...(openL1 === item.id ? navLinkActiveStyle : navLinkStyle),
+                    ...(columns <= 4 ? { minHeight: 44, minWidth: 44, padding: 'var(--ds-spacing-s)' } : {}),
+                  }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = 'var(--ds-color-surface-secondary)'
                   }}
@@ -193,20 +213,28 @@ export function TopNavBlock() {
               ))}
             </nav>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-m)' }}>
-            <a href="#" style={navTextSmallStyle}>
-              Support
-            </a>
-            <a href="#" style={navTextSmallStyle}>
-              Company
-            </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 'var(--ds-spacing-xs)' : 'var(--ds-spacing-m)', flexShrink: 0 }}>
+            {!isMobile && (
+              <>
+                <a href="#" style={navTextSmallStyle}>
+                  Support
+                </a>
+                <a href="#" style={navTextSmallStyle}>
+                  Company
+                </a>
+              </>
+            )}
             <Button
               appearance="secondary"
               contained={false}
               size="M"
               attention="low"
               aria-label="Search"
-              style={{ minWidth: 0, padding: 'var(--ds-spacing-xs)' }}
+              style={{
+                minWidth: columns <= 4 ? 44 : 0,
+                minHeight: columns <= 4 ? 44 : undefined,
+                padding: 'var(--ds-spacing-xs)',
+              }}
             >
               <Icon asset={<IcSearch />} size="M" appearance="secondary" />
             </Button>
@@ -216,7 +244,11 @@ export function TopNavBlock() {
               size="M"
               attention="low"
               aria-label="Profile"
-              style={{ minWidth: 0, padding: 'var(--ds-spacing-xs)' }}
+              style={{
+                minWidth: columns <= 4 ? 44 : 0,
+                minHeight: columns <= 4 ? 44 : undefined,
+                padding: 'var(--ds-spacing-xs)',
+              }}
             >
               <Icon asset={<IcProfile />} size="M" appearance="secondary" />
             </Button>
@@ -227,32 +259,36 @@ export function TopNavBlock() {
       {/* Dropdown */}
       {openL1 && (
         <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: '100%',
-            zIndex: 50,
-            backgroundColor: 'white',
-            borderTop: '1px solid var(--ds-color-stroke-divider)',
-          }}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: '100%',
+              zIndex: 50,
+              backgroundColor: 'white',
+              borderTop: '1px solid var(--ds-color-stroke-divider)',
+              maxWidth: '100vw',
+              overflowX: 'hidden',
+              boxSizing: 'border-box',
+            }}
         >
           <div
             style={{
               maxWidth: contentMaxDefault,
               width: '100%',
               margin: '0 auto',
-              paddingLeft: 'var(--ds-spacing-l)',
-              paddingRight: 'var(--ds-spacing-l)',
+              paddingLeft: headerPadding,
+              paddingRight: headerPadding,
               paddingTop: 'var(--ds-spacing-3xl)',
               paddingBottom: 'var(--ds-spacing-2xl)',
               textAlign: 'left',
+              boxSizing: 'border-box',
             }}
           >
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: columns <= 4 ? '1fr' : columns <= 8 ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                 gap: 'var(--ds-spacing-2xl)',
               }}
             >
@@ -498,10 +534,10 @@ export function TopNavBlock() {
               {showBusinessProductPanel && l3?.listings?.length && (
                 <div
                   style={{
-                    gridColumn: 'span 3',
+                    gridColumn: columns <= 4 ? '1' : 'span 3',
                     textAlign: 'left',
-                    paddingLeft: 'var(--ds-spacing-xl)',
-                    borderLeft: '1px solid var(--ds-color-stroke-divider)',
+                    paddingLeft: columns <= 4 ? 0 : 'var(--ds-spacing-xl)',
+                    borderLeft: columns <= 4 ? 'none' : '1px solid var(--ds-color-stroke-divider)',
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     maxHeight: '70vh',
@@ -550,7 +586,7 @@ export function TopNavBlock() {
                         <div
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gridTemplateColumns: columns <= 4 ? '1fr' : columns <= 8 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
                             gap: 'var(--ds-spacing-l) var(--ds-spacing-m)',
                           }}
                         >
@@ -584,10 +620,10 @@ export function TopNavBlock() {
               {showMobileAppsPanel && MOBILE_APPS_SERVICES.listings?.length && (
                 <div
                   style={{
-                    gridColumn: 'span 3',
+                    gridColumn: columns <= 4 ? '1' : 'span 3',
                     textAlign: 'left',
-                    paddingLeft: 'var(--ds-spacing-xl)',
-                    borderLeft: '1px solid var(--ds-color-stroke-divider)',
+                    paddingLeft: columns <= 4 ? 0 : 'var(--ds-spacing-xl)',
+                    borderLeft: columns <= 4 ? 'none' : '1px solid var(--ds-color-stroke-divider)',
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     maxHeight: '70vh',
@@ -638,7 +674,7 @@ export function TopNavBlock() {
                         <div
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gridTemplateColumns: columns <= 4 ? '1fr' : columns <= 8 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
                             gap: 'var(--ds-spacing-l)',
                           }}
                         >
@@ -713,7 +749,7 @@ export function TopNavBlock() {
                 </div>
               )}
 
-              <div style={{ gridColumn: 'span 2' }} />
+              {columns > 4 && <div style={{ gridColumn: 'span 2' }} />}
             </div>
           </div>
         </div>

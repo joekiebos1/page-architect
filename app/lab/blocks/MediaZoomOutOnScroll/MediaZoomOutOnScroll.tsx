@@ -18,7 +18,7 @@ export function MediaZoomOutOnScroll({
   alt = '',
 }: MediaZoomOutOnScrollProps) {
   const { progress, ref, prefersReducedMotion } = useScrollZoomProgress()
-  const { contentMaxDefault } = useGridBreakpoint()
+  const { contentMaxDefault, columns } = useGridBreakpoint()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -60,11 +60,13 @@ export function MediaZoomOutOnScroll({
     backgroundColor: 'var(--ds-color-surface-subtle)',
   }
 
+  const minHeightVh = columns <= 4 ? 80 : 120
+
   return (
     <div
       ref={ref}
       style={{
-        minHeight: '120vh',
+        minHeight: `${minHeightVh}vh`,
         paddingBlockStart: 'var(--ds-spacing-2xl)',
         paddingBlockEnd: 'var(--ds-spacing-2xl)',
       }}

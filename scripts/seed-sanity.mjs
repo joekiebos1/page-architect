@@ -471,10 +471,11 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardItem', _key: 'i1', cardType: 'media', title: 'Card 1', description: 'Compact card with image.', image: imageRef(getAsset(0)) },
-            { _type: 'cardItem', _key: 'i2', cardType: 'media', title: 'Card 2', description: 'Compact card with image.', image: imageRef(getAsset(1)) },
-            { _type: 'cardItem', _key: 'i3', cardType: 'media', title: 'Card 3', description: 'Compact card with image.', image: imageRef(getAsset(2)) },
-            { _type: 'cardItem', _key: 'i4', cardType: 'media', title: 'Card 4', description: 'Compact card with image.', image: imageRef(getAsset(3)) },
+            { _type: 'cardItem', _key: 'i1', cardType: 'media', title: 'Card 1 (4:5)', description: 'Compact card.', image: imageRef(getAsset(0)), aspectRatio: '4:5' },
+            { _type: 'cardItem', _key: 'i2', cardType: 'media', title: 'Card 2 (8:5)', description: 'Wider compact card.', image: imageRef(getAsset(1)), aspectRatio: '8:5' },
+            { _type: 'cardItem', _key: 'i3', cardType: 'media', title: 'Card 3 (4:5)', description: 'Compact card.', image: imageRef(getAsset(2)), aspectRatio: '4:5' },
+            { _type: 'cardItem', _key: 'i4', cardType: 'media', title: 'Card 4 (8:5)', description: 'Wider compact card.', image: imageRef(getAsset(3)), aspectRatio: '8:5' },
+            { _type: 'cardItem', _key: 'i5', cardType: 'media', title: 'Card 5 (4:5)', description: 'Compact card.', image: imageRef(getAsset(0)), aspectRatio: '4:5' },
           ],
         },
         {

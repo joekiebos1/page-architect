@@ -40,6 +40,12 @@ export const mediaTextStackedBlock = defineType({
         layout: 'radio',
       },
       initialValue: 'edgeToEdge',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as { template?: string }
+          if (parent?.template === 'TextOnly') return true
+          return value ? true : 'Required when Stacked or Overlay'
+        }),
       hidden: ({ parent }) => parent?.template === 'TextOnly',
     }),
     defineField({
@@ -55,6 +61,7 @@ export const mediaTextStackedBlock = defineType({
         layout: 'radio',
       },
       initialValue: 'left',
+      validation: (Rule) => Rule.required().error('Alignment is required'),
     }),
     // Colour
     defineField({

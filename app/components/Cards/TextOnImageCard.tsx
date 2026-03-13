@@ -1,10 +1,16 @@
 'use client'
 
 import Image from 'next/image'
-import { CardOverlayTitle, CardOverlayDescription } from './CardTypography'
 import { StreamImage } from '../StreamImage'
 import type { CardMediaAspectRatio, TextOnImageCardConfig } from './Card.types'
 import type { ImageSlotState } from '../../hooks/useImageStream'
+
+/** Typography per card size for overlay. */
+const CARD_SIZE_TYPOGRAPHY = {
+  large: { title: 'var(--ds-typography-h4)', desc: 'var(--ds-typography-label-m)' },
+  medium: { title: 'var(--ds-typography-h5)', desc: 'var(--ds-typography-label-s)' },
+  small: { title: 'var(--ds-typography-label-l)', desc: 'var(--ds-typography-label-s)' },
+} as const
 
 export type TextOnImageCardProps = {
   title?: string | null
@@ -25,7 +31,8 @@ export function TextOnImageCard({
   imageState,
   imageSlot,
 }: TextOnImageCardProps) {
-  const { aspectRatio = '4/3' } = config
+  const { aspectRatio = '4/3', cardSize = 'medium' } = config
+  const typography = CARD_SIZE_TYPOGRAPHY[cardSize]
   const aspectMap: Record<CardMediaAspectRatio, string> = {
     '4/5': '4/5',
     '4/3': '4/3',
@@ -72,8 +79,34 @@ export function TextOnImageCard({
           padding: 'var(--ds-spacing-xl)',
         }}
       >
-        {title && <CardOverlayTitle>{title}</CardOverlayTitle>}
-        {description && <CardOverlayDescription>{description}</CardOverlayDescription>}
+        {title && (
+          <p
+            style={{
+              margin: 0,
+              fontSize: typography.title,
+              fontWeight: 'var(--ds-typography-weight-medium)',
+              color: 'var(--local-color-text-on-overlay)',
+              lineHeight: 1.4,
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {title}
+          </p>
+        )}
+        {description && (
+          <p
+            style={{
+              margin: 'var(--ds-spacing-xs) 0 0',
+              fontSize: typography.desc,
+              lineHeight: 1.4,
+              color: 'var(--local-color-text-on-overlay-subtle)',
+              fontWeight: 'var(--ds-typography-weight-low)',
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {description}
+          </p>
+        )}
       </div>
     </div>
   )

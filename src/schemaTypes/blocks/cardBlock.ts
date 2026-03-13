@@ -90,12 +90,11 @@ export const cardItem = defineType({
       name: 'aspectRatio',
       type: 'string',
       title: 'Card size',
-      description: 'Compact carousel only: 4:5 = 1 slot, 8:5 = 2 slots (wider), 2:1 = 2 slots. Hidden when carousel Card size is Large (2:1) or Medium (4:5).',
+      description: 'Compact carousel only: 4:5 = 1 slot, 8:5 = 2 slots. Hidden when carousel Card size is Large (2:1) or Medium (4:5).',
       options: {
         list: [
           { value: '4:5', title: '4:5 (1 slot)' },
           { value: '8:5', title: '8:5 (2 slots)' },
-          { value: '2:1', title: '2:1 (wider)' },
         ],
         layout: 'radio',
       },

@@ -8,15 +8,20 @@
  */
 
 import { useRouter } from 'next/navigation'
-import { Headline, Text, Button, Icon } from '@marcelinodzn/ds-react'
+import { Button, Icon } from '@marcelinodzn/ds-react'
 import { useDsContextOptional } from '../../lib/use-ds-token-context'
 import { getProofPointIcon } from '@/lib/proof-point-icons'
 import { resolveCardBackgroundColor } from '../../lib/resolve-card-background-color'
 
 export type TextOnColourCardGridBackground = string
 
+/** Card size from grid context: 1 col = large, 2 cols = medium, 3–4 cols = small. Drives typography scale. */
+export type TextOnColourCardGridCardSize = 'large' | 'medium' | 'small'
+
 export type TextOnColourCardGridProps = {
   size?: 'large' | 'small'
+  /** Card size from grid columns (1, 2, 3–4 cols). Smaller cards get smaller text. */
+  cardSize?: TextOnColourCardGridCardSize
   icon?: string | null
   iconImage?: string | null
   title: string
@@ -39,8 +44,16 @@ function isDarkBackground(value: string | null | undefined): boolean {
   return false
 }
 
+/** Typography: title/desc per card size. Pixel 10 Pro reference: lighter weight. */
+const CARD_SIZE_TYPOGRAPHY: Record<TextOnColourCardGridCardSize, { titleFontSize: string; titleWeight: string; descFontSize: string }> = {
+  large: { titleFontSize: 'var(--ds-typography-h2)', titleWeight: 'var(--ds-typography-weight-medium)', descFontSize: 'var(--ds-typography-label-m)' },
+  medium: { titleFontSize: 'var(--ds-typography-h4)', titleWeight: 'var(--ds-typography-weight-medium)', descFontSize: 'var(--ds-typography-label-s)' },
+  small: { titleFontSize: 'var(--ds-typography-h5)', titleWeight: 'var(--ds-typography-weight-medium)', descFontSize: 'var(--ds-typography-label-s)' },
+}
+
 export function TextOnColourCardGrid({
   size = 'small',
+  cardSize = 'medium',
   icon,
   iconImage,
   title,
@@ -55,6 +68,7 @@ export function TextOnColourCardGrid({
   const bgColor = resolveCardBackgroundColor(backgroundColor ?? 'primary', tokenContext)
   const isDark = isDarkBackground(backgroundColor)
   const isLarge = size === 'large'
+  const typography = CARD_SIZE_TYPOGRAPHY[cardSize]
 
   const handleCtaPress = (href: string) => {
     if (href?.startsWith('/')) router.push(href)
@@ -100,18 +114,32 @@ export function TextOnColourCardGrid({
           ) : null}
         </div>
       )}
-      <Headline
-        size={isLarge ? 'M' : 'S'}
-        weight="high"
-        as="h3"
-        style={{ margin: 0, color: 'inherit', fontSize: isLarge ? 'var(--ds-typography-h2)' : undefined }}
+      <p
+        style={{
+          margin: 0,
+          color: 'inherit',
+          fontSize: typography.titleFontSize,
+          fontWeight: typography.titleWeight,
+          lineHeight: 1.4,
+          whiteSpace: 'pre-line',
+        }}
       >
         {title}
-      </Headline>
+      </p>
       {description && (
-        <Text size="M" as="p" style={{ margin: 0, opacity: isDark ? 0.95 : 1, color: 'inherit', lineHeight: 1.5 }}>
+        <p
+          style={{
+            margin: 0,
+            opacity: isDark ? 0.95 : 1,
+            color: 'inherit',
+            fontSize: typography.descFontSize,
+            fontWeight: 'var(--ds-typography-weight-low)',
+            lineHeight: 1.5,
+            whiteSpace: 'pre-line',
+          }}
+        >
           {description}
-        </Text>
+        </p>
       )}
       {showCtas && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--ds-spacing-m)' }}>

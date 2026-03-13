@@ -76,6 +76,7 @@ export function LabCardGridBlock({
                       <CardRenderer
                         item={item}
                         prefersReducedMotion={prefersReducedMotion}
+                        gridColumns={cols}
                         imageState={(item as { imageSlot?: string }).imageSlot && images
                           ? images[(item as { imageSlot: string }).imageSlot]
                           : undefined}

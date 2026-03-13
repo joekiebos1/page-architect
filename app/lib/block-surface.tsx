@@ -167,34 +167,37 @@ export function BlockSurfaceProvider({
       ? `linear-gradient(to bottom, white 0%, ${bgColor} 100%)`
       : bgColor
 
-    /** Coloured padding: Large (4xl) by default. flushTop/flushBottom omit padding for symmetric alignment (sideBySide edgeToEdge Hero). fullWidth: capped at 1920px on large screens. */
+    /** fullWidth: band spans full viewport (100vw); content inside capped at 1920px. */
+    if (fullWidth) {
+      return (
+        <div
+          style={{
+            width: '100vw',
+            marginLeft: 'calc(50% - 50vw)',
+            marginRight: 'calc(50% - 50vw)',
+            background,
+            boxSizing: 'border-box',
+            paddingBlockStart: flushTop ? 0 : 'var(--ds-spacing-4xl)',
+            paddingBlockEnd: flushBottom ? 0 : 'var(--ds-spacing-4xl)',
+          }}
+        >
+          <div style={edgeStyles.inner}>{content}</div>
+        </div>
+      )
+    }
+
+    /** Contained: band and content same width. */
     return (
       <div
         style={{
-          width: fullWidth ? '100vw' : '100%',
-          maxWidth: fullWidth ? '100vw' : undefined,
-          marginLeft: fullWidth ? 'calc(50% - 50vw)' : undefined,
-          marginRight: fullWidth ? 'calc(50% - 50vw)' : undefined,
-          background: fullWidth ? undefined : background,
+          width: '100%',
+          background,
           boxSizing: 'border-box',
-          paddingBlockStart: fullWidth ? undefined : (flushTop ? 0 : 'var(--ds-spacing-4xl)'),
-          paddingBlockEnd: fullWidth ? undefined : (flushBottom ? 0 : 'var(--ds-spacing-4xl)'),
+          paddingBlockStart: flushTop ? 0 : 'var(--ds-spacing-4xl)',
+          paddingBlockEnd: flushBottom ? 0 : 'var(--ds-spacing-4xl)',
         }}
       >
-        {fullWidth ? (
-          <div
-            style={{
-              ...edgeStyles.innerContainer,
-              background,
-              paddingBlockStart: flushTop ? 0 : 'var(--ds-spacing-4xl)',
-              paddingBlockEnd: flushBottom ? 0 : 'var(--ds-spacing-4xl)',
-            }}
-          >
-            {content}
-          </div>
-        ) : (
-          content
-        )}
+        {content}
       </div>
     )
   }
