@@ -34,14 +34,14 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
           </Link>
           <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
             <Link
-              href="/studio/story-coach"
+              href="/studio/storytelling-inspiration"
               style={{
                 color: 'rgba(0, 0, 0, 0.48)',
                 textDecoration: 'none',
                 fontSize: 'var(--ds-typography-label-s)',
               }}
             >
-              Storytelling Coach
+              Storytelling Inspiration
             </Link>
             <Link
               href="/studio/block-inspiration"

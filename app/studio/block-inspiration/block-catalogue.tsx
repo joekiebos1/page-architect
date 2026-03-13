@@ -32,6 +32,8 @@ export type BlockCatalogueEntry = {
   creativeUses: string[]
   /** Production or Lab */
   tier: 'production' | 'lab'
+  /** Lab page slug for /lab/[slug]. top-nav uses dedicated /lab/top-nav. */
+  labSlug: string
   /** Renders a small preview of the block */
   Preview: React.ComponentType
 }
@@ -74,6 +76,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Hero',
     description: 'Full-width hero section with headline, subheadline, media and CTAs. Supports stacked, side-by-side, category, media overlay and text-only layouts.',
     tier: 'production',
+    labSlug: 'hero',
     creativeUses: [
       'Product launch announcements with bold imagery',
       'Campaign landing with media overlay and centred text',
@@ -98,6 +101,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Media + Text (Stacked)',
     description: 'Stacked or overlay layout with media above or behind text. Supports contained and edge-to-edge media.',
     tier: 'production',
+    labSlug: 'media-text',
     creativeUses: [
       'Feature highlights with image or video',
       'Overlay for dramatic full-bleed imagery',
@@ -120,6 +124,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Media + Text (50/50)',
     description: 'Side-by-side layout with paragraphs or accordion. Image position left or right.',
     tier: 'production',
+    labSlug: 'media-text-5050',
     creativeUses: [
       'Product specs with imagery',
       'FAQ or accordion with supporting visual',
@@ -142,6 +147,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Card Grid',
     description: 'Responsive grid of cards. Supports media cards, text-on-colour and text-on-image variants.',
     tier: 'production',
+    labSlug: 'card-grid',
     creativeUses: [
       'Product or service showcases',
       'Feature grids with icons or imagery',
@@ -166,6 +172,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Carousel',
     description: 'Horizontal carousel of cards. Compact, medium or large card sizes. Responsive column counts.',
     tier: 'production',
+    labSlug: 'carousel',
     creativeUses: [
       'Product carousels on category pages',
       'Featured content or recommendations',
@@ -189,6 +196,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Proof Points',
     description: 'Icon or stat variant. Highlights key benefits or metrics.',
     tier: 'production',
+    labSlug: 'proof-points',
     creativeUses: [
       'Feature benefits with icons',
       'Stats or numbers for credibility',
@@ -214,6 +222,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Icon Grid',
     description: 'Grid of icons with titles. Supports spectrum colours and accent colours.',
     tier: 'production',
+    labSlug: 'icon-grid',
     creativeUses: [
       'Service or feature overview',
       'Category quick links',
@@ -238,6 +247,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'List',
     description: 'Text list, FAQ or links variant. Collapsible FAQ items.',
     tier: 'production',
+    labSlug: 'list',
     creativeUses: [
       'FAQ sections',
       'Link lists or navigation',
@@ -262,6 +272,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Full Bleed Vertical Carousel',
     description: 'Full-viewport vertical carousel. Each item has full-bleed media and scrolling text overlay.',
     tier: 'lab',
+    labSlug: 'full-bleed-vertical-carousel',
     creativeUses: [
       'Product storytelling with immersive scroll',
       'Campaign narratives with multiple stories',
@@ -286,6 +297,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Rotating Media',
     description: 'Rotating carousel of media cards. Small, large or combined variants.',
     tier: 'lab',
+    labSlug: 'rotating-media',
     creativeUses: [
       'Product imagery with rotation',
       'Brand or campaign visuals',
@@ -311,6 +323,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Media Zoom Out on Scroll',
     description: 'Media that zooms out as you scroll. Image or video.',
     tier: 'lab',
+    labSlug: 'media-zoom-out-on-scroll',
     creativeUses: [
       'Immersive hero or section transitions',
       'Video with scroll-driven reveal',
@@ -329,6 +342,7 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     name: 'Top Nav (Mega Menu)',
     description: 'Mega menu navigation. Supports dropdowns and links.',
     tier: 'lab',
+    labSlug: 'top-nav',
     creativeUses: [
       'Site navigation with mega menu',
       'Category browsing',

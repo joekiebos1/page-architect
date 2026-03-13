@@ -102,7 +102,7 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
     async (field: string, text: string) => {
       if (text.trim().length < 30) return
       try {
-        const res = await fetch('/api/story-coach/analyse', {
+        const res = await fetch('/api/storytelling-inspiration/analyse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ field, text }),
@@ -143,7 +143,7 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
           }}
         >
           <Headline level={2} style={{ marginBottom: CHUNK_GAP, fontWeight: 'var(--ds-typography-weight-medium)', color: 'var(--ds-color-text-high)', letterSpacing: '-0.02em' }}>
-            Storytelling Coach
+            Storytelling Inspiration
           </Headline>
           <Text
             style={{

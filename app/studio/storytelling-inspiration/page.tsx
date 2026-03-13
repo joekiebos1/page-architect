@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { GridBlock } from '../../components/GridBlock'
 import { useGridBreakpoint } from '../../lib/use-grid-breakpoint'
-import { InputPanel } from '../../components/story-coach/InputPanel'
-import { OutputPanel } from '../../components/story-coach/OutputPanel'
-import type { StoryCoachInput, StoryCoachState } from '../../components/story-coach/types'
+import { InputPanel } from '../../components/storytelling-inspiration/InputPanel'
+import { OutputPanel } from '../../components/storytelling-inspiration/OutputPanel'
+import type { StoryCoachInput, StoryCoachState } from '../../components/storytelling-inspiration/types'
 
 const initialState: StoryCoachState = {
   status: 'idle',
@@ -13,7 +13,7 @@ const initialState: StoryCoachState = {
   error: null,
 }
 
-export default function StoryCoachPage() {
+export default function StorytellingInspirationPage() {
   const { columns } = useGridBreakpoint()
   const [state, setState] = useState<StoryCoachState>(initialState)
   const [productName, setProductName] = useState<string>('')
@@ -26,7 +26,7 @@ export default function StoryCoachPage() {
     setProductName(input.productName)
     setState({ status: 'loading', result: null, error: null })
     try {
-      const res = await fetch('/api/story-coach', {
+      const res = await fetch('/api/storytelling-inspiration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input),

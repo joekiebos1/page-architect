@@ -86,11 +86,10 @@ export function FullBleedVerticalCarousel({ emphasis = 'ghost', surfaceColour = 
   const prevImageIndexRef = useRef(0)
   const [isSticky, setIsSticky] = useState(false)
 
-  if (n === 0) return null
-
   const heightVh = n * ITEM_VH
 
   useEffect(() => {
+    if (n === 0) return
     const el = containerRef.current
     if (!el) return
 
@@ -142,6 +141,8 @@ export function FullBleedVerticalCarousel({ emphasis = 'ghost', surfaceColour = 
       window.removeEventListener('resize', onScroll)
     }
   }, [n])
+
+  if (n === 0) return null
 
   const showOverlay = isSticky
   const textShadow = showOverlay ? '0 1px 2px var(--local-color-shadow-overlay)' : 'none'

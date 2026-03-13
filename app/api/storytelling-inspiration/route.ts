@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import type { StoryCoachInput, StoryCoachResult } from '../../components/story-coach/types'
+import type { StoryCoachInput, StoryCoachResult } from '../../components/storytelling-inspiration/types'
 
-const SYSTEM_PROMPT = `You are the JioKarna Storytelling Coach — a brand storytelling strategist for Jio, India's largest digital services company.
+const SYSTEM_PROMPT = `You are the JioKarna Storytelling Inspiration — a brand storytelling strategist for Jio, India's largest digital services company.
 
 Your job is to read a structured product brief and produce a narrative arc and block structure for a Jio product or category page. Your output feeds directly into a design production pipeline — it must be specific, opinionated, and immediately usable.
 
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data)
   } catch (err) {
-    console.error('Storytelling Coach API error:', err)
+    console.error('Storytelling Inspiration API error:', err)
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })
   }
