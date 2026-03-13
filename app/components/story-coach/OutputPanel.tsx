@@ -17,15 +17,21 @@ type OutputPanelProps = {
   productName?: string
 }
 
+const grey = {
+  border: 'rgba(0, 0, 0, 0.06)',
+  label: 'rgba(0, 0, 0, 0.65)',
+  secondary: 'rgba(0, 0, 0, 0.48)',
+  tertiary: 'rgba(0, 0, 0, 0.36)',
+}
+
 const sectionHeaderStyle: React.CSSProperties = {
   fontSize: 'var(--ds-typography-label-s)',
-  fontWeight: 'var(--ds-typography-weight-high)',
-  color: 'var(--ds-color-text-medium)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.06em',
+  fontWeight: 'var(--ds-typography-weight-medium)',
+  color: 'var(--ds-color-text-high)',
+  letterSpacing: '0.02em',
   marginBottom: 'var(--ds-spacing-m)',
   paddingBottom: 'var(--ds-spacing-s)',
-  borderBottom: '1px solid var(--ds-color-stroke-subtle)',
+  borderBottom: `1px solid ${grey.border}`,
 }
 
 function ResultView({ result, productName }: { result: StoryCoachResult; productName?: string }) {
@@ -35,15 +41,15 @@ function ResultView({ result, productName }: { result: StoryCoachResult; product
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-2xl)' }}>
-      <header style={{ marginBottom: 'var(--ds-spacing-l)' }}>
-        <Headline level={1} style={{ marginBottom: 'var(--ds-spacing-xs)' }}>
+      <header style={{ marginBottom: 'var(--ds-spacing-2xl)' }}>
+        <Headline level={1} style={{ marginBottom: 'var(--ds-spacing-s)', fontWeight: 'var(--ds-typography-weight-medium)', color: 'var(--ds-color-text-high)', letterSpacing: '-0.02em' }}>
           {productName || result.primaryEmotion}
         </Headline>
         <Text
-          appearance="secondary"
           style={{
-            fontSize: 'var(--ds-typography-body-xs)',
-            fontWeight: 'var(--ds-typography-weight-medium)',
+            fontSize: 'var(--ds-typography-label-s)',
+            fontWeight: 'var(--ds-typography-weight-low)',
+            color: grey.secondary,
           }}
         >
           {result.blocks.length} blocks — {setup.length} setup · {engage.length} engage · {resolve.length} resolve
@@ -51,7 +57,7 @@ function ResultView({ result, productName }: { result: StoryCoachResult; product
       </header>
 
       <section>
-        <div style={sectionHeaderStyle}>RTBs</div>
+        <div style={sectionHeaderStyle}>Reasons to believe</div>
         <div
           style={{
             display: 'grid',
@@ -67,11 +73,11 @@ function ResultView({ result, productName }: { result: StoryCoachResult; product
       </section>
 
       <section>
-        <div style={sectionHeaderStyle}>Narrative arc</div>
+        <div style={sectionHeaderStyle}>Narrative Arc</div>
         <div
           style={{
             padding: 'var(--ds-spacing-m)',
-            border: '1px solid var(--ds-color-stroke-subtle)',
+            border: `1px solid ${grey.border}`,
             marginBottom: 'var(--ds-spacing-l)',
           }}
         >
@@ -81,12 +87,13 @@ function ResultView({ result, productName }: { result: StoryCoachResult; product
             style={{
               margin: 0,
               fontWeight: 'var(--ds-typography-weight-medium)',
-              color: 'var(--ds-color-text-medium)',
+              color: 'var(--ds-color-text-high)',
+              fontSize: 'var(--ds-typography-label-s)',
             }}
           >
-            Central truth
+            Central Truth
           </Text>
-          <Text size="M" as="p" style={{ margin: 'var(--ds-spacing-xs) 0 0' }}>
+          <Text size="M" as="p" style={{ margin: 'var(--ds-spacing-s) 0 0', fontWeight: 'var(--ds-typography-weight-low)', color: grey.secondary, lineHeight: 1.5 }}>
             {result.centralTruth}
           </Text>
         </div>
@@ -98,7 +105,7 @@ function ResultView({ result, productName }: { result: StoryCoachResult; product
       </section>
 
       <section>
-        <div style={sectionHeaderStyle}>Block structure</div>
+        <div style={sectionHeaderStyle}>Block Structure</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {result.blocks.map((block) => (
             <BlockRow key={block.num} block={block} />
@@ -114,22 +121,23 @@ function RTBRow({ label, value }: { label: string; value: string }) {
     <div
       style={{
         padding: 'var(--ds-spacing-m)',
-        border: '1px solid var(--ds-color-stroke-subtle)',
+        border: `1px solid ${grey.border}`,
       }}
     >
       <Text
-        size="XS"
+        size="S"
         as="span"
         style={{
           display: 'block',
           fontWeight: 'var(--ds-typography-weight-medium)',
-          marginBottom: 'var(--ds-spacing-xs)',
-          color: 'var(--ds-color-text-medium)',
+          marginBottom: 'var(--ds-spacing-s)',
+          color: 'var(--ds-color-text-high)',
+          fontSize: 'var(--ds-typography-label-s)',
         }}
       >
         {label}
       </Text>
-      <Text size="S" as="p" style={{ margin: 0 }}>
+      <Text size="S" as="p" style={{ margin: 0, fontWeight: 'var(--ds-typography-weight-low)', color: grey.secondary, lineHeight: 1.5 }}>
         {value}
       </Text>
     </div>
@@ -140,16 +148,17 @@ function ArcSection({ title, items }: { title: string; items: Record<string, str
   return (
     <div
       style={{
-        border: '1px solid var(--ds-color-stroke-subtle)',
+        border: `1px solid ${grey.border}`,
         padding: 'var(--ds-spacing-m)',
       }}
     >
       <Text
-        size="S"
+        size="M"
         as="span"
         style={{
-          fontWeight: 'var(--ds-typography-weight-high)',
+          fontWeight: 'var(--ds-typography-weight-medium)',
           color: 'var(--ds-color-text-high)',
+          fontSize: 'var(--ds-typography-label-s)',
         }}
       >
         {title}
@@ -160,11 +169,16 @@ function ArcSection({ title, items }: { title: string; items: Record<string, str
             <Text
               size="XS"
               as="span"
-              style={{ color: 'var(--ds-color-text-medium)', textTransform: 'capitalize' }}
+              style={{
+                color: grey.tertiary,
+                fontWeight: 'var(--ds-typography-weight-medium)',
+                textTransform: 'capitalize',
+                fontSize: 'var(--ds-typography-label-s)',
+              }}
             >
               {key.replace(/([A-Z])/g, ' $1').trim()}
             </Text>
-            <Text size="S" as="p" style={{ margin: 'var(--ds-spacing-2xs) 0 0' }}>
+            <Text size="S" as="p" style={{ margin: 'var(--ds-spacing-2xs) 0 0', fontWeight: 'var(--ds-typography-weight-low)', color: grey.secondary, lineHeight: 1.5 }}>
               {value}
             </Text>
           </div>
@@ -183,15 +197,16 @@ function BlockRow({ block }: { block: Block }) {
         gap: 'var(--ds-spacing-m)',
         alignItems: 'start',
         padding: 'var(--ds-spacing-m)',
-        borderBottom: '1px solid var(--ds-color-stroke-subtle)',
+        borderBottom: `1px solid ${grey.border}`,
       }}
     >
       <Text
         size="S"
         as="span"
         style={{
-          fontWeight: 'var(--ds-typography-weight-high)',
-          color: 'var(--ds-color-text-medium)',
+          fontWeight: 'var(--ds-typography-weight-medium)',
+          color: grey.tertiary,
+          fontSize: 'var(--ds-typography-label-s)',
         }}
       >
         {block.num}
@@ -202,8 +217,9 @@ function BlockRow({ block }: { block: Block }) {
           as="span"
           style={{
             fontWeight: 'var(--ds-typography-weight-medium)',
-            color: 'var(--ds-color-text-low)',
+            color: grey.tertiary,
             textTransform: 'capitalize',
+            fontSize: 'var(--ds-typography-body-xs)',
           }}
         >
           {block.type}
@@ -212,18 +228,29 @@ function BlockRow({ block }: { block: Block }) {
           size="XS"
           as="span"
           style={{
-            color: 'var(--ds-color-text-low)',
+            color: grey.tertiary,
+            fontWeight: 'var(--ds-typography-weight-low)',
             textTransform: 'capitalize',
+            fontSize: 'var(--ds-typography-body-xs)',
           }}
         >
           {block.section}
         </Text>
       </div>
       <div>
-        <Text size="S" as="p" style={{ margin: '0 0 var(--ds-spacing-xs)', fontWeight: 'var(--ds-typography-weight-medium)' }}>
+        <Text
+          size="S"
+          as="p"
+          style={{
+            margin: '0 0 var(--ds-spacing-xs)',
+            fontWeight: 'var(--ds-typography-weight-medium)',
+            fontSize: 'var(--ds-typography-label-s)',
+            color: 'var(--ds-color-text-high)',
+          }}
+        >
           {block.headline}
         </Text>
-        <Text size="XS" as="p" style={{ margin: 0, color: 'var(--ds-color-text-medium)' }}>
+        <Text size="XS" as="p" style={{ margin: 0, color: grey.secondary, fontWeight: 'var(--ds-typography-weight-low)', lineHeight: 1.45 }}>
           {block.job}
         </Text>
       </div>
@@ -256,7 +283,7 @@ export function OutputPanel({ state, productName }: OutputPanelProps) {
             padding: 'var(--ds-spacing-2xl)',
           }}
         >
-          <Text appearance="secondary" style={{ fontSize: 'var(--ds-typography-body-xs)' }}>
+          <Text style={{ fontSize: 'var(--ds-typography-label-s)', fontWeight: 'var(--ds-typography-weight-low)', color: grey.secondary }}>
             Enter a product name and generate to see the narrative arc.
           </Text>
         </div>
@@ -276,7 +303,7 @@ export function OutputPanel({ state, productName }: OutputPanelProps) {
             padding: 'var(--ds-spacing-2xl)',
           }}
         >
-          <Text style={{ fontSize: 'var(--ds-typography-body-xs)' }}>{loadingMessage}</Text>
+          <Text style={{ fontSize: 'var(--ds-typography-label-s)', fontWeight: 'var(--ds-typography-weight-low)', color: grey.secondary }}>{loadingMessage}</Text>
         </div>
       </SurfaceProvider>
     )
@@ -286,7 +313,7 @@ export function OutputPanel({ state, productName }: OutputPanelProps) {
     return (
       <SurfaceProvider level={0}>
         <div style={{ padding: 'var(--ds-spacing-2xl)' }}>
-          <Text appearance="negative" style={{ fontSize: 'var(--ds-typography-body-xs)' }}>
+          <Text appearance="negative" style={{ fontSize: 'var(--ds-typography-label-s)', fontWeight: 'var(--ds-typography-weight-medium)' }}>
             {state.error}
           </Text>
         </div>
@@ -297,7 +324,7 @@ export function OutputPanel({ state, productName }: OutputPanelProps) {
   if (state.status === 'success' && state.result) {
     return (
       <SurfaceProvider level={0}>
-        <div style={{ padding: 'var(--ds-spacing-2xl)' }}>
+        <div style={{ padding: 'var(--ds-spacing-2xl)', maxWidth: 720 }}>
           <ResultView result={state.result} productName={productName} />
         </div>
       </SurfaceProvider>

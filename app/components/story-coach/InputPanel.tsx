@@ -8,33 +8,39 @@ import type { StoryCoachInput } from './types'
 const CHECKLIST: Record<string, { id: string; label: string }[]> = {
   whatItDoes: [
     { id: 'core', label: 'Core functionality' },
+    { id: 'social', label: 'Social, family and sharing functionality' },
     { id: 'personalisation', label: 'Personalisation and intelligence' },
-    { id: 'social', label: 'Social and sharing' },
-    { id: 'settings', label: 'Settings and controls' },
     { id: 'access', label: 'Access and pricing' },
+    { id: 'privacy', label: 'Privacy, data, accessibility' },
   ],
   whatIsInIt: [
     { id: 'catalogue', label: 'Catalogue depth and breadth' },
-    { id: 'languages', label: 'Languages and regions' },
+    { id: 'languages', label: 'Language and regions' },
     { id: 'editorial', label: 'Editorial and curation' },
-    { id: 'partners', label: 'Partners and exclusives' },
+    { id: 'partners', label: 'Partner and exclusives' },
   ],
   builtFor: [
     { id: 'devices', label: 'Device range' },
     { id: 'network', label: 'Network conditions' },
-    { id: 'household', label: 'Household and family use' },
     { id: 'india', label: 'Indian-specific adaptations' },
   ],
+}
+
+const grey = {
+  border: 'rgba(0, 0, 0, 0.06)',
+  label: 'rgba(0, 0, 0, 0.65)',
+  secondary: 'rgba(0, 0, 0, 0.48)',
+  tertiary: 'rgba(0, 0, 0, 0.36)',
 }
 
 const inputStyles: React.CSSProperties = {
   width: '100%',
   padding: 'var(--ds-spacing-s) var(--ds-spacing-m)',
-  border: '1px solid var(--ds-color-stroke-divider)',
+  border: `1px solid ${grey.border}`,
   fontSize: 'var(--ds-typography-body-xs)',
   fontFamily: 'inherit',
   color: 'var(--ds-color-text-high)',
-  background: 'var(--ds-color-background-ghost)',
+  background: 'transparent',
   boxSizing: 'border-box',
 }
 
@@ -64,9 +70,9 @@ type ChecklistState = {
 }
 
 const initialChecks: ChecklistState = {
-  whatItDoes: { core: false, personalisation: false, social: false, settings: false, access: false },
+  whatItDoes: { core: false, social: false, personalisation: false, access: false, privacy: false },
   whatIsInIt: { catalogue: false, languages: false, editorial: false, partners: false },
-  builtFor: { devices: false, network: false, household: false, india: false },
+  builtFor: { devices: false, network: false, india: false },
 }
 
 export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
@@ -117,23 +123,39 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            padding: 'var(--ds-spacing-xl)',
+            padding: 'var(--ds-spacing-2xl)',
           }}
         >
-          <Headline level={2} style={{ marginBottom: 'var(--ds-spacing-xs)' }}>
+          <Headline level={2} style={{ marginBottom: 'var(--ds-spacing-s)', fontWeight: 'var(--ds-typography-weight-medium)', color: 'var(--ds-color-text-high)', letterSpacing: '-0.02em' }}>
             Story Coach
           </Headline>
           <Text
-            appearance="secondary"
-            style={{ marginBottom: 'var(--ds-spacing-xl)', fontSize: 'var(--ds-typography-body-xs)' }}
+            style={{
+              marginBottom: 'var(--ds-spacing-2xs)',
+              fontSize: 'var(--ds-typography-label-s)',
+              fontWeight: 'var(--ds-typography-weight-medium)',
+              color: grey.label,
+              letterSpacing: '-0.01em',
+            }}
           >
-            Product name is required. Add detail for a richer arc.
+            Helps you craft stories for jio.com
+          </Text>
+          <Text
+            style={{
+              marginBottom: 'var(--ds-spacing-xl)',
+              fontSize: 'var(--ds-typography-body-xs)',
+              fontWeight: 'var(--ds-typography-weight-low)',
+              color: grey.secondary,
+              lineHeight: 1.5,
+            }}
+          >
+            Fill in as much detail as possible to create a rich story that is uniquely Jio.
           </Text>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)', flex: 1 }}>
             <div>
               <label htmlFor="productName" style={labelStyles}>
-                Product name <span style={{ color: 'var(--ds-color-negative)' }}>*</span>
+                Product name <span style={{ color: grey.tertiary }}>*</span>
               </label>
               <input
                 id="productName"
@@ -148,7 +170,7 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
 
             <div>
               <label htmlFor="whatItDoes" style={labelStyles}>
-                What does it do? <span style={{ color: 'var(--ds-color-text-low)', fontWeight: 400 }}>(optional)</span>
+                Describe what the product does
               </label>
               <textarea
                 id="whatItDoes"
@@ -166,27 +188,31 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
                   flexWrap: 'wrap',
                   gap: 'var(--ds-spacing-s)',
                   marginTop: 'var(--ds-spacing-s)',
-                  fontSize: 'var(--ds-typography-body-xs)',
+                  marginBottom: 'var(--ds-spacing-xl)',
                 }}
               >
                 {CHECKLIST.whatItDoes.map((item) => (
-                  <span
+                  <div
                     key={item.id}
                     style={{
+                      padding: 'var(--ds-spacing-xs) var(--ds-spacing-s)',
+                      border: `1px solid ${grey.border}`,
+                      fontSize: '12px',
+                      fontWeight: 'var(--ds-typography-weight-low)',
                       color: checks.whatItDoes[item.id]
                         ? 'var(--ds-color-positive)'
-                        : 'var(--ds-color-text-low)',
+                        : grey.tertiary,
                     }}
                   >
                     {checks.whatItDoes[item.id] ? '✓' : '✗'} {item.label}
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>
 
             <div>
               <label htmlFor="whatIsInIt" style={labelStyles}>
-                What is in it? <span style={{ color: 'var(--ds-color-text-low)', fontWeight: 400 }}>(optional)</span>
+                Describe what is in the product or can be accessed through the product
               </label>
               <textarea
                 id="whatIsInIt"
@@ -204,27 +230,31 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
                   flexWrap: 'wrap',
                   gap: 'var(--ds-spacing-s)',
                   marginTop: 'var(--ds-spacing-s)',
-                  fontSize: 'var(--ds-typography-body-xs)',
+                  marginBottom: 'var(--ds-spacing-xl)',
                 }}
               >
                 {CHECKLIST.whatIsInIt.map((item) => (
-                  <span
+                  <div
                     key={item.id}
                     style={{
+                      padding: 'var(--ds-spacing-xs) var(--ds-spacing-s)',
+                      border: `1px solid ${grey.border}`,
+                      fontSize: '12px',
+                      fontWeight: 'var(--ds-typography-weight-low)',
                       color: checks.whatIsInIt[item.id]
                         ? 'var(--ds-color-positive)'
-                        : 'var(--ds-color-text-low)',
+                        : grey.tertiary,
                     }}
                   >
                     {checks.whatIsInIt[item.id] ? '✓' : '✗'} {item.label}
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>
 
             <div>
               <label htmlFor="builtFor" style={labelStyles}>
-                What is it built for? <span style={{ color: 'var(--ds-color-text-low)', fontWeight: 400 }}>(optional)</span>
+                What is it built for?
               </label>
               <textarea
                 id="builtFor"
@@ -242,20 +272,24 @@ export function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
                   flexWrap: 'wrap',
                   gap: 'var(--ds-spacing-s)',
                   marginTop: 'var(--ds-spacing-s)',
-                  fontSize: 'var(--ds-typography-body-xs)',
+                  marginBottom: 'var(--ds-spacing-xl)',
                 }}
               >
                 {CHECKLIST.builtFor.map((item) => (
-                  <span
+                  <div
                     key={item.id}
                     style={{
+                      padding: 'var(--ds-spacing-xs) var(--ds-spacing-s)',
+                      border: `1px solid ${grey.border}`,
+                      fontSize: '12px',
+                      fontWeight: 'var(--ds-typography-weight-low)',
                       color: checks.builtFor[item.id]
                         ? 'var(--ds-color-positive)'
-                        : 'var(--ds-color-text-low)',
+                        : grey.tertiary,
                     }}
                   >
                     {checks.builtFor[item.id] ? '✓' : '✗'} {item.label}
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>

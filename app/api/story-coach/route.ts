@@ -98,13 +98,13 @@ ACROSS ALL ACTS:
 function buildUserMessage(input: StoryCoachInput): string {
   return `Product: ${input.productName}
 
-INPUT 1 — What does it do? (features, specific numbers, technical decisions)
+INPUT 1 — Describe what the product does (core functionality, social/family/sharing, personalisation, access and pricing, privacy/data/accessibility)
 ${input.whatItDoes}
 
-INPUT 2 — What is in it? (content, catalogue, languages, partners — named specifically)
+INPUT 2 — Describe what is in the product or can be accessed through the product (catalogue, language and regions, editorial, partners and exclusives)
 ${input.whatIsInIt}
 
-INPUT 3 — What is it built for? (device range, network conditions, household use, Indian-specific adaptations)
+INPUT 3 — What is it built for? (device range, network conditions, Indian-specific adaptations)
 ${input.builtFor}
 
 From these three inputs:

@@ -4,21 +4,20 @@ import { NextRequest, NextResponse } from 'next/server'
 const CHECKLIST: Record<string, { id: string; label: string }[]> = {
   whatItDoes: [
     { id: 'core', label: 'Core functionality' },
+    { id: 'social', label: 'Social, family and sharing functionality' },
     { id: 'personalisation', label: 'Personalisation and intelligence' },
-    { id: 'social', label: 'Social and sharing' },
-    { id: 'settings', label: 'Settings and controls' },
     { id: 'access', label: 'Access and pricing' },
+    { id: 'privacy', label: 'Privacy, data, accessibility' },
   ],
   whatIsInIt: [
     { id: 'catalogue', label: 'Catalogue depth and breadth' },
-    { id: 'languages', label: 'Languages and regions' },
+    { id: 'languages', label: 'Language and regions' },
     { id: 'editorial', label: 'Editorial and curation' },
-    { id: 'partners', label: 'Partners and exclusives' },
+    { id: 'partners', label: 'Partner and exclusives' },
   ],
   builtFor: [
     { id: 'devices', label: 'Device range' },
     { id: 'network', label: 'Network conditions' },
-    { id: 'household', label: 'Household and family use' },
     { id: 'india', label: 'Indian-specific adaptations' },
   ],
 }

@@ -15,42 +15,42 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
           zIndex: 20,
           paddingBlock: 'var(--ds-spacing-s)',
           paddingInline: 'var(--ds-spacing-m)',
-          borderBottom: '1px solid var(--ds-color-stroke-subtle)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
       >
-        <Link
-          href="/"
-          style={{
-            fontWeight: 'var(--ds-typography-weight-high)',
-            color: 'var(--ds-color-text-high)',
-            textDecoration: 'none',
-            fontSize: 'var(--ds-typography-label-m)',
-          }}
-        >
-          Page Architect
-        </Link>
-        <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
           <Link
-            href="/studio/story-coach"
+            href="/"
             style={{
-              color: 'var(--ds-color-text-medium)',
+              fontWeight: 'var(--ds-typography-weight-medium)',
+              color: 'rgba(0, 0, 0, 0.65)',
               textDecoration: 'none',
-              fontSize: 'var(--ds-typography-label-s)',
+              fontSize: 'var(--ds-typography-label-m)',
             }}
           >
-            Story Coach
+            Page Architect
           </Link>
-          <Link
-            href="/jiokarna"
-            style={{
-              color: 'var(--ds-color-text-medium)',
-              textDecoration: 'none',
-              fontSize: 'var(--ds-typography-label-s)',
-            }}
-          >
+          <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
+            <Link
+              href="/studio/story-coach"
+              style={{
+                color: 'rgba(0, 0, 0, 0.48)',
+                textDecoration: 'none',
+                fontSize: 'var(--ds-typography-label-s)',
+              }}
+            >
+              Story Coach
+            </Link>
+            <Link
+              href="/jiokarna"
+              style={{
+                color: 'rgba(0, 0, 0, 0.48)',
+                textDecoration: 'none',
+                fontSize: 'var(--ds-typography-label-s)',
+              }}
+            >
             JioKarna
           </Link>
         </nav>

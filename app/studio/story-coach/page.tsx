@@ -49,7 +49,8 @@ export default function StoryCoachPage() {
         style={{
           gridColumn: asideCol,
           gridRow: isSideBySide ? undefined : 1,
-          borderRight: isSideBySide ? '1px solid var(--ds-color-stroke-subtle)' : undefined,
+          borderLeft: '1px solid rgba(0, 0, 0, 0.06)',
+          borderRight: isSideBySide ? '1px solid rgba(0, 0, 0, 0.06)' : undefined,
           overflowY: 'auto',
         }}
       >
