@@ -44,6 +44,16 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
               Storytelling Coach
             </Link>
             <Link
+              href="/studio/block-inspiration"
+              style={{
+                color: 'rgba(0, 0, 0, 0.48)',
+                textDecoration: 'none',
+                fontSize: 'var(--ds-typography-label-s)',
+              }}
+            >
+              Block Inspiration
+            </Link>
+            <Link
               href="/jiokarna"
               style={{
                 color: 'rgba(0, 0, 0, 0.48)',
