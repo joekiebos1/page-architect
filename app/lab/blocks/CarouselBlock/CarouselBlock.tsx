@@ -12,21 +12,12 @@ import { createTransition } from '@marcelinodzn/ds-tokens'
 import { Headline, Button, Icon, IcChevronLeft, IcChevronRight } from '@marcelinodzn/ds-react'
 import { getHeadlineSize, normalizeHeadingLevel, TYPOGRAPHY } from '../../../../lib/utils/semantic-headline'
 import { useGridBreakpoint, getBreakpointName } from '../../../../lib/utils/use-grid-breakpoint'
+import { Grid, useCell } from '../../../components/blocks/Grid'
 import { WidthCap } from '../../../blocks/WidthCap'
 import { useCarouselReveal } from '../../../../lib/utils/use-carousel-reveal'
-import { MediaCard, TextOnColourCard } from '../../../components/blocks/Cards'
+import { LabCardRenderer, type LabCardItem } from '../LabCardRenderer'
 
-type CarouselItem = {
-  cardType?: 'media' | 'text-on-colour' | null
-  title?: string | null
-  description?: string | null
-  image?: string | null
-  video?: string | null
-  link?: string | null
-  ctaText?: string | null
-  aspectRatio?: '4:5' | '8:5' | '2:1'
-  imageSlot?: string
-}
+type CarouselItem = LabCardItem
 
 type CarouselCardSize = 'compact' | 'medium' | 'large'
 
@@ -82,15 +73,21 @@ function getCarouselConfig(
   if (breakpoint === 'mobile') {
     const cardPx = CARD_WIDTH_MOBILE_PX
     const g = gridValues.gutter
+    const isLarge = cardSize === 'large'
+    // Large on mobile: 1 card over 4 columns, minus the gaps on each side. [gap][card][gap]
+    const largeCardWidthCss = `calc(100cqw - 2 * ${GAP_MOBILE})`
+    const largeGap = GAP_MOBILE
     return {
       breakpoint: 'mobile',
       cols: 1,
       buttonsPlacement: 'bottom',
       outerContentWidth: 'Default',
-      gap: GAP_MOBILE,
-      useFixedCardWidth: true,
-      getCardWidthCss: (slots) => (slots === 1 ? `${cardPx}px` : `${cardPx * 2 + g}px`),
-      getImageHeight4_5: () => `${cardPx * (5 / 4)}px`,
+      gap: isLarge ? largeGap : GAP_MOBILE,
+      useFixedCardWidth: !isLarge,
+      getCardWidthCss: (slots) =>
+        isLarge ? largeCardWidthCss : slots === 1 ? `${cardPx}px` : `${cardPx * 2 + g}px`,
+      getImageHeight4_5: () =>
+        isLarge ? `calc(${largeCardWidthCss} * 5 / 4)` : `${cardPx * (5 / 4)}px`,
       getSlots: () => 1,
       getEffectiveAspectRatio: () => '4:5',
     }
@@ -258,18 +255,21 @@ export function LabCarouselBlock({
       if (first) setStepPx(first.offsetWidth + gapPx)
       if (capScrollAtGrid) {
         setTrackGapPx(Number.isFinite(gapPx) ? gapPx : 0)
-        // Cumulative scroll per card (one card at a time, different for 4:5 vs 8:5)
+        // Cumulative scroll per card. cum[i] = scroll to show card i at left.
+        // Only add gap between cards (n-1 gaps for n cards), not after the last.
         const cum: number[] = [0]
         const gap = Number.isFinite(gapPx) ? gapPx : 0
-        for (let i = 0; i < track.children.length; i++) {
+        const n = track.children.length
+        for (let i = 0; i < n; i++) {
           const el = track.children[i] as HTMLElement
-          cum.push(cum[i] + el.offsetWidth + gap)
+          cum.push(cum[i] + el.offsetWidth + (i < n - 1 ? gap : 0))
         }
         setCumulativeScrollPx(cum)
         const trackWidth = track.scrollWidth
         const viewportWidth = cardArea.clientWidth || cardArea.offsetWidth
         setViewportWidthPx(viewportWidth)
-        const maxScroll = trackWidth - viewportWidth
+        // maxScroll: use cum[n] as track width (sum(cards) + (n-1)*gap) so we don't over-scroll.
+        const maxScroll = (cum[n] ?? trackWidth) - viewportWidth
         setMaxScrollPx(Math.max(0, maxScroll))
       } else {
         setCumulativeScrollPx([])
@@ -401,22 +401,22 @@ export function LabCarouselBlock({
     overflow: 'visible',
   }
 
+  const cellContainer = useCell(config.outerContentWidth === 'Wide' ? 'Wide' : 'Default')
+
   return (
-    <WidthCap
-          as="section"
-          contentWidth={config.outerContentWidth}
-          style={{ overflow: 'visible' }}
-        >
-        <div
-          ref={revealRef}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: titleCarouselGap,
-            width: '100%',
-            overflow: 'visible',
-          }}
-        >
+    <Grid as="section">
+      <div
+        ref={revealRef}
+        style={{
+          ...cellContainer,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: titleCarouselGap,
+          width: '100%',
+          overflow: 'visible',
+        }}
+      >
+        <WidthCap contentWidth={config.outerContentWidth} style={{ overflow: 'visible' }}>
           {title && (
             <WidthCap contentWidth="Default">
               <Headline
@@ -503,7 +503,7 @@ export function LabCarouselBlock({
                       if (isLargeLayout) {
                         const bufferCenter = largeCenterIndex + 1
                         const isInView = i === bufferCenter
-                        const largeAspectRatio = cardSize === 'large' ? '2:1' : '4:5'
+                        const largeAspectRatio = cardSize === 'large' ? config.getEffectiveAspectRatio('2:1') : '4:5'
                         const opacity = prefersReducedMotion ? 1 : (i === bufferCenter ? 1 : CAROUSEL_FADED_OPACITY)
                         return (
                           <div
@@ -521,28 +521,19 @@ export function LabCarouselBlock({
                               transition: isWrapping ? 'none' : fadeTransition,
                             }}
                           >
-                            <MediaCard
-                              title={item.title}
-                              description={item.description}
-                              image={
-                                images?.[item.imageSlot!]?.ready
-                                  ? images[item.imageSlot!].url
-                                  : item.image
-                              }
-                              video={item.video}
-                              link={item.link}
-                              ctaText={item.ctaText}
-                              aspectRatio={largeAspectRatio}
+                            <LabCardRenderer
+                              item={item}
                               prefersReducedMotion={prefersReducedMotion}
-                              videoPaused={!isInView}
-                              inView={isInView}
-                              config={{
+                              context="carousel"
+                              aspectRatio={largeAspectRatio}
+                              mediaConfig={{
                                 layout: effectiveCardLayout,
                                 imageHeight4_5: config.getImageHeight4_5(),
                                 ...(config.getImageHeight8_5 && { imageHeight8_5: config.getImageHeight8_5() }),
                               }}
+                              videoPaused={!isInView}
+                              inView={isInView}
                               imageState={item.imageSlot ? images?.[item.imageSlot] : undefined}
-                              imageSlot={item.imageSlot}
                             />
                           </div>
                         )
@@ -572,46 +563,22 @@ export function LabCarouselBlock({
                             transition: useFadeTransition ? fadeTransition : cardTransition,
                           }}
                         >
-                          {item.cardType === 'text-on-colour' ? (
-                            <TextOnColourCard
-                              title={item.title}
-                              description={item.description}
-                              surface="bold"
-                              size={effectiveCardLayout === 'medium' ? 'large' : 'compact'}
-                              titleFontSize={
-                                effectiveCardLayout === 'medium' && textCardAspectRatio === '4:5'
-                                  ? TYPOGRAPHY.h3
-                                  : undefined
-                              }
-                              aspectRatio={textCardAspectRatio}
-                              inView={inView}
-                              prefersReducedMotion={prefersReducedMotion}
-                            />
-                          ) : (
-                            <MediaCard
-                              title={item.title}
-                              description={item.description}
-                              image={
-                                item.imageSlot && images?.[item.imageSlot]?.ready
-                                  ? images[item.imageSlot].url
-                                  : item.image
-                              }
-                              video={item.video}
-                              link={item.link}
-                              ctaText={item.ctaText}
-                              aspectRatio={effectiveAspectRatio}
-                              prefersReducedMotion={prefersReducedMotion}
-                              videoPaused={!isCardInView(i)}
-                              inView={inView}
-                              config={{
-                                layout: effectiveCardLayout,
-                                imageHeight4_5: config.getImageHeight4_5(),
-                                ...(config.getImageHeight8_5 && { imageHeight8_5: config.getImageHeight8_5() }),
-                              }}
-                              imageState={item.imageSlot ? images?.[item.imageSlot] : undefined}
-                              imageSlot={item.imageSlot}
-                            />
-                          )}
+                          <LabCardRenderer
+                            item={item}
+                            prefersReducedMotion={prefersReducedMotion}
+                            context="carousel"
+                            aspectRatio={
+                              item.cardType === 'text-on-colour' ? textCardAspectRatio : effectiveAspectRatio
+                            }
+                            mediaConfig={{
+                              layout: effectiveCardLayout,
+                              imageHeight4_5: config.getImageHeight4_5(),
+                              ...(config.getImageHeight8_5 && { imageHeight8_5: config.getImageHeight8_5() }),
+                            }}
+                            videoPaused={!isCardInView(i)}
+                            inView={inView}
+                            imageState={item.imageSlot ? images?.[item.imageSlot] : undefined}
+                          />
                         </div>
                       )
                     })}
@@ -660,7 +627,8 @@ export function LabCarouselBlock({
               )}
             </div>
           </div>
-        </div>
-      </WidthCap>
+        </WidthCap>
+      </div>
+    </Grid>
   )
 }

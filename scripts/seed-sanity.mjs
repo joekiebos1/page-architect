@@ -74,21 +74,203 @@ async function seed() {
 
   const LAB_MEDIA_URL = 'https://storage.googleapis.com/mannequin/blobs/4627df29-fe27-4e9c-b58f-8077848e265f.mp4'
 
-  // Lab block pages – one page per block type, all variants from block-variants.ts
-  const sharedHeroFields = {
-    productName: 'Product Name',
-    headline: 'Designed for the way you live.',
-    subheadline: 'Clean lines. Thoughtful details. Built to last.',
-    ctaText: 'Shop now',
-    ctaLink: '#',
-    cta2Text: 'Learn more',
-    cta2Link: '#',
+  // Merge with Sanity export – preserve existing content, only add/update editorial and carousel
+  let sanityExport = null
+  try {
+    const exportPath = join(__dirname, 'sanity-export.json')
+    sanityExport = JSON.parse(readFileSync(exportPath, 'utf-8'))
+    console.log('Using sanity-export.json for merge (preserving existing pages)')
+  } catch {
+    console.log('No sanity-export.json found – run: node --env-file=.env scripts/export-sanity-for-seed.mjs first')
   }
 
-  const labBlockPages = [
-    {
-      _type: 'labBlockPage',
-      _id: 'labBlockPage-hero',
+  const stripSanityMeta = (doc) => {
+    const { _rev, _createdAt, _updatedAt, _system, ...rest } = doc
+    return rest
+  }
+
+  // Build labBlockPages: use export for existing pages, add editorial (5 blocks), replace carousel (3 carousels)
+  const SLUG_ORDER = ['top-nav', 'hero', 'media-text', 'media-text-5050', 'carousel', 'card-grid', 'editorial', 'icon-grid', 'proof-points', 'list', 'full-bleed-vertical-carousel', 'rotating-media', 'media-zoom-out-on-scroll']
+
+  const editorialPage = {
+    _type: 'labBlockPage',
+    _id: 'labBlockPage-editorial',
+    slug: 'editorial',
+    title: 'Editorial',
+    sections: [
+      {
+        _type: 'editorialBlock',
+        _key: 'ed-1-display',
+        headline: 'Designer-crafted moments',
+        body: 'Text and image placed independently on a 12×6 grid. Display headline, ghost emphasis, text behind image.',
+        image: imageRef(getAsset(0)),
+        ctaText: 'Learn more',
+        ctaLink: '#',
+        textArea: { topLeft: { column: 1, row: 2 }, bottomRight: { column: 6, row: 4 } },
+        imageArea: { topLeft: { column: 5, row: 1 }, bottomRight: { column: 12, row: 6 } },
+        textInFront: false,
+        headlineSize: 'display',
+        emphasis: 'ghost',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+      },
+      {
+        _type: 'editorialBlock',
+        _key: 'ed-2-offset',
+        headline: 'Offset composition',
+        body: 'Text block and image block can overlap. Z-index controls layering. Headline size, minimal surface.',
+        image: imageRef(getAsset(1)),
+        textArea: { topLeft: { column: 1, row: 1 }, bottomRight: { column: 6, row: 3 } },
+        imageArea: { topLeft: { column: 5, row: 2 }, bottomRight: { column: 12, row: 6 } },
+        textInFront: true,
+        headlineSize: 'headline',
+        emphasis: 'minimal',
+        surfaceColour: 'primary',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+      },
+      {
+        _type: 'editorialBlock',
+        _key: 'ed-3-title',
+        headline: 'Compact title size',
+        body: 'Title-level typography. Centre-aligned text, vertical centre. Subtle emphasis, secondary surface.',
+        image: imageRef(getAsset(2)),
+        textArea: { topLeft: { column: 2, row: 2 }, bottomRight: { column: 11, row: 5 } },
+        imageArea: { topLeft: { column: 1, row: 1 }, bottomRight: { column: 12, row: 6 } },
+        textInFront: true,
+        headlineSize: 'title',
+        textAlign: 'center',
+        textVerticalAlign: 'center',
+        emphasis: 'subtle',
+        surfaceColour: 'secondary',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+      },
+      {
+        _type: 'editorialBlock',
+        _key: 'ed-4-bold',
+        headline: 'Bold editorial',
+        body: 'Strong emphasis with sparkle surface. Text in front, full grid coverage.',
+        image: imageRef(getAsset(3)),
+        ctaText: 'Explore',
+        ctaLink: '#',
+        textArea: { topLeft: { column: 1, row: 1 }, bottomRight: { column: 8, row: 6 } },
+        imageArea: { topLeft: { column: 7, row: 2 }, bottomRight: { column: 12, row: 5 } },
+        textInFront: true,
+        headlineSize: 'headline',
+        emphasis: 'bold',
+        surfaceColour: 'sparkle',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+      },
+      {
+        _type: 'editorialBlock',
+        _key: 'ed-5-right',
+        headline: 'Image left, text right',
+        body: 'Reversed layout. Image spans left columns, text on the right. Neutral surface.',
+        image: imageRef(getAsset(4)),
+        textArea: { topLeft: { column: 7, row: 2 }, bottomRight: { column: 12, row: 4 } },
+        imageArea: { topLeft: { column: 1, row: 1 }, bottomRight: { column: 6, row: 6 } },
+        textInFront: true,
+        headlineSize: 'title',
+        emphasis: 'minimal',
+        surfaceColour: 'neutral',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+      },
+    ],
+  }
+
+  const carouselPage = {
+    _type: 'labBlockPage',
+    _id: 'labBlockPage-carousel',
+    slug: 'carousel',
+    title: 'Carousel',
+    sections: [
+      {
+        _type: 'labCarousel',
+        _key: 'car-small',
+        title: 'Small · Compact carousel',
+        cardSize: 'compact',
+        emphasis: 'ghost',
+        surfaceColour: 'primary',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+        items: [
+          { _type: 'labCardItem', _key: 'i1', cardType: 'media-description-below', title: 'Card 1', description: 'Media below, 4:5.', image: imageRef(getAsset(0)), aspectRatio: '4:5' },
+          { _type: 'labCardItem', _key: 'i2', cardType: 'media-description-inside', title: 'Overlay card', description: 'Text on image.', image: imageRef(getAsset(1)), aspectRatio: '4:5' },
+          { _type: 'labCardItem', _key: 'i3', cardType: 'media-description-below', title: 'Card 3', description: '8:5 aspect.', image: imageRef(getAsset(2)), aspectRatio: '8:5' },
+          { _type: 'labCardItem', _key: 'i4', cardType: 'media-description-below', title: 'Card 4', description: 'Compact.', image: imageRef(getAsset(3)), aspectRatio: '4:5' },
+          { _type: 'labCardItem', _key: 'i5', cardType: 'media-description-inside', title: 'Card 5', description: 'Inside overlay.', image: imageRef(getAsset(4)), aspectRatio: '4:5' },
+        ],
+      },
+      {
+        _type: 'labCarousel',
+        _key: 'car-medium',
+        title: 'Medium · Mixed cards',
+        cardSize: 'medium',
+        emphasis: 'minimal',
+        surfaceColour: 'secondary',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+        items: [
+          { _type: 'labCardItem', _key: 'i1', cardType: 'media-description-below', title: 'Medium 1', description: '4:5 media below.', image: imageRef(getAsset(5)) },
+          { _type: 'labCardItem', _key: 'i2', cardType: 'media-description-inside', title: 'Medium 2', description: 'Text overlay.', image: imageRef(getAsset(6)) },
+          { _type: 'labCardItem', _key: 'i3', cardType: 'media-description-below', title: 'Medium 3', description: 'Media below.', image: imageRef(getAsset(7)) },
+          { _type: 'labCardItem', _key: 'i4', cardType: 'media-description-below', title: 'Medium 4', description: '4:5.', image: imageRef(getAsset(0)) },
+        ],
+      },
+      {
+        _type: 'labCarousel',
+        _key: 'car-large',
+        title: 'Large · Bold carousel',
+        cardSize: 'large',
+        emphasis: 'bold',
+        surfaceColour: 'sparkle',
+        spacingTop: 'large',
+        spacingBottom: 'large',
+        items: [
+          { _type: 'labCardItem', _key: 'i1', cardType: 'media-description-below', title: 'Large card 1', description: '2:1 aspect, full width.', image: imageRef(getAsset(7)), aspectRatio: '2:1' },
+          { _type: 'labCardItem', _key: 'i2', cardType: 'media-description-inside', title: 'Large overlay', description: 'Text on image.', image: imageRef(getAsset(8)), aspectRatio: '2:1' },
+          { _type: 'labCardItem', _key: 'i3', cardType: 'media-description-below', title: 'Large card 3', description: '2:1.', image: imageRef(getAsset(0)), aspectRatio: '2:1' },
+        ],
+      },
+    ],
+  }
+
+  let labBlockPages
+  if (sanityExport?.labBlockPages?.length) {
+    const published = sanityExport.labBlockPages.filter((p) => !String(p._id).startsWith('drafts.'))
+    const bySlug = Object.fromEntries(published.map((p) => [p.slug, stripSanityMeta(p)]))
+    // Preserve all except editorial and carousel; add our editorial and carousel
+    const merged = []
+    for (const slug of SLUG_ORDER) {
+      if (slug === 'editorial') merged.push(editorialPage)
+      else if (slug === 'carousel') merged.push(carouselPage)
+      else if (slug === 'top-nav' && !bySlug[slug]) merged.push({ _type: 'labBlockPage', _id: 'labBlockPage-top-nav', slug: 'top-nav', title: 'Top nav (mega menu)', sections: [{ _type: 'topNavBlock', _key: 'top-nav' }] })
+      else if (bySlug[slug]) merged.push(bySlug[slug])
+    }
+    // Add any export pages not in SLUG_ORDER
+    for (const slug of Object.keys(bySlug)) {
+      if (!SLUG_ORDER.includes(slug) && slug !== 'editorial' && slug !== 'carousel') merged.push(bySlug[slug])
+    }
+    labBlockPages = merged
+    console.log(`Merged ${labBlockPages.length} lab block pages (from export + editorial + carousel)`)
+  } else {
+    // Fallback: use seed-only (no export)
+    const sharedHeroFields = {
+      productName: 'Product Name',
+      headline: 'Designed for the way you live.',
+      subheadline: 'Clean lines. Thoughtful details. Built to last.',
+      ctaText: 'Shop now',
+      ctaLink: '#',
+      cta2Text: 'Learn more',
+      cta2Link: '#',
+    }
+    labBlockPages = [
+      {
+        _type: 'labBlockPage',
+        _id: 'labBlockPage-hero',
       slug: 'hero',
       title: 'Hero',
       sections: [
@@ -306,6 +488,7 @@ async function seed() {
         },
       ],
     },
+    carouselPage,
     {
       _type: 'labBlockPage',
       _id: 'labBlockPage-card-grid',
@@ -323,8 +506,8 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Image with text below. CTA optional.', image: imageRef(getAsset(0)), ctaText: 'Learn more', ctaLink: '#' },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Image with text below.', image: imageRef(getAsset(1)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Image with text below. CTA optional.', image: imageRef(getAsset(0)), ctaText: 'Learn more', ctaLink: '#' },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Image with text below.', image: imageRef(getAsset(1)) },
           ],
         },
         {
@@ -337,9 +520,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Description for card 1.', image: imageRef(getAsset(2)) },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Description for card 2.', image: imageRef(getAsset(3)) },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Description for card 3.', image: imageRef(getAsset(4)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Description for card 1.', image: imageRef(getAsset(2)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Description for card 2.', image: imageRef(getAsset(3)) },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Description for card 3.', image: imageRef(getAsset(4)) },
           ],
         },
         {
@@ -352,10 +535,10 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Short.', image: imageRef(getAsset(5)) },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Short.', image: imageRef(getAsset(6)) },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Short.', image: imageRef(getAsset(7)) },
-            { _type: 'cardGridItem', _key: 'c4', cardType: 'media-description-below', title: 'Card 4', description: 'Short.', image: imageRef(getAsset(0)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Short.', image: imageRef(getAsset(5)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Short.', image: imageRef(getAsset(6)) },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Short.', image: imageRef(getAsset(7)) },
+            { _type: 'labCardItem', _key: 'c4', cardType: 'media-description-below', title: 'Card 4', description: 'Short.', image: imageRef(getAsset(0)) },
           ],
         },
         // 2. Media card type: inside (text overlay)
@@ -369,9 +552,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-inside', title: 'Overlay card 1', description: 'Text over image.', image: imageRef(getAsset(1)) },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-inside', title: 'Overlay card 2', description: 'Text over image.', image: imageRef(getAsset(2)) },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-inside', title: 'Overlay card 3', description: 'Text over image.', image: imageRef(getAsset(3)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-inside', title: 'Overlay card 1', description: 'Text over image.', image: imageRef(getAsset(1)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-inside', title: 'Overlay card 2', description: 'Text over image.', image: imageRef(getAsset(2)) },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-inside', title: 'Overlay card 3', description: 'Text over image.', image: imageRef(getAsset(3)) },
           ],
         },
         // 3. Text inside: large (headline + description) — colour picker: primary-bold, secondary-bold, sparkle-bold
@@ -385,9 +568,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'labGridBlockCardItem', _key: 'c1', size: 'large', title: 'Primary bold', description: 'Headline and description with background colour.', backgroundColor: 'primary-bold' },
-            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'large', title: 'Secondary bold', description: 'Headline and description with background colour.', backgroundColor: 'secondary-bold' },
-            { _type: 'labGridBlockCardItem', _key: 'c3', size: 'large', title: 'Sparkle bold', description: 'Headline and description with background colour.', backgroundColor: 'sparkle-bold' },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'text-on-colour', size: 'large', title: 'Primary bold', description: 'Headline and description with background colour.', backgroundColor: 'primary-bold' },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'text-on-colour', size: 'large', title: 'Secondary bold', description: 'Headline and description with background colour.', backgroundColor: 'secondary-bold' },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'text-on-colour', size: 'large', title: 'Sparkle bold', description: 'Headline and description with background colour.', backgroundColor: 'sparkle-bold' },
           ],
         },
         // 4. Text inside: small (icon, CTAs, features) — colour picker: primary-subtle, secondary-subtle, spectrum
@@ -401,9 +584,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'labGridBlockCardItem', _key: 'c1', size: 'small', title: 'Feature card 1', description: 'With icon and CTA.', icon: 'IcWifiNetwork', backgroundColor: 'primary-subtle', callToActionButtons: [{ _key: 'b1', label: 'Learn more', link: '#', style: 'filled' }] },
-            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'small', title: 'Feature card 2', description: 'With features list.', backgroundColor: 'secondary-subtle', features: ['Feature A', 'Feature B', 'Feature C'] },
-            { _type: 'labGridBlockCardItem', _key: 'c3', size: 'small', title: 'Spectrum card', description: 'reliance.800 from full spectrum.', backgroundColor: 'reliance.800', callToActionButtons: [{ _key: 'b1', label: 'Explore', link: '#', style: 'outlined' }] },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'text-on-colour', size: 'small', title: 'Feature card 1', description: 'With icon and CTA.', icon: 'IcWifiNetwork', backgroundColor: 'primary-subtle', callToActionButtons: [{ _key: 'b1', label: 'Learn more', link: '#', style: 'filled' }] },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'text-on-colour', size: 'small', title: 'Feature card 2', description: 'With features list.', backgroundColor: 'secondary-subtle', features: ['Feature A', 'Feature B', 'Feature C'] },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'text-on-colour', size: 'small', title: 'Spectrum card', description: 'reliance.800 from full spectrum.', backgroundColor: 'reliance.800', callToActionButtons: [{ _key: 'b1', label: 'Explore', link: '#', style: 'outlined' }] },
           ],
         },
         // 5. Mixed: media + text inside in one grid
@@ -417,9 +600,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Media below', description: 'Image with text underneath.', image: imageRef(getAsset(4)) },
-            { _type: 'labGridBlockCardItem', _key: 'c2', size: 'large', title: 'Text inside', description: 'Coloured card in same grid.', backgroundColor: 'primary-bold' },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-inside', title: 'Media inside', description: 'Text overlay on image.', image: imageRef(getAsset(5)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Media below', description: 'Image with text underneath.', image: imageRef(getAsset(4)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'text-on-colour', size: 'large', title: 'Text inside', description: 'Coloured card in same grid.', backgroundColor: 'primary-bold' },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-inside', title: 'Media inside', description: 'Text overlay on image.', image: imageRef(getAsset(5)) },
           ],
         },
         // 6. Block surface variants: minimal, bold (1–2 examples)
@@ -433,9 +616,9 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Light tint background.', image: imageRef(getAsset(6)) },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Light tint background.', image: imageRef(getAsset(7)) },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Light tint background.', image: imageRef(getAsset(0)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Light tint background.', image: imageRef(getAsset(6)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Light tint background.', image: imageRef(getAsset(7)) },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Light tint background.', image: imageRef(getAsset(0)) },
           ],
         },
         {
@@ -448,68 +631,14 @@ async function seed() {
           spacingTop: 'large',
           spacingBottom: 'large',
           items: [
-            { _type: 'cardGridItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Strong tint, inverted text.', image: imageRef(getAsset(1)) },
-            { _type: 'cardGridItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Strong tint, inverted text.', image: imageRef(getAsset(2)) },
-            { _type: 'cardGridItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Strong tint, inverted text.', image: imageRef(getAsset(3)) },
+            { _type: 'labCardItem', _key: 'c1', cardType: 'media-description-below', title: 'Card 1', description: 'Strong tint, inverted text.', image: imageRef(getAsset(1)) },
+            { _type: 'labCardItem', _key: 'c2', cardType: 'media-description-below', title: 'Card 2', description: 'Strong tint, inverted text.', image: imageRef(getAsset(2)) },
+            { _type: 'labCardItem', _key: 'c3', cardType: 'media-description-below', title: 'Card 3', description: 'Strong tint, inverted text.', image: imageRef(getAsset(3)) },
           ],
         },
       ],
     },
-    {
-      _type: 'labBlockPage',
-      _id: 'labBlockPage-carousel',
-      slug: 'carousel',
-      title: 'Carousel',
-      sections: [
-        {
-          _type: 'carousel',
-          _key: 'car-compact-ghost',
-          title: 'Carousel · Compact',
-          cardSize: 'compact',
-          emphasis: 'ghost',
-          surfaceColour: 'primary',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'cardItem', _key: 'i1', cardType: 'media', title: 'Card 1 (4:5)', description: 'Compact card.', image: imageRef(getAsset(0)), aspectRatio: '4:5' },
-            { _type: 'cardItem', _key: 'i2', cardType: 'media', title: 'Card 2 (8:5)', description: 'Wider compact card.', image: imageRef(getAsset(1)), aspectRatio: '8:5' },
-            { _type: 'cardItem', _key: 'i3', cardType: 'media', title: 'Card 3 (4:5)', description: 'Compact card.', image: imageRef(getAsset(2)), aspectRatio: '4:5' },
-            { _type: 'cardItem', _key: 'i4', cardType: 'media', title: 'Card 4 (8:5)', description: 'Wider compact card.', image: imageRef(getAsset(3)), aspectRatio: '8:5' },
-            { _type: 'cardItem', _key: 'i5', cardType: 'media', title: 'Card 5 (4:5)', description: 'Compact card.', image: imageRef(getAsset(0)), aspectRatio: '4:5' },
-          ],
-        },
-        {
-          _type: 'carousel',
-          _key: 'car-medium-minimal',
-          title: 'Carousel · Medium',
-          cardSize: 'medium',
-          emphasis: 'minimal',
-          surfaceColour: 'secondary',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'cardItem', _key: 'i1', cardType: 'media', title: 'Card 1', description: 'Medium card (4:5).', image: imageRef(getAsset(4)) },
-            { _type: 'cardItem', _key: 'i2', cardType: 'media', title: 'Card 2', description: 'Medium card (4:5).', image: imageRef(getAsset(5)) },
-            { _type: 'cardItem', _key: 'i3', cardType: 'media', title: 'Card 3', description: 'Medium card (4:5).', image: imageRef(getAsset(6)) },
-          ],
-        },
-        {
-          _type: 'carousel',
-          _key: 'car-large-bold',
-          title: 'Carousel · Large',
-          cardSize: 'large',
-          emphasis: 'bold',
-          surfaceColour: 'sparkle',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'cardItem', _key: 'i1', cardType: 'media', title: 'Card 1', description: 'Large card (2:1).', image: imageRef(getAsset(7)) },
-            { _type: 'cardItem', _key: 'i2', cardType: 'media', title: 'Card 2', description: 'Large card (2:1).', image: imageRef(getAsset(8)) },
-            { _type: 'cardItem', _key: 'i3', cardType: 'media', title: 'Card 3', description: 'Large card (2:1).', image: imageRef(getAsset(0)) },
-          ],
-        },
-      ],
-    },
+    editorialPage,
     {
       _type: 'labBlockPage',
       _id: 'labBlockPage-icon-grid',
@@ -701,42 +830,60 @@ async function seed() {
       sections: [{ _type: 'topNavBlock', _key: 'top-nav' }],
     },
   ]
+  }
 
   for (const page of labBlockPages) {
     await client.createOrReplace(page)
     console.log(`Created Lab block page: ${page.title} (/lab/${page.slug})`)
   }
 
-  // Lab overview – singleton for /lab page with List block (links variant) linking to each block page
-  const labOverview = {
-    _type: 'labOverview',
-    _id: 'labOverview',
-    sections: [
-      {
-        _type: 'list',
-        _key: 'lab-overview-blocks',
-        blockTitle: 'Blocks',
-        listVariant: 'links',
-        emphasis: 'ghost',
-        surfaceColour: 'primary',
-        spacingTop: 'large',
-        spacingBottom: 'large',
-        items: [
-          { _type: 'listItem', _key: 'top-nav', subtitle: 'Top nav (mega menu)', linkUrl: '/lab/top-nav' },
-          { _type: 'listItem', _key: 'hero', subtitle: 'Hero', linkUrl: '/lab/hero' },
-          { _type: 'listItem', _key: 'media-text', subtitle: 'Media + Text: Stacked', linkUrl: '/lab/media-text' },
-          { _type: 'listItem', _key: 'media-text-5050', subtitle: 'Media + Text: 50/50', linkUrl: '/lab/media-text-5050' },
-          { _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' },
-          { _type: 'listItem', _key: 'card-grid', subtitle: 'Card grid', linkUrl: '/lab/card-grid' },
-          { _type: 'listItem', _key: 'icon-grid', subtitle: 'Icon grid', linkUrl: '/lab/icon-grid' },
-          { _type: 'listItem', _key: 'proof-points', subtitle: 'Proof points', linkUrl: '/lab/proof-points' },
-          { _type: 'listItem', _key: 'list', subtitle: 'List', linkUrl: '/lab/list' },
-          { _type: 'listItem', _key: 'fbvc', subtitle: 'Full bleed vertical carousel', linkUrl: '/lab/full-bleed-vertical-carousel' },
-          { _type: 'listItem', _key: 'rotating-media', subtitle: 'Rotating media', linkUrl: '/lab/rotating-media' },
-          { _type: 'listItem', _key: 'media-zoom-out', subtitle: 'Media zoom out on scroll', linkUrl: '/lab/media-zoom-out-on-scroll' },
-        ],
-      },
-    ],
+  // Lab overview – merge from export when available, preserve existing sections
+  const defaultLabOverviewItems = [
+    { _type: 'listItem', _key: 'top-nav', subtitle: 'Top nav (mega menu)', linkUrl: '/lab/top-nav' },
+    { _type: 'listItem', _key: 'hero', subtitle: 'Hero', linkUrl: '/lab/hero' },
+    { _type: 'listItem', _key: 'media-text', subtitle: 'Media + Text: Stacked', linkUrl: '/lab/media-text' },
+    { _type: 'listItem', _key: 'media-text-5050', subtitle: 'Media + Text: 50/50', linkUrl: '/lab/media-text-5050' },
+    { _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' },
+    { _type: 'listItem', _key: 'card-grid', subtitle: 'Card grid', linkUrl: '/lab/card-grid' },
+    { _type: 'listItem', _key: 'editorial', subtitle: 'Editorial', linkUrl: '/lab/editorial' },
+    { _type: 'listItem', _key: 'icon-grid', subtitle: 'Icon grid', linkUrl: '/lab/icon-grid' },
+    { _type: 'listItem', _key: 'proof-points', subtitle: 'Proof points', linkUrl: '/lab/proof-points' },
+    { _type: 'listItem', _key: 'list', subtitle: 'List', linkUrl: '/lab/list' },
+    { _type: 'listItem', _key: 'fbvc', subtitle: 'Full bleed vertical carousel', linkUrl: '/lab/full-bleed-vertical-carousel' },
+    { _type: 'listItem', _key: 'rotating-media', subtitle: 'Rotating media', linkUrl: '/lab/rotating-media' },
+    { _type: 'listItem', _key: 'media-zoom-out', subtitle: 'Media zoom out on scroll', linkUrl: '/lab/media-zoom-out-on-scroll' },
+  ]
+  let labOverview
+  if (sanityExport?.labOverview?.sections?.length) {
+    const sections = sanityExport.labOverview.sections.map((s) => stripSanityMeta(s))
+    // Ensure editorial and carousel links exist in the first list block
+    const listBlock = sections.find((s) => s._type === 'list' && s.items)
+    if (listBlock) {
+      const hasEditorial = listBlock.items.some((i) => i.linkUrl === '/lab/editorial' || i._key === 'editorial')
+      const hasCarousel = listBlock.items.some((i) => i.linkUrl === '/lab/carousel' || i._key === 'carousel')
+      if (!hasEditorial) listBlock.items.push({ _type: 'listItem', _key: 'editorial', subtitle: 'Editorial', linkUrl: '/lab/editorial' })
+      if (!hasCarousel) listBlock.items.push({ _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' })
+    }
+    labOverview = { _type: 'labOverview', _id: 'labOverview', sections }
+    console.log('Merged Lab overview from export')
+  } else {
+    labOverview = {
+      _type: 'labOverview',
+      _id: 'labOverview',
+      sections: [
+        {
+          _type: 'list',
+          _key: 'lab-overview-blocks',
+          blockTitle: 'Blocks',
+          listVariant: 'links',
+          emphasis: 'ghost',
+          surfaceColour: 'primary',
+          spacingTop: 'large',
+          spacingBottom: 'large',
+          items: defaultLabOverviewItems,
+        },
+      ],
+    }
   }
   await client.createOrReplace(labOverview)
   console.log('Created Lab overview')

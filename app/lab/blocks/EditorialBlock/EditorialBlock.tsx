@@ -1,0 +1,291 @@
+'use client'
+
+/**
+ * EditorialBlock — 12×6 grid composition for text + image.
+ * Text and image placed independently, can overlap.
+ * Lab only.
+ *
+ * Grid debugging: set NEXT_PUBLIC_DEBUG_EDITORIAL_GRID=true in .env.local
+ */
+
+import { useEffect, useRef, useState } from 'react'
+
+const DEBUG_EDITORIAL_GRID = process.env.NEXT_PUBLIC_DEBUG_EDITORIAL_GRID === 'true'
+import { useRouter } from 'next/navigation'
+import { Display, Headline, Title, Text, Button, SurfaceProvider } from '@marcelinodzn/ds-react'
+import { BlockSurfaceProvider, getSurfaceProviderProps } from '../../../../lib/utils/block-surface'
+import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
+import { Grid, useCell } from '../../../components/blocks/Grid'
+import { WidthCap } from '../../../blocks/WidthCap'
+import type { EditorialBlockProps } from './EditorialBlock.types'
+
+function fromCorners(
+  topLeft: { column?: number; row?: number } | null | undefined,
+  bottomRight: { column?: number; row?: number } | null | undefined,
+  defaults: { colStart: number; colSpan: number; rowStart: number; rowSpan: number }
+) {
+  const tlCol = topLeft?.column ?? defaults.colStart
+  const tlRow = topLeft?.row ?? defaults.rowStart
+  const brCol = bottomRight?.column ?? tlCol + defaults.colSpan - 1
+  const brRow = bottomRight?.row ?? tlRow + defaults.rowSpan - 1
+  const colStart = Math.min(tlCol, brCol)
+  const colSpan = Math.max(1, Math.abs(brCol - tlCol) + 1)
+  const rowStart = Math.min(tlRow, brRow)
+  const rowSpan = Math.max(1, Math.abs(brRow - tlRow) + 1)
+  return { colStart, colSpan, rowStart, rowSpan }
+}
+
+export function EditorialBlock({
+  headline,
+  body,
+  image,
+  videoUrl,
+  ctaText,
+  ctaLink,
+  textTopLeft,
+  textBottomRight,
+  headlineSize = 'display',
+  textAlign = 'left',
+  textVerticalAlign = 'top',
+  imageTopLeft,
+  imageBottomRight,
+  imageFit = 'contain',
+  textInFront = true,
+  rows = 6,
+  emphasis = 'ghost',
+  surfaceColour,
+}: EditorialBlockProps) {
+  const router = useRouter()
+  const { columns, isStacked } = useGridBreakpoint()
+  const cell = useCell('Wide')
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [cellSize, setCellSize] = useState(0)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const surfaceProps = getSurfaceProviderProps(emphasis)
+
+  const rowsClamped = Math.min(16, Math.max(2, rows ?? 6))
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mq.matches)
+    const handler = () => setPrefersReducedMotion(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const ro = new ResizeObserver((entries) => {
+      const width = entries[0].contentRect.width
+      setCellSize(width / 12)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const hasMedia = Boolean(image || videoUrl)
+  const textAlignStyle = textAlign === 'center' ? 'center' : 'left'
+  const alignItems = textVerticalAlign === 'top' ? 'flex-start' : textVerticalAlign === 'bottom' ? 'flex-end' : 'center'
+  const objPos = 'center'
+
+  const handleCtaPress = () => {
+    if (ctaLink?.startsWith('/')) router.push(ctaLink)
+    else if (ctaLink) window.location.href = ctaLink
+  }
+
+  const headlineComponent = headlineSize === 'display' ? (
+    <Display size="L" as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }}>{headline}</Display>
+  ) : headlineSize === 'headline' ? (
+    <Headline size="L" weight="high" as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }}>{headline}</Headline>
+  ) : (
+    <Title level={2} style={{ textAlign: textAlignStyle, whiteSpace: 'pre-line', margin: 0 }}>{headline}</Title>
+  )
+
+  const textContent = (
+    <SurfaceProvider {...surfaceProps}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: alignItems,
+          justifyContent: textVerticalAlign === 'top' ? 'flex-start' : textVerticalAlign === 'bottom' ? 'flex-end' : 'center',
+          gap: 'var(--ds-spacing-m)',
+          height: '100%',
+        }}
+      >
+        {headline && headlineComponent}
+        {body && (
+          <Text size="M" as="p" style={{ margin: 0, whiteSpace: 'pre-line', textAlign: textAlignStyle, maxWidth: '100%' }}>{body}</Text>
+        )}
+        {ctaText && ctaLink && (
+          <Button size="M" appearance="primary" attention="high" onPress={handleCtaPress}>{ctaText}</Button>
+        )}
+      </div>
+    </SurfaceProvider>
+  )
+
+  const showVideo = hasMedia && videoUrl && !prefersReducedMotion
+  const imageContent = (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {showVideo ? (
+        <video
+          src={videoUrl}
+          poster={image ?? undefined}
+          muted
+          autoPlay
+          loop
+          playsInline
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: imageFit,
+            objectPosition: objPos,
+          }}
+        />
+      ) : image ? (
+        <img
+          src={image}
+          alt=""
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: imageFit,
+            objectPosition: objPos,
+          }}
+        />
+      ) : null}
+    </div>
+  )
+
+  if (isStacked) {
+    const isMobile = columns <= 4
+    return (
+      <section>
+        <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth={false}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-l)' }}>
+            <WidthCap contentWidth="Default">
+              {textContent}
+            </WidthCap>
+            {hasMedia && (
+              <WidthCap contentWidth="Wide">
+                <div
+                  style={{
+                    aspectRatio: isMobile ? '4/5' : '2/1',
+                    width: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {imageContent}
+                </div>
+              </WidthCap>
+            )}
+          </div>
+        </BlockSurfaceProvider>
+      </section>
+    )
+  }
+
+  const cols = 12
+  const blockHeight = cellSize * rowsClamped
+
+  /**
+   * Debug overlay: 1px red lines at column and row boundaries.
+   * Editorial grid has 12 columns × rows, gap 0. Pattern repeats per cell.
+   */
+  const debugOverlayStyle: React.CSSProperties = DEBUG_EDITORIAL_GRID
+    ? {
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        backgroundImage: `
+          repeating-linear-gradient(
+            to right,
+            transparent 0,
+            transparent calc(100% / 12 - 1px),
+            rgba(255, 0, 0, 0.3) calc(100% / 12 - 1px),
+            rgba(255, 0, 0, 0.3) calc(100% / 12)
+          ),
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(100% / ${rowsClamped} - 1px),
+            rgba(255, 0, 0, 0.3) calc(100% / ${rowsClamped} - 1px),
+            rgba(255, 0, 0, 0.3) calc(100% / ${rowsClamped})
+          )
+        `,
+        zIndex: 3,
+      }
+    : {}
+
+  const text = fromCorners(textTopLeft, textBottomRight, { colStart: 1, colSpan: 6, rowStart: 2, rowSpan: 3 })
+  const img = fromCorners(imageTopLeft, imageBottomRight, { colStart: 5, colSpan: 8, rowStart: 1, rowSpan: 6 })
+  const tColStart = Math.min(Math.max(1, text.colStart), cols)
+  const tColSpan = Math.min(text.colSpan, cols - tColStart + 1)
+  const tRowStart = Math.min(Math.max(1, text.rowStart), rowsClamped)
+  const tRowSpan = Math.min(text.rowSpan, rowsClamped - tRowStart + 1)
+  const iColStart = Math.min(Math.max(1, img.colStart), cols)
+  const iColSpan = Math.min(img.colSpan, cols - iColStart + 1)
+  const iRowStart = Math.min(Math.max(1, img.rowStart), rowsClamped)
+  const iRowSpan = Math.min(img.rowSpan, rowsClamped - iRowStart + 1)
+
+  const gridContent = (
+    <div
+      ref={containerRef}
+      style={{
+        ...cell,
+        position: 'relative',
+        width: '100%',
+        height: blockHeight > 0 ? `${blockHeight}px` : undefined,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(12, 1fr)',
+        gridTemplateRows: cellSize > 0 ? `repeat(${rowsClamped}, ${cellSize}px)` : `repeat(${rowsClamped}, 1fr)`,
+        gap: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          gridColumn: `${tColStart} / span ${tColSpan}`,
+          gridRow: `${tRowStart} / span ${tRowSpan}`,
+          zIndex: textInFront ? 2 : 1,
+          minHeight: 0,
+          minWidth: 0,
+        }}
+      >
+        {textContent}
+      </div>
+      {hasMedia && (
+        <div
+          style={{
+            gridColumn: `${iColStart} / span ${iColSpan}`,
+            gridRow: `${iRowStart} / span ${iRowSpan}`,
+            zIndex: textInFront ? 1 : 2,
+            minHeight: 0,
+            minWidth: 0,
+          }}
+        >
+          {imageContent}
+        </div>
+      )}
+      {DEBUG_EDITORIAL_GRID && <div aria-hidden style={debugOverlayStyle} />}
+    </div>
+  )
+
+  return (
+    <section>
+      <BlockSurfaceProvider emphasis={emphasis} surfaceColour={surfaceColour} fullWidth={false}>
+        <Grid as="div">
+          {gridContent}
+        </Grid>
+      </BlockSurfaceProvider>
+    </section>
+  )
+}

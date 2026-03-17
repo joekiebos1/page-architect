@@ -10,10 +10,20 @@ import { useEffect, useState } from 'react'
 import { Headline } from '@marcelinodzn/ds-react'
 import { WidthCap } from '../../../blocks/WidthCap'
 import { BlockReveal } from '../../../blocks/BlockReveal'
-import { CardRenderer } from '../../../blocks/CardGridBlock/CardRenderer'
+import { LabCardRenderer } from '../LabCardRenderer'
 import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
 import { normalizeHeadingLevel, TYPOGRAPHY } from '../../../../lib/utils/semantic-headline'
-import type { CardGridBlockProps } from '../../../blocks/CardGridBlock/CardGridBlock.types'
+import type { LabCardItem } from '../LabCardRenderer'
+
+export type LabCardGridBlockProps = {
+  columns?: 2 | 3 | 4
+  title?: string | null
+  emphasis?: 'ghost' | 'minimal' | 'subtle' | 'bold'
+  minimalBackgroundStyle?: 'block' | 'gradient' | null
+  surfaceColour?: 'primary' | 'secondary' | 'sparkle' | 'neutral'
+  items?: LabCardItem[] | null
+  images?: Record<string, import('../../../hooks/useImageStream').ImageSlotState>
+}
 
 const MAX_ITEMS = 12
 
@@ -22,7 +32,7 @@ export function LabCardGridBlock({
   title,
   items,
   images,
-}: CardGridBlockProps) {
+}: LabCardGridBlockProps) {
   const level = normalizeHeadingLevel('h2')
   const items_ = (items ?? []).filter((i) => i?.title || (i as { image?: string })?.image || (i as { video?: string })?.video).slice(0, MAX_ITEMS)
   const { columns: gridColumns } = useGridBreakpoint()
@@ -66,10 +76,11 @@ export function LabCardGridBlock({
               {items_.map((item, i) => (
                 <div key={(item as { _key?: string })._key ?? i} style={{ minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%' }}>
                   <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
-                    <CardRenderer
-                      item={item}
+                    <LabCardRenderer
+                      item={item as import('../LabCardRenderer').LabCardItem}
                       prefersReducedMotion={prefersReducedMotion}
                       gridColumns={cols}
+                      context="grid"
                       imageState={(item as { imageSlot?: string }).imageSlot && images
                         ? images[(item as { imageSlot: string }).imageSlot]
                         : undefined}

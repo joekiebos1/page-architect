@@ -99,22 +99,27 @@ function getTypographyVars(platformCtx) {
   return v
 }
 
+const CONTAINER_MAX_FALLBACK = 1346
 const platformMediaVars = []
 for (const [platform, minWidth] of gridPlatforms) {
   const platformCtx = createPlatformContext(platform)
-  const cols = getVariableByName('Grid/columns', platformCtx)
-  const margin = getVariableByName(
+  const cols = Number(getVariableByName('Grid/columns', platformCtx)) || 12
+  const margin = Number(getVariableByName(
     platform.includes('360') ? 'Grid/S (360)/margin' : platform.includes('768') ? 'Grid/M (768)/margin' : platform.includes('1440') ? 'Grid/L (1440)/margin' : 'Grid/XL (1920)/margin',
     platformCtx
-  )
-  const gutter = getVariableByName(
+  )) || 47
+  const gutter = Number(getVariableByName(
     platform.includes('360') ? 'Grid/S (360)/gutter' : platform.includes('768') ? 'Grid/M (768)/gutter' : platform.includes('1440') ? 'Grid/L (1440)/gutter' : 'Grid/XL (1920)/gutter',
     platformCtx
-  )
+  )) || 19
+  const rawContainerWidth = Math.max(0, minWidth - 2 * margin)
+  const isDesktop = minWidth >= bp.desktop
+  const containerMaxCap = Number(getVariableByName('ContainerWidth/L (1440)/100-100-100', platformCtx)) || CONTAINER_MAX_FALLBACK
+  const containerWidth = isDesktop ? Math.min(rawContainerWidth, containerMaxCap) : rawContainerWidth
   const gridVars = [
-    `  --ds-grid-columns: ${cols ?? 12};`,
-    `  --ds-grid-margin: ${margin ?? 47}px;`,
-    `  --ds-grid-gutter: ${gutter ?? 19}px;`,
+    `  --ds-grid-columns: ${cols};`,
+    `  --ds-grid-margin: ${margin}px;`,
+    `  --ds-grid-gutter: ${gutter}px;`,
   ]
   const typographyVars = getTypographyVars(platformCtx)
   platformMediaVars.push({ minWidth, gridVars, typographyVars })

@@ -97,6 +97,29 @@ const S_CARD_GRID_ITEMS = `{
       features,
       backgroundColor
     }`
+const S_LAB_CARD_ITEMS = `{
+      _type,
+      _key,
+      cardType,
+      title,
+      description,
+      size,
+      backgroundColor,
+      "image": coalesce(imageUrl, image.asset->url),
+      "video": coalesce(videoUrl, video.asset->url),
+      ctaText,
+      ctaLink,
+      aspectRatio,
+      icon,
+      "iconImage": iconImage.asset->url,
+      callToActionButtons[]{
+        _key,
+        label,
+        link,
+        style
+      },
+      features
+    }`
 const S_CAROUSEL = `{
     spacingTop,
     spacingBottom,
@@ -110,6 +133,7 @@ const S_CAROUSEL = `{
       cardType,
       title,
       description,
+      backgroundColor,
       "image": coalesce(imageUrl, image.asset->url),
       "video": coalesce(videoUrl, video.asset->url),
       link,
@@ -255,7 +279,39 @@ const LAB_SECTIONS_PROJECTION = `{
     emphasis,
     minimalBackgroundStyle,
     surfaceColour,
-    items[]${S_CARD_GRID_ITEMS}
+    items[]${S_LAB_CARD_ITEMS}
+  },
+  _type == "labCarousel" => {
+    spacingTop,
+    spacingBottom,
+    spacing,
+    title,
+    cardSize,
+    emphasis,
+    minimalBackgroundStyle,
+    surfaceColour,
+    items[]${S_LAB_CARD_ITEMS}
+  },
+  _type == "editorialBlock" => {
+    spacingTop,
+    spacingBottom,
+    rows,
+    emphasis,
+    surfaceColour,
+    textArea,
+    headlineSize,
+    textAlign,
+    textVerticalAlign,
+    textInFront,
+    headline,
+    body,
+    ctaText,
+    ctaLink,
+    imageArea,
+    "image": coalesce(imageUrl, image.asset->url),
+    imageUrl,
+    videoUrl,
+    imageFit
   },
   _type == "carousel" => ${S_CAROUSEL},
   _type == "hero" => {

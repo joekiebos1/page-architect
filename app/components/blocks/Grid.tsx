@@ -15,8 +15,10 @@ import { useGridBreakpoint } from '../../../lib/utils/use-grid-breakpoint'
 import type { ContentWidth } from '../../blocks/WidthCap'
 
 /**
- * Enable grid column debugging via .env.local:
+ * Enable main/public grid column debugging via .env or .env.local:
  * NEXT_PUBLIC_DEBUG_GRID=true
+ * (Editorial block has its own: NEXT_PUBLIC_DEBUG_EDITORIAL_GRID)
+ * Restart dev server after changing env.
  */
 const DEBUG_GRID = process.env.NEXT_PUBLIC_DEBUG_GRID === 'true'
 
@@ -38,34 +40,34 @@ export function Grid({ children, as: Component = 'div', style }: GridProps) {
   const { gridMaxWidth } = useGridBreakpoint()
 
   /**
-   * Debug stripes aligned to actual columns only (not the margin/padding area).
-   * Each stripe = one column width. Each gap = one gutter.
-   *
-   * background-clip: content-box + background-origin: content-box ensure
-   * stripes paint only in the content area (between the paddings), not
-   * in the page margin (paddingInline).
-   *
+   * Debug stripes: overlay on top so they're visible above block content.
    * Formula: column width = (100% - (cols-1)*gutter) / cols
-   * (100% is content-box width; margin is excluded by clip.)
    */
-  const debugBackground = DEBUG_GRID
+  const debugOverlayStyle: React.CSSProperties = DEBUG_GRID
     ? {
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
         backgroundImage: `repeating-linear-gradient(
           to right,
-          rgba(255, 0, 0, 0.12) 0px,
-          rgba(255, 0, 0, 0.12) calc((100% - var(--ds-grid-gutter) * (var(--ds-grid-columns) - 1)) / var(--ds-grid-columns)),
+          rgba(255, 0, 0, 0.2) 0px,
+          rgba(255, 0, 0, 0.2) calc((100% - var(--ds-grid-gutter) * (var(--ds-grid-columns) - 1)) / var(--ds-grid-columns)),
           transparent calc((100% - var(--ds-grid-gutter) * (var(--ds-grid-columns) - 1)) / var(--ds-grid-columns)),
           transparent calc((100% - var(--ds-grid-gutter) * (var(--ds-grid-columns) - 1)) / var(--ds-grid-columns) + var(--ds-grid-gutter))
         )`,
         backgroundOrigin: 'content-box',
         backgroundClip: 'content-box',
         backgroundRepeat: 'repeat-x',
+        paddingInline: 'var(--ds-grid-margin)',
+        boxSizing: 'border-box',
+        zIndex: 2,
       }
     : {}
 
   return (
     <Component
       style={{
+        position: 'relative',
         width: '100%',
         maxWidth: gridMaxWidth,                 // JS — desktop container cap (1346px)
         marginInline: 'auto',                   // centres grid when maxWidth kicks in
@@ -73,12 +75,12 @@ export function Grid({ children, as: Component = 'div', style }: GridProps) {
         gridTemplateColumns: 'repeat(var(--ds-grid-columns), 1fr)',
         paddingInline: 'var(--ds-grid-margin)', // page margin — viewport edge to grid edge
         boxSizing: 'border-box',
-        ...debugBackground,
         ...style,
         gap: 'var(--ds-grid-gutter)',           // always last — never overridden
       }}
     >
       {children}
+      {DEBUG_GRID && <div aria-hidden style={debugOverlayStyle} />}
     </Component>
   )
 }

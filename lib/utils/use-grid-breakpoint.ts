@@ -102,6 +102,7 @@ function getGridTokenPrefix(platform: string): string {
 
 export type GridBreakpoint = {
   columns: number
+  margin: number
   gutter: number
   /** Content area between margins: viewport - 2*margin */
   containerWidth: number
@@ -180,6 +181,7 @@ function resolveGridValues(platform: string, viewport: number): GridBreakpoint {
 
   return {
     columns,
+    margin,
     gutter,
     containerWidth,
     columnWidth,
@@ -223,6 +225,12 @@ export function useGridBreakpoint(): GridBreakpoint {
       const platform = getPlatformForWidth(w)
       const next = resolveGridValues(platform, w)
       setValues((prev) => (gridValuesEqual(prev, next) ? prev : next))
+      // Sync CSS tokens with JS-resolved values (client-only, after mount).
+      // Overrides media query values so CSS and JS always agree.
+      const root = document.documentElement
+      root.style.setProperty('--ds-grid-columns', String(next.columns))
+      root.style.setProperty('--ds-grid-margin', `${next.margin}px`)
+      root.style.setProperty('--ds-grid-gutter', `${next.gutter}px`)
     }
     update()
     window.addEventListener('resize', update)

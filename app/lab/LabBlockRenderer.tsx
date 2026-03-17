@@ -15,6 +15,7 @@ import {
   LabRotatingMediaBlock,
   LabMediaText5050Block,
   LabTopNavBlock,
+  EditorialBlock,
 } from './blocks'
 import { Headline, Text } from '@marcelinodzn/ds-react'
 import { WidthCap } from '../blocks/WidthCap'
@@ -44,6 +45,7 @@ function getBlockTypeTitle(_type: string): string {
     list: 'List',
     mediaZoomOutOnScroll: 'Media zoom out on scroll',
     topNavBlock: 'Top nav (mega menu)',
+    editorialBlock: 'Editorial',
   }
   return titles[_type] ?? _type
 }
@@ -108,7 +110,8 @@ export function getBlockLayoutTitle(block: LabBlock): string {
       if (template === 'Overlay') return `Overlay · ${sizeLabel} · Align ${block.alignment as string}`
       return `Stacked · ${sizeLabel} · Align ${block.alignment as string}`
     }
-    case 'carousel': {
+    case 'carousel':
+    case 'labCarousel': {
       const size = (block.cardSize as string) ?? 'medium'
       return size === 'compact' ? 'Compact' : size === 'large' ? 'Large' : 'Medium'
     }
@@ -118,6 +121,8 @@ export function getBlockLayoutTitle(block: LabBlock): string {
     }
     case 'topNavBlock':
       return 'Mega menu'
+    case 'editorialBlock':
+      return 'Editorial'
     default:
       return getBlockTypeTitle(block._type)
   }
@@ -195,7 +200,7 @@ function deriveLabPattern(block: LabBlock): BlockPattern {
   }
   const emphasis = (block.emphasis as string)?.toLowerCase?.()
   const hasBand = emphasis && !['ghost', 'none'].includes(emphasis)
-  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'labCardGrid', 'cardGrid', 'proofPoints', 'iconGrid', 'list', 'fullBleedVerticalCarousel', 'rotatingMedia']
+  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'labCarousel', 'labCardGrid', 'cardGrid', 'proofPoints', 'iconGrid', 'list', 'fullBleedVerticalCarousel', 'rotatingMedia', 'editorialBlock']
   if (hasBand && bandTypes.includes(block._type)) {
     return 'band'
   }
@@ -466,37 +471,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
           }
           case 'labCardGrid': {
             const cols = block.columns as string
-            const rawItems = (block.items as Record<string, unknown>[]) ?? []
-            const items = rawItems.map((i) => {
-              if (i._type === 'labGridBlockCardItem') {
-                const c = i as LabBlock
-                return {
-                  _type: 'textOnColourCardItem' as const,
-                  _key: c._key,
-                  size: ((c.size as string) === 'large' ? 'large' : 'small') as 'large' | 'small',
-                  icon: c.icon as string | undefined,
-                  iconImage: c.iconImage as string | undefined,
-                  title: (c.title as string) ?? '',
-                  description: c.description as string | undefined,
-                  callToActionButtons: (c.callToActionButtons as { label: string; link?: string; style?: string }[] | undefined)?.map((btn) => ({
-                    _key: (btn as { _key?: string })._key,
-                    label: btn.label,
-                    link: btn.link,
-                    style: (btn.style === 'filled' || btn.style === 'outlined' ? btn.style : 'filled') as 'filled' | 'outlined',
-                  })),
-                  features: c.features as string[] | undefined,
-                  backgroundColor: c.backgroundColor as string,
-                }
-              }
-              return {
-                ...i,
-                _type: 'cardGridItem' as const,
-                title: (i.title as string) ?? '',
-                cardType: i.cardType as string,
-                cardStyle: i.cardStyle as string,
-                surface: i.surface as string,
-              }
-            }) as import('../blocks/CardGridBlock/CardGridBlock.types').CardGridBlockItem[]
+            const items = (block.items ?? []) as import('./blocks/LabCardRenderer').LabCardItem[]
             return wrapSection(
               <LabCardGridBlock
                 columns={parseInt(cols, 10) as 2 | 3 | 4}
@@ -510,12 +485,21 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               i,
             )
           }
+          case 'labCarousel':
           case 'carousel': {
-            const carouselItems = ((block.items ?? []) as { cardType?: string; title?: string; description?: string; image?: string; video?: string; link?: string; ctaText?: string; aspectRatio?: '4:5' | '8:5' | '2:1'; imageSlot?: string }[]).map((it) => ({
-              ...it,
-              cardType: (it.cardType as 'media' | 'text-on-colour') ?? 'media',
-              aspectRatio: it.aspectRatio as '4:5' | '8:5' | '2:1',
-            }))
+            const rawItems = (block.items ?? []) as { cardType?: string; title?: string; description?: string; image?: string; video?: string; link?: string; ctaText?: string; aspectRatio?: string; imageSlot?: string }[]
+            const carouselItems = rawItems.map((it) => ({
+              _type: 'labCardItem' as const,
+              cardType: (it.cardType === 'text-on-colour' ? 'text-on-colour' : 'media-description-below') as 'media-description-below' | 'text-on-colour',
+              title: it.title,
+              description: it.description,
+              image: it.image,
+              video: it.video,
+              link: it.link,
+              ctaText: it.ctaText,
+              aspectRatio: (it.aspectRatio as '4:5' | '8:5' | '2:1') ?? '4:5',
+              imageSlot: it.imageSlot,
+            })) as import('./blocks/LabCardRenderer').LabCardItem[]
             return wrapSection(
               <LabCarouselBlock
                 title={block.title as string}
@@ -610,6 +594,34 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
           }
           case 'topNavBlock': {
             return wrapSection(<LabTopNavBlock />, block, i)
+          }
+          case 'editorialBlock': {
+            const textArea = block.textArea as { topLeft?: { column?: number; row?: number }; bottomRight?: { column?: number; row?: number } } | undefined
+            const imageArea = block.imageArea as { topLeft?: { column?: number; row?: number }; bottomRight?: { column?: number; row?: number } } | undefined
+            return wrapSection(
+              <EditorialBlock
+                headline={block.headline as string | null}
+                body={block.body as string | null}
+                image={block.image as string | null}
+                videoUrl={block.videoUrl as string | null}
+                ctaText={block.ctaText as string | null}
+                ctaLink={block.ctaLink as string | null}
+                textTopLeft={textArea?.topLeft}
+                textBottomRight={textArea?.bottomRight}
+                headlineSize={block.headlineSize as 'display' | 'headline' | 'title' | undefined}
+                textAlign={block.textAlign as 'left' | 'center' | undefined}
+                textVerticalAlign={block.textVerticalAlign as 'top' | 'center' | 'bottom' | undefined}
+                imageTopLeft={imageArea?.topLeft}
+                imageBottomRight={imageArea?.bottomRight}
+                imageFit={(block.imageFit as 'cover' | 'contain') ?? 'contain'}
+                textInFront={block.textInFront as boolean | undefined}
+                rows={block.rows as number | undefined}
+                emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
+              />,
+              block,
+              i,
+            )
           }
           case 'list': {
             const listItems = Array.isArray(block.items)

@@ -55,11 +55,8 @@ export const labCardGridBlock = defineType({
       name: 'items',
       type: 'array',
       title: 'Cards',
-      description: 'Add media cards (image + text) or text inside cards (coloured background).',
-      of: [
-        { type: 'cardGridItem', title: 'Media card (image + text)' },
-        { type: 'labGridBlockCardItem', title: 'Text inside card (coloured background)' },
-      ],
+      description: 'Media cards (image + text) or text on colour cards. Same card types as carousel.',
+      of: [{ type: 'labCardItem' }],
       validation: (Rule) => Rule.required().min(1).max(12),
     }),
   ],

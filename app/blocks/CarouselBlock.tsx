@@ -129,8 +129,8 @@ export function CarouselBlock({
   images,
 }: CarouselBlockProps) {
   const level = normalizeHeadingLevel('h2')
-  const { contentMaxDefault } = useGridBreakpoint()
   const cellContainer = useCell('Wide')
+  const { contentMaxDefault } = useGridBreakpoint()
   const config = cardSize && cardSize in CARD_SIZE_CONFIG ? CARD_SIZE_CONFIG[cardSize] : undefined
   if (!config) return null
   const viewportRef = useRef<HTMLDivElement>(null)

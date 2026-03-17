@@ -12,7 +12,8 @@ type Story = StoryObj<typeof LabCardGridBlock>
 
 const textOnColourItems = [
   {
-    _type: 'textOnColourCardItem' as const,
+    _type: 'labCardItem' as const,
+    cardType: 'text-on-colour' as const,
     size: 'small' as const,
     backgroundColor: 'primary' as const,
     icon: 'IcComputer',
@@ -25,7 +26,8 @@ const textOnColourItems = [
     features: ['Speeds up to 1 Gbps', 'High-speed data up to 10 TB'],
   },
   {
-    _type: 'textOnColourCardItem' as const,
+    _type: 'labCardItem' as const,
+    cardType: 'text-on-colour' as const,
     size: 'small' as const,
     backgroundColor: 'secondary' as const,
     icon: 'IcGlobe',
@@ -35,7 +37,8 @@ const textOnColourItems = [
     features: ['Symmetric upload and download', '99.9% uptime SLA'],
   },
   {
-    _type: 'textOnColourCardItem' as const,
+    _type: 'labCardItem' as const,
+    cardType: 'text-on-colour' as const,
     size: 'small' as const,
     backgroundColor: 'tertiary' as const,
     icon: 'IcWifiNetwork',
@@ -62,14 +65,16 @@ export const TextOnColourLarge: Story = {
     emphasis: 'ghost',
     items: [
       {
-        _type: 'textOnColourCardItem' as const,
+        _type: 'labCardItem' as const,
+        cardType: 'text-on-colour' as const,
         size: 'large' as const,
         backgroundColor: 'primary' as const,
         title: 'Headline one',
         description: 'Supporting description for the first card.',
       },
       {
-        _type: 'textOnColourCardItem' as const,
+        _type: 'labCardItem' as const,
+        cardType: 'text-on-colour' as const,
         size: 'large' as const,
         backgroundColor: 'secondary' as const,
         title: 'Headline two',

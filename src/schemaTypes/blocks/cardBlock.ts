@@ -1,65 +1,12 @@
 import { defineField, defineType } from 'sanity'
+import { ColorPickerInput } from '../../components/sanity/ColorPickerInput'
 
 export const cardItem = defineType({
   name: 'cardItem',
   type: 'object',
   title: 'Card',
   fields: [
-    defineField({
-      name: 'title',
-      type: 'text',
-      title: 'Title',
-      rows: 2,
-      description: 'Required for text-only cards. Optional for media-only cards. Press Enter for a line break.',
-      validation: (Rule) =>
-        Rule.custom((title, ctx) => {
-          const parent = (ctx as { parent?: { imageUrl?: string; image?: unknown; video?: unknown; videoUrl?: string } })?.parent
-          const hasMedia = !!(parent?.imageUrl || parent?.image || parent?.video || parent?.videoUrl)
-          if (hasMedia) return true
-          if (title && String(title).trim()) return true
-          return 'Title is required for text-only cards.'
-        }),
-    }),
-    defineField({
-      name: 'description',
-      type: 'text',
-      title: 'Description',
-      rows: 2,
-    }),
-    defineField({
-      name: 'image',
-      type: 'image',
-      title: 'Image (upload)',
-      description: 'Upload or use Image URL below. Optional when video is set.',
-      options: { hotspot: true },
-      validation: (Rule) =>
-        Rule.custom((image, ctx) => {
-          const parent = (ctx as { parent?: { imageUrl?: string; video?: unknown; videoUrl?: string } })?.parent
-          if (image || parent?.imageUrl) return true
-          if (parent?.video || parent?.videoUrl) return true
-          // Allow text-only cards (e.g. when source has no media)
-          return true
-        }),
-    }),
-    defineField({
-      name: 'imageUrl',
-      type: 'string',
-      title: 'Image URL',
-      description: 'External image URL. Used when no image is uploaded. Also used as poster for video.',
-    }),
-    defineField({
-      name: 'video',
-      type: 'file',
-      title: 'Video (upload)',
-      description: 'Optional video. When set, video is shown instead of image. Autoplay with mute/play controls.',
-      options: { accept: 'video/*' },
-    }),
-    defineField({
-      name: 'videoUrl',
-      type: 'string',
-      title: 'Video URL',
-      description: 'External video URL. Used when no video is uploaded.',
-    }),
+    // Layout
     defineField({
       name: 'cardType',
       type: 'string',
@@ -112,23 +59,100 @@ export const cardItem = defineType({
         return block?._type === 'carousel' && (block?.cardSize === 'large' || block?.cardSize === 'medium')
       },
     }),
+    // Colour (text-on-colour only)
+    defineField({
+      name: 'backgroundColor',
+      type: 'string',
+      title: 'Background colour',
+      description: 'Theme colours (Primary, Secondary, Sparkle × Minimal, Subtle, Bold) or full DS spectrum.',
+      components: { input: ColorPickerInput },
+      initialValue: 'primary-bold',
+      hidden: ({ parent }) => parent?.cardType !== 'text-on-colour',
+    }),
+    // Content
+    defineField({
+      name: 'title',
+      type: 'text',
+      title: 'Title',
+      rows: 2,
+      description: 'Required for text-on-colour. Optional for media cards. Press Enter for a line break.',
+      validation: (Rule) =>
+        Rule.custom((title, ctx) => {
+          const parent = (ctx as { parent?: { cardType?: string; imageUrl?: string; image?: unknown; video?: unknown; videoUrl?: string } })?.parent
+          if (parent?.cardType === 'text-on-colour') {
+            return (title && String(title).trim()) ? true : 'Title is required for text-on-colour cards.'
+          }
+          const hasMedia = !!(parent?.imageUrl || parent?.image || parent?.video || parent?.videoUrl)
+          if (hasMedia) return true
+          if (title && String(title).trim()) return true
+          return 'Title is required for text-only cards.'
+        }),
+    }),
+    defineField({
+      name: 'description',
+      type: 'text',
+      title: 'Description',
+      rows: 2,
+      description: 'Body text. Media cards: optional. Text-on-colour: primary content.',
+    }),
+    defineField({
+      name: 'image',
+      type: 'image',
+      title: 'Image (upload)',
+      description: 'Upload or use Image URL below. Optional when video is set.',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
+      validation: (Rule) =>
+        Rule.custom((image, ctx) => {
+          const parent = (ctx as { parent?: { cardType?: string; imageUrl?: string; video?: unknown; videoUrl?: string } })?.parent
+          if (parent?.cardType === 'text-on-colour') return true
+          if (image || parent?.imageUrl) return true
+          if (parent?.video || parent?.videoUrl) return true
+          return true
+        }),
+    }),
+    defineField({
+      name: 'imageUrl',
+      type: 'string',
+      title: 'Image URL',
+      description: 'External image URL. Used when no image is uploaded. Also used as poster for video.',
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
+    }),
+    defineField({
+      name: 'video',
+      type: 'file',
+      title: 'Video (upload)',
+      description: 'Optional video. When set, video is shown instead of image. Autoplay with mute/play controls. Not available for text-on-colour cards.',
+      options: { accept: 'video/*' },
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
+    }),
+    defineField({
+      name: 'videoUrl',
+      type: 'string',
+      title: 'Video URL',
+      description: 'External video URL. Used when no video is uploaded. Not available for text-on-colour cards.',
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
+    }),
     defineField({
       name: 'link',
       type: 'string',
       title: 'Link',
-      description: 'Optional link for the card. Use relative paths (e.g. /games/play) or full URLs (e.g. https://example.com).',
+      description: 'Optional link for the card. Use relative paths (e.g. /games/play) or full URLs (e.g. https://example.com). Media cards only.',
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
     }),
     defineField({
       name: 'ctaText',
       type: 'string',
       title: 'Button label',
-      description: 'Optional button (low emphasis). Requires a link.',
+      description: 'Optional button (low emphasis). Requires a link. Media cards only.',
+      hidden: ({ parent }) => parent?.cardType === 'text-on-colour',
     }),
   ],
   preview: {
-    select: { title: 'title' },
-    prepare: ({ title }) => ({
+    select: { title: 'title', cardType: 'cardType' },
+    prepare: ({ title, cardType }) => ({
       title: title || 'Card',
+      subtitle: cardType === 'text-on-colour' ? 'Text on colour' : 'Media',
     }),
   },
 })

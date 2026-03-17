@@ -15,7 +15,9 @@ import { cardBlock, cardItem } from './blocks/cardBlock'
 import { carouselBlock } from './blocks/carousel'
 import { proofPointsBlock } from './blocks/proofPoints'
 import { rotatingMediaBlock, rotatingMediaItem } from './blocks/rotatingMedia'
-import { labGridBlockCardBlock, labGridBlockCardItem } from './blocks/labGridBlockCard'
+import { labCardItem } from './blocks/labCardItem'
+import { labCarouselBlock } from './blocks/labCarousel'
+import { editorialBlock } from './blocks/editorialBlock'
 import { labCardGridBlock } from './blocks/labCardGrid'
 import { mediaZoomOutOnScrollBlock } from './blocks/mediaZoomOutOnScroll'
 import { iconGridBlock, iconGridItem } from './blocks/iconGrid'
@@ -44,8 +46,9 @@ export const schemaTypes = [
   proofPointsBlock,
   rotatingMediaItem,
   rotatingMediaBlock,
-  labGridBlockCardItem,
-  labGridBlockCardBlock,
+  labCardItem,
+  labCarouselBlock,
+  editorialBlock,
   labCardGridBlock,
   mediaZoomOutOnScrollBlock,
   iconGridItem,
