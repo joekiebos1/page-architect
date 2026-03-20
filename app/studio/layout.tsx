@@ -32,7 +32,17 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
           >
             Page Architect
           </Link>
-          <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)' }}>
+          <nav style={{ display: 'flex', gap: 'var(--ds-spacing-m)', alignItems: 'center' }}>
+            <Link
+              href="/studio"
+              style={{
+                color: 'rgba(0, 0, 0, 0.48)',
+                textDecoration: 'none',
+                fontSize: 'var(--ds-typography-label-s)',
+              }}
+            >
+              Studio home
+            </Link>
             <Link
               href="/studio/storytelling-inspiration"
               style={{
