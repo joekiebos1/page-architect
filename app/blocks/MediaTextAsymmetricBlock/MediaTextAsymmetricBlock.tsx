@@ -1,13 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import {
-  Headline,
-  Text,
-  Icon,
-  IcChevronDown,
-  IcChevronUp,
-} from '@marcelinodzn/ds-react'
+import { Headline, Text, Icon, IcChevronDown, IcChevronUp } from '@marcelinodzn/ds-react'
 import { Collapsible } from '@base-ui/react/collapsible'
 import { Grid, useCell } from '../../components/blocks/Grid'
 import { useGridBreakpoint } from '../../../lib/utils/use-grid-breakpoint'
@@ -15,28 +9,36 @@ import {
   getHeadlineSize,
   getChildLevel,
   normalizeHeadingLevel,
-  TYPOGRAPHY,
   type HeadingLevel,
 } from '../../../lib/utils/semantic-headline'
+import {
+  LAB_TYPOGRAPHY_VARS,
+  labHeadlineBlockTitleAlt,
+  labTextBody,
+  labTextBodyLead,
+  labTextSubtitle,
+} from '../../../lib/typography/block-typography'
 import type {
-  ListBlockProps,
-  ListBlockTextItem,
-  ListBlockFaqItem,
-  ListBlockLinkItem,
-} from './ListBlock.types'
+  MediaTextAsymmetricBlockProps,
+  MediaTextAsymmetricTextItem,
+  MediaTextAsymmetricFaqItem,
+  MediaTextAsymmetricLinkItem,
+  MediaTextAsymmetricLongFormParagraph,
+} from './MediaTextAsymmetricBlock.types'
 
 function handleLinkPress(href: string, router: ReturnType<typeof useRouter>) {
   if (href.startsWith('/')) router.push(href)
   else window.location.href = href
 }
 
-function TextListItem({
+/** Paragraph variant row (CMS `textList`). */
+function ParagraphRow({
   item,
   itemLevel,
   router,
   openInNewTab,
 }: {
-  item: ListBlockTextItem
+  item: MediaTextAsymmetricTextItem
   itemLevel: HeadingLevel
   router: ReturnType<typeof useRouter>
   openInNewTab?: boolean
@@ -56,22 +58,22 @@ function TextListItem({
       }}
     >
       {item.title && (
-        <Headline
-          size="XS"
-          weight="high"
+        <Text
           as={itemLevel}
-          style={{ margin: 0, fontSize: TYPOGRAPHY.labelM, whiteSpace: 'pre-line' }}
+          {...labTextSubtitle}
+          style={{ margin: 0, whiteSpace: 'pre-line' }}
         >
           {item.title}
-        </Headline>
+        </Text>
       )}
       {item.body && (
         <Text
-          size="S"
-          weight="low"
-          color="medium"
           as="p"
-          style={{ margin: 0, whiteSpace: 'pre-line' }}
+          {...labTextBody}
+          style={{
+            margin: 0,
+            whiteSpace: 'pre-line',
+          }}
         >
           {item.body}
         </Text>
@@ -81,8 +83,8 @@ function TextListItem({
           href={item.linkUrl!}
           {...linkProps}
           style={{
-            fontSize: TYPOGRAPHY.labelM,
-            fontWeight: 'var(--ds-typography-weight-medium)',
+            fontSize: LAB_TYPOGRAPHY_VARS.labelM,
+            fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
             color: 'var(--ds-color-text-interactive)',
             textDecoration: 'underline',
             cursor: 'pointer',
@@ -100,7 +102,7 @@ function FaqItem({
   item,
   itemLevel,
 }: {
-  item: ListBlockFaqItem
+  item: MediaTextAsymmetricFaqItem
   itemLevel: HeadingLevel
 }) {
   return (
@@ -130,19 +132,17 @@ function FaqItem({
               }}
             >
               {item.title && (
-                <Headline
-                  size="XS"
-                  weight="high"
+                <Text
                   as={itemLevel}
+                  {...labTextSubtitle}
                   style={{
                     margin: 0,
-                    fontSize: TYPOGRAPHY.labelM,
                     whiteSpace: 'pre-line',
                     flex: 1,
                   }}
                 >
                   {item.title}
-                </Headline>
+                </Text>
               )}
               <span style={{ display: 'flex', flexShrink: 0 }}>
                 <Icon
@@ -161,11 +161,12 @@ function FaqItem({
         >
           {item.body && (
             <Text
-              size="S"
-              weight="low"
-              color="medium"
               as="p"
-              style={{ margin: 0, whiteSpace: 'pre-line' }}
+              {...labTextBody}
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-line',
+              }}
             >
               {item.body}
             </Text>
@@ -181,7 +182,7 @@ function LinksItem({
   router,
   openInNewTab,
 }: {
-  item: ListBlockLinkItem
+  item: MediaTextAsymmetricLinkItem
   router: ReturnType<typeof useRouter>
   openInNewTab?: boolean
 }) {
@@ -201,8 +202,8 @@ function LinksItem({
       {...linkProps}
       style={{
         display: 'block',
-        fontSize: TYPOGRAPHY.labelM,
-        fontWeight: 'var(--ds-typography-weight-medium)',
+        fontSize: LAB_TYPOGRAPHY_VARS.labelM,
+        fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
         color: 'var(--ds-color-text-interactive)',
         textDecoration: 'underline',
         cursor: 'pointer',
@@ -215,81 +216,140 @@ function LinksItem({
   )
 }
 
-export function ListBlock({
+function longFormParagraphsWithText(paragraphs: MediaTextAsymmetricLongFormParagraph[] | null | undefined) {
+  if (paragraphs == null || !Array.isArray(paragraphs)) return []
+  return paragraphs.filter(
+    (p): p is MediaTextAsymmetricLongFormParagraph & { text: string } =>
+      p != null && typeof p.text === 'string' && p.text.trim().length > 0,
+  )
+}
+
+export function MediaTextAsymmetricBlock({
   blockTitle,
-  listVariant = 'textList',
+  variant: contentVariant = 'textList',
+  longFormParagraphs,
   items,
   size: _size = 'feature',
   openLinksInNewTab,
-}: ListBlockProps) {
+}: MediaTextAsymmetricBlockProps) {
   const router = useRouter()
-  const level = normalizeHeadingLevel('h2')
-  const itemLevel = getChildLevel(level)
-  const headlineSize = getHeadlineSize(level)
-  const cell = useCell('XL')
-  const items_ = (items ?? []).filter((i) => i != null) as (ListBlockTextItem | ListBlockFaqItem | ListBlockLinkItem)[]
+  const blockTitleLevel = normalizeHeadingLevel('h3')
+  const itemLevel = getChildLevel(blockTitleLevel)
+  const headlineSize = getHeadlineSize(blockTitleLevel)
+  const cell = useCell('L')
+  const items_ = (items ?? []).filter((i) => i != null) as (
+    | MediaTextAsymmetricTextItem
+    | MediaTextAsymmetricFaqItem
+    | MediaTextAsymmetricLinkItem
+  )[]
+  const isLongForm = contentVariant === 'longForm'
+  const longFormParas_ = longFormParagraphsWithText(longFormParagraphs)
 
-  if (items_.length === 0 && !blockTitle) return null
+  if (!isLongForm && items_.length === 0 && !blockTitle) return null
+  if (isLongForm && longFormParas_.length === 0 && !blockTitle) return null
 
   const titleContent = blockTitle ? (
     <Headline
       size={headlineSize}
-      weight="high"
-      as={level}
-      style={{ margin: 0, fontSize: TYPOGRAPHY.h2, whiteSpace: 'pre-line' }}
+      as={blockTitleLevel}
+      {...labHeadlineBlockTitleAlt}
+      style={{ margin: 0, fontSize: LAB_TYPOGRAPHY_VARS.h3, whiteSpace: 'pre-line' }}
     >
       {blockTitle}
     </Headline>
   ) : null
 
-  const listContent = (
+  const mainColumnContent = isLongForm ? (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: listVariant === 'textList' ? 'var(--ds-spacing-l)' : 0,
+        gap: 'var(--ds-spacing-l)',
       }}
     >
-      {listVariant === 'textList' &&
+      {longFormParas_.map((para, i) => {
+        const textProps =
+          para.bodyTypography === 'large'
+            ? labTextBodyLead
+            : { ...labTextBody, size: 'M' as const, color: 'medium' as const }
+        const key = para._key != null && para._key !== '' ? para._key : `lfp-${i}`
+        return (
+          <Text
+            key={key}
+            as="p"
+            {...textProps}
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {para.text}
+          </Text>
+        )
+      })}
+    </div>
+  ) : (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: contentVariant === 'textList' ? 'var(--ds-spacing-l)' : 0,
+      }}
+    >
+      {contentVariant === 'textList' &&
         items_.map((item, i) => (
-          <TextListItem
+          <ParagraphRow
             key={i}
-            item={item as ListBlockTextItem}
+            item={item as MediaTextAsymmetricTextItem}
             itemLevel={itemLevel}
             router={router}
             openInNewTab={openLinksInNewTab}
           />
         ))}
-      {listVariant === 'faq' &&
+      {contentVariant === 'faq' &&
         items_.map((item, i) => (
-          <FaqItem
-            key={i}
-            item={item as ListBlockFaqItem}
-            itemLevel={itemLevel}
-          />
+          <FaqItem key={i} item={item as MediaTextAsymmetricFaqItem} itemLevel={itemLevel} />
         ))}
-      {listVariant === 'links' &&
+      {contentVariant === 'links' &&
         items_.map((item, i) => (
-          <LinksItem key={i} item={item as ListBlockLinkItem} router={router} openInNewTab={openLinksInNewTab} />
+          <LinksItem key={i} item={item as MediaTextAsymmetricLinkItem} router={router} openInNewTab={openLinksInNewTab} />
         ))}
     </div>
   )
 
-  const { isStacked } = useGridBreakpoint()
+  const { isStacked, columnWidth, gutter } = useGridBreakpoint()
 
   const gridStyle: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: isStacked ? '1fr' : '1fr 1fr',
-    gap: isStacked ? 'var(--ds-spacing-2xl)' : 'var(--ds-spacing-3xl)',
+    gridTemplateColumns: isStacked ? '1fr' : '1fr 2fr',
+    columnGap: 0,
+    rowGap: isStacked ? 'var(--ds-spacing-2xl)' : 0,
     alignItems: 'start',
+  }
+
+  const titleColumnStyle: React.CSSProperties = {
+    minWidth: 0,
+    ...(isStacked ? {} : { paddingInlineEnd: 'var(--ds-spacing-xl)' }),
+  }
+
+  const mainMaxWidth =
+    !isStacked && columnWidth > 0 ? `calc(100% - ${columnWidth + gutter}px)` : undefined
+
+  const mainColumnStyle: React.CSSProperties = {
+    minWidth: 0,
+    paddingInline: 0,
+    marginInline: 0,
+    maxWidth: mainMaxWidth,
+    justifySelf: 'start',
+    width: '100%',
   }
 
   return (
     <Grid as="section">
       <div style={{ ...cell, minWidth: 0 }}>
         <div style={gridStyle}>
-          <div style={{ minWidth: 0 }}>{titleContent}</div>
-          <div style={{ minWidth: 0 }}>{listContent}</div>
+          <div style={titleColumnStyle}>{titleContent}</div>
+          <div style={mainColumnStyle}>{mainColumnContent}</div>
         </div>
       </div>
     </Grid>

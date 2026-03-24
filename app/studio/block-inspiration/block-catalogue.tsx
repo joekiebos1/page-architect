@@ -13,9 +13,10 @@ import {
   CarouselBlock,
   ProofPointsBlock,
   IconGridBlock,
-  ListBlock,
+  MediaTextAsymmetricBlock,
 } from '../../blocks'
 import {
+  EditorialBlock,
   LabFullBleedVerticalCarousel,
   LabRotatingMediaBlock,
   LabMediaZoomOutOnScroll,
@@ -327,22 +328,23 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
     ),
   },
   {
-    id: 'list',
-    name: 'List',
-    description: 'Text list, FAQ or links variant. Collapsible FAQ items.',
+    id: 'mediaTextAsymmetric',
+    name: 'Media + Text Asymmetric',
+    description: '1/3 + 2/3 layout. Paragraph rows, FAQ, links, or long form copy on the right.',
     category: 'Content blocks',
     tier: 'production',
-    labSlug: 'list',
+    labSlug: 'media-text-asymmetric',
     creativeUses: [
       'FAQ sections',
       'Link lists or navigation',
       'Bullet-point features',
+      'Long form copy with title on left',
     ],
     Preview: () => (
       <PreviewFrame>
-        <ListBlock
+        <MediaTextAsymmetricBlock
           blockTitle="FAQ"
-          listVariant="faq"
+          variant="faq"
           items={[
             { title: 'Question 1?', body: 'Answer.' },
             { title: 'Question 2?', body: 'Answer.' },
@@ -352,15 +354,60 @@ export const BLOCK_CATALOGUE: BlockCatalogueEntry[] = [
       </PreviewFrame>
     ),
     PreviewFull: () => (
-      <ListBlock
+      <MediaTextAsymmetricBlock
         blockTitle="FAQ"
-        listVariant="faq"
+        variant="faq"
         items={[
           { title: 'Question 1?', body: 'Answer.' },
           { title: 'Question 2?', body: 'Answer.' },
         ]}
         emphasis="ghost"
       />
+    ),
+  },
+  {
+    id: 'editorial',
+    name: 'Editorial',
+    description: '12×6 grid composition. Text and image placed independently, can overlap. Optional background image.',
+    category: 'Content blocks',
+    tier: 'lab',
+    labSlug: 'editorial',
+    creativeUses: [
+      'Editorial storytelling with text and image overlap',
+      'Campaign or feature layouts with custom composition',
+      'Magazine-style content blocks',
+    ],
+    Preview: () => (
+      <PreviewFrame>
+        <SurfaceProvider level={0}>
+          <EditorialBlock
+            headline="Designer-crafted moments"
+            body="Text and image placed independently."
+            image={PLACEHOLDER}
+            textTopLeft={{ column: 1, row: 2 }}
+            textBottomRight={{ column: 6, row: 4 }}
+            imageTopLeft={{ column: 5, row: 1 }}
+            imageBottomRight={{ column: 12, row: 6 }}
+            textInFront
+            emphasis="ghost"
+          />
+        </SurfaceProvider>
+      </PreviewFrame>
+    ),
+    PreviewFull: () => (
+      <SurfaceProvider level={0}>
+        <EditorialBlock
+          headline="Designer-crafted moments"
+          body="Text and image placed independently on a 12×6 grid."
+          image={PLACEHOLDER}
+          textTopLeft={{ column: 1, row: 2 }}
+          textBottomRight={{ column: 6, row: 4 }}
+          imageTopLeft={{ column: 5, row: 1 }}
+          imageBottomRight={{ column: 12, row: 6 }}
+          textInFront
+          emphasis="ghost"
+        />
+      </SurfaceProvider>
     ),
   },
   {

@@ -37,7 +37,7 @@ async function main() {
         blockBackground,
         surface,
         variant,
-        listVariant,
+        variant,
         columns,
         slug,
         title
@@ -56,7 +56,7 @@ async function main() {
     if (page.sections?.length) {
       console.log(`   Sections (${page.sections.length}):`)
       for (const s of page.sections) {
-        const layout = s.contentLayout ?? s.template ?? s.surface ?? s.variant ?? s.listVariant ?? s._type
+        const layout = s.contentLayout ?? s.template ?? s.surface ?? s.variant ?? s._type
         const key = s._key ?? '(no key)'
         console.log(`     - ${s._type} [${key}] ${layout ? `· ${layout}` : ''}`)
       }

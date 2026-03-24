@@ -16,18 +16,96 @@ import {
   LabMediaText5050Block,
   LabTopNavBlock,
   EditorialBlock,
+  LabIconGridBlock,
+  LabMediaTextBlock,
+  LabProofPointsBlock,
+  LabMediaTextAsymmetricBlock,
 } from './blocks'
 import { Headline, Text } from '@marcelinodzn/ds-react'
+import { LAB_TYPOGRAPHY_VARS, labHeadlineBlockTitle, labTextBody } from '../../lib/typography/block-typography'
 import { WidthCap } from '../blocks/WidthCap'
-import { MediaTextBlock, ProofPointsBlock, ListBlock, IconGridBlock, BlockShell } from '../blocks'
+import { BlockShell } from '../blocks'
 import type { BlockPattern } from '../blocks/BlockShell'
 import type { LabHeroBlockProps } from './blocks/HeroBlock/LabHeroBlock'
-import type { MediaTextBlockProps, MediaText5050BlockProps } from '../blocks'
+import type { MediaText5050BlockProps } from '../blocks'
+import type { MediaTextBlockProps } from './blocks/MediaTextBlock/MediaTextBlock.types'
 
 type LabBlock = {
   _type: string
   _key?: string
   [key: string]: unknown
+}
+
+/** Map legacy production `mediaTextAsymmetric` (e.g. textList / longForm) to lab merged shape. */
+function normalizeLegacyProductionAsymmetricForLab(block: LabBlock): {
+  blockTitle: string | null
+  variant: 'paragraphs' | 'faq' | 'links'
+  paragraphRows?: Array<{
+    _key?: string
+    title?: string | null
+    body?: string | null
+    bodyTypography: 'regular' | 'large'
+    linkText?: string | null
+    linkUrl?: string | null
+  }>
+  items?: Array<{
+    title?: string | null
+    body?: string | null
+    linkText?: string | null
+    linkUrl?: string | null
+    subtitle?: string | null
+  }>
+} {
+  const rawVariant = (block.variant as string) ?? 'textList'
+  const blockTitle = (block.blockTitle as string | null) ?? null
+
+  if (rawVariant === 'textList' || rawVariant === 'longForm') {
+    const paragraphRows =
+      rawVariant === 'textList'
+        ? (Array.isArray(block.items) ? block.items : []).map((it, i) => {
+            const row = it as {
+              _key?: string
+              title?: string | null
+              body?: string | null
+              linkText?: string | null
+              linkUrl?: string | null
+            }
+            return {
+              _key: row._key ?? `legacy-tl-${i}`,
+              title: row.title,
+              body: row.body,
+              bodyTypography: 'regular' as const,
+              linkText: row.linkText,
+              linkUrl: row.linkUrl,
+            }
+          })
+        : (Array.isArray(block.longFormParagraphs) ? block.longFormParagraphs : []).map(
+            (p: { _key?: string; text?: string | null; bodyTypography?: string | null }, i) => ({
+              _key: p._key ?? `legacy-lf-${i}`,
+              title: undefined as string | undefined,
+              body: p.text,
+              bodyTypography: p.bodyTypography === 'large' ? ('large' as const) : ('regular' as const),
+            }),
+          )
+    return { blockTitle, variant: 'paragraphs', paragraphRows }
+  }
+
+  if (rawVariant === 'faq' || rawVariant === 'links') {
+    const items = Array.isArray(block.items)
+      ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map(
+          (i) => ({
+            title: i.title,
+            body: i.body,
+            linkText: i.linkText,
+            linkUrl: i.linkUrl,
+            subtitle: i.subtitle,
+          }),
+        )
+      : []
+    return { blockTitle, variant: rawVariant, items }
+  }
+
+  return { blockTitle, variant: 'paragraphs', paragraphRows: [] }
 }
 
 function getBlockTypeTitle(_type: string): string {
@@ -42,7 +120,8 @@ function getBlockTypeTitle(_type: string): string {
     rotatingMedia: 'Rotating media',
     iconGrid: 'Icon grid',
     proofPoints: 'Proof points',
-    list: 'List',
+    mediaTextAsymmetric: 'Media + Text Asymmetric',
+    labMediaTextAsymmetric: 'Media + Text Asymmetric (Lab)',
     mediaZoomOutOnScroll: 'Media zoom out on scroll',
     topNavBlock: 'Top nav (mega menu)',
     editorialBlock: 'Editorial',
@@ -115,9 +194,18 @@ export function getBlockLayoutTitle(block: LabBlock): string {
       const size = (block.cardSize as string) ?? 'medium'
       return size === 'compact' ? 'Compact' : size === 'large' ? 'Large' : 'Medium'
     }
-    case 'list': {
-      const v = (block.listVariant as string) ?? 'textList'
-      return v === 'faq' ? 'FAQ' : v === 'links' ? 'Links' : 'Text list'
+    case 'mediaTextAsymmetric': {
+      const v = (block.variant as string) ?? 'textList'
+      if (v === 'faq') return 'FAQ'
+      if (v === 'links') return 'Links'
+      if (v === 'longForm') return 'Long form'
+      return 'Paragraphs'
+    }
+    case 'labMediaTextAsymmetric': {
+      const v = (block.variant as string) ?? 'paragraphs'
+      if (v === 'faq') return 'FAQ'
+      if (v === 'links') return 'Links'
+      return 'Paragraphs'
     }
     case 'topNavBlock':
       return 'Mega menu'
@@ -156,8 +244,32 @@ export function getBlockOtherSettings(block: LabBlock): string {
       return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''}`
     case 'carousel':
       return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${Array.isArray(block.items) ? block.items.length : 0} item(s)`
-    case 'list':
-      return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${Array.isArray(block.items) ? block.items.length : 0} item(s)`
+    case 'mediaTextAsymmetric': {
+      const v = (block.variant as string) ?? 'textList'
+      const n =
+        v === 'longForm'
+          ? Array.isArray(block.longFormParagraphs)
+            ? block.longFormParagraphs.length
+            : 0
+          : Array.isArray(block.items)
+            ? block.items.length
+            : 0
+      const label = v === 'longForm' ? 'paragraph(s)' : 'item(s)'
+      return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${n} ${label}`
+    }
+    case 'labMediaTextAsymmetric': {
+      const v = (block.variant as string) ?? 'paragraphs'
+      const n =
+        v === 'paragraphs'
+          ? Array.isArray(block.paragraphRows)
+            ? block.paragraphRows.length
+            : 0
+          : Array.isArray(block.items)
+            ? block.items.length
+            : 0
+      const label = v === 'paragraphs' ? 'paragraph(s)' : 'item(s)'
+      return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${n} ${label}`
+    }
     case 'topNavBlock':
       return 'L1/L2/L3 navigation'
     default:
@@ -200,7 +312,7 @@ function deriveLabPattern(block: LabBlock): BlockPattern {
   }
   const emphasis = (block.emphasis as string)?.toLowerCase?.()
   const hasBand = emphasis && !['ghost', 'none'].includes(emphasis)
-  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'labCarousel', 'labCardGrid', 'cardGrid', 'proofPoints', 'iconGrid', 'list', 'fullBleedVerticalCarousel', 'rotatingMedia', 'editorialBlock']
+  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'labCarousel', 'labCardGrid', 'cardGrid', 'proofPoints', 'iconGrid', 'mediaTextAsymmetric', 'labMediaTextAsymmetric', 'fullBleedVerticalCarousel', 'rotatingMedia', 'editorialBlock']
   if (hasBand && bandTypes.includes(block._type)) {
     return 'band'
   }
@@ -388,11 +500,11 @@ type LabBlockRendererProps = {
   variantLabels?: string[]
   /** When true, render blocks without section headers/settings (e.g. lab overview). */
   clean?: boolean
-  /** When true, List block links open in new tab. */
-  listBlockOpenLinksInNewTab?: boolean
+  /** When true, Media + Text Asymmetric block links open in new tab. */
+  asymmetricBlockOpenLinksInNewTab?: boolean
 }
 
-export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLinksInNewTab }: LabBlockRendererProps) {
+export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlockOpenLinksInNewTab }: LabBlockRendererProps) {
   if (!blocks?.length) return null
 
   const wrapSection = (content: React.ReactNode, block: LabBlock, i: number) => {
@@ -433,11 +545,16 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
     const helperInfo = (
       <WidthCap contentWidth="L" style={{ marginBottom: 'var(--ds-spacing-l)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-2xs)', alignItems: 'flex-start' }}>
-          <Headline size="S" weight="high" as="h2" style={{ margin: 0, fontSize: 'var(--ds-typography-h3)', whiteSpace: 'pre-line' }}>
+          <Headline
+            size="S"
+            as="h2"
+            style={{ margin: 0, fontSize: LAB_TYPOGRAPHY_VARS.h3, whiteSpace: 'pre-line' }}
+            {...labHeadlineBlockTitle}
+          >
             {layoutTitle}
           </Headline>
           {otherSettings && (
-            <Text size="S" weight="low" color="low" as="p" style={{ margin: 0, whiteSpace: 'pre-line' }}>
+            <Text as="p" style={{ margin: 0, whiteSpace: 'pre-line' }} {...labTextBody}>
               {otherSettings}
             </Text>
           )}
@@ -463,7 +580,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
           case 'mediaTextStacked':
           case 'mediaTextBlock': {
             const mapped = mapMediaTextBlock(block)
-            return wrapSection(<MediaTextBlock {...mapped} />, block, i)
+            return wrapSection(<LabMediaTextBlock {...mapped} />, block, i)
           }
           case 'mediaText5050': {
             const mapped = mapMediaText5050Block(block)
@@ -552,7 +669,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
                 }))
               : []
             return wrapSection(
-              <IconGridBlock
+              <LabIconGridBlock
                 items={items}
                 columns={(block.columns as 3 | 4 | 5 | 6) ?? undefined}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
@@ -569,7 +686,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
             const ppAccValid = ppAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(ppAcc) ? ppAcc : undefined
             const ppVariant = (block.variant as string)?.toLowerCase?.() === 'stat' ? 'stat' : 'icon'
             return wrapSection(
-              <ProofPointsBlock
+              <LabProofPointsBlock
                 title={block.title as string | null}
                 variant={ppVariant}
                 emphasis={ppSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
@@ -626,30 +743,72 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, listBlockOpenLi
               i,
             )
           }
-          case 'list': {
-            const listItems = Array.isArray(block.items)
-              ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map((i) => ({
-                  title: i.title,
-                  body: i.body,
-                  linkText: i.linkText,
-                  linkUrl: i.linkUrl,
-                  subtitle: i.subtitle,
+          case 'labMediaTextAsymmetric': {
+            const paragraphRows = Array.isArray(block.paragraphRows)
+              ? (
+                  block.paragraphRows as {
+                    _key?: string
+                    title?: string
+                    body?: string
+                    bodyTypography?: string
+                    linkText?: string
+                    linkUrl?: string
+                  }[]
+                ).map((p) => ({
+                  _key: p._key,
+                  title: p.title,
+                  body: p.body,
+                  bodyTypography: p.bodyTypography === 'large' ? ('large' as const) : ('regular' as const),
+                  linkText: p.linkText,
+                  linkUrl: p.linkUrl,
                 }))
               : []
-            const listSurf = String(block.emphasis ?? '').toLowerCase()
-            const listSurfValid = listSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(listSurf) ? listSurf : undefined
-            const listAcc = String(block.surfaceColour ?? '').toLowerCase()
-            const listAccValid = listAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(listAcc) ? listAcc : undefined
+            const asymmetricItems = Array.isArray(block.items)
+              ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map((j) => ({
+                  title: j.title,
+                  body: j.body,
+                  linkText: j.linkText,
+                  linkUrl: j.linkUrl,
+                  subtitle: j.subtitle,
+                }))
+              : []
+            const asymmetricSurf = String(block.emphasis ?? '').toLowerCase()
+            const asymmetricSurfValid = asymmetricSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(asymmetricSurf) ? asymmetricSurf : undefined
+            const asymmetricAcc = String(block.surfaceColour ?? '').toLowerCase()
+            const asymmetricAccValid = asymmetricAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(asymmetricAcc) ? asymmetricAcc : undefined
             return wrapSection(
-              <ListBlock
+              <LabMediaTextAsymmetricBlock
                 blockTitle={block.blockTitle as string | null}
-                listVariant={(block.listVariant as 'textList' | 'faq' | 'links') ?? 'textList'}
-                items={listItems}
+                variant={(block.variant as 'paragraphs' | 'faq' | 'links') ?? 'paragraphs'}
+                paragraphRows={paragraphRows}
+                items={asymmetricItems}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
-                emphasis={listSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                emphasis={asymmetricSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
-                surfaceColour={listAccValid as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
-                openLinksInNewTab={listBlockOpenLinksInNewTab}
+                surfaceColour={asymmetricAccValid as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
+                openLinksInNewTab={asymmetricBlockOpenLinksInNewTab}
+              />,
+              block,
+              i,
+            )
+          }
+          case 'mediaTextAsymmetric': {
+            const normalized = normalizeLegacyProductionAsymmetricForLab(block)
+            const asymmetricSurf = String(block.emphasis ?? '').toLowerCase()
+            const asymmetricSurfValid = asymmetricSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(asymmetricSurf) ? asymmetricSurf : undefined
+            const asymmetricAcc = String(block.surfaceColour ?? '').toLowerCase()
+            const asymmetricAccValid = asymmetricAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(asymmetricAcc) ? asymmetricAcc : undefined
+            return wrapSection(
+              <LabMediaTextAsymmetricBlock
+                blockTitle={normalized.blockTitle}
+                variant={normalized.variant}
+                paragraphRows={normalized.paragraphRows}
+                items={normalized.items}
+                size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
+                emphasis={asymmetricSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
+                minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
+                surfaceColour={asymmetricAccValid as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
+                openLinksInNewTab={asymmetricBlockOpenLinksInNewTab}
               />,
               block,
               i,

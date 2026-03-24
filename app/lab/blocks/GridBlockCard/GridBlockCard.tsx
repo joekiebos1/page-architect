@@ -12,7 +12,7 @@ import { Headline, Text, Button, Icon } from '@marcelinodzn/ds-react'
 import { Grid, useCell } from '../../../components/blocks/Grid'
 import { BlockSurfaceProvider } from '../../../../lib/utils/block-surface'
 import { getProofPointIcon } from '@/lib/proof-point-icons'
-
+import { LAB_TYPOGRAPHY_VARS, labHeadlineBlockTitle, labPlainBodyStyle, labTextBody, labTextSubtitle } from '../../../../lib/typography/block-typography'
 type CardBackgroundColor = 'primary' | 'secondary' | 'tertiary'
 
 type CTAButton = {
@@ -93,11 +93,20 @@ function GridCardItemCard({ card }: { card: GridCardItem }) {
           ) : null}
         </div>
       )}
-      <Headline size="S" weight="high" as="h3" style={{ margin: 0, color: 'inherit' }}>
+      <Text as="h3" {...labTextSubtitle} style={{ margin: 0, color: 'inherit' }}>
         {card.title}
-      </Headline>
+      </Text>
       {card.description && (
-        <Text size="M" as="p" style={{ margin: 0, opacity: isDark ? 0.95 : 1, color: 'inherit', lineHeight: 1.5 }}>
+        <Text
+          as="p"
+          size={labTextBody.size}
+          weight={labTextBody.weight}
+          style={{
+            ...labPlainBodyStyle(isDark ? { color: 'inherit' } : {}),
+            margin: 0,
+            opacity: isDark ? 0.95 : 1,
+          }}
+        >
           {card.description}
         </Text>
       )}
@@ -134,7 +143,7 @@ function GridCardItemCard({ card }: { card: GridCardItem }) {
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 'var(--ds-spacing-s)',
-                fontSize: 'var(--ds-typography-body-xs)',
+                fontSize: LAB_TYPOGRAPHY_VARS.bodyXs,
                 lineHeight: 1.4,
                 color: 'inherit',
                 opacity: isDark ? 0.95 : 1,
@@ -182,7 +191,7 @@ export function GridCard({
           }}
         >
           {sectionTitle && (
-            <Headline size="M" weight="high" as="h2" align="center" style={{ margin: 0 }}>
+            <Headline size="M" as="h2" align="center" {...labHeadlineBlockTitle} style={{ margin: 0 }}>
               {sectionTitle}
             </Headline>
           )}

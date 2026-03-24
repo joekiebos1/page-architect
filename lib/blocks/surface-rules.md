@@ -1,6 +1,6 @@
 # Surface Rules
 
-How blocks use background colour and DS surface context. **Block-level only.** Layout (Band, Overlay, Contained) is in [layout-rules.md](./layout-rules.md).
+How blocks use background colour and DS surface context. **Block-level only.** Layout (Band, Overlay, Contained) is in [layout-rules.md](./layout-rules.md). Typography roles are in [typography-roles.md](./typography-roles.md).
 
 **Principle:** Responsibilities are **mutually exclusive**. Each concern has exactly one owner. No overlap.
 

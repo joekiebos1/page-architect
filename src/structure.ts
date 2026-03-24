@@ -16,7 +16,7 @@ export const structure: StructureResolver = (S) =>
         .child(
           S.documentList()
             .title('Lab')
-            .filter('_type in ["labOverview", "labBlockPage"]')
+            .filter('_type in ["labOverview", "labBlockPage", "blockInspirationCatalogue"]')
         ),
       S.listItem()
         .title('Image Library')

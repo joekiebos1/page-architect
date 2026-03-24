@@ -37,6 +37,137 @@ const client = createClient({
   useCdn: false,
 })
 
+const SEED_LIST_LONG_FORM_BODY =
+  'We believe in creating products that stand the test of time. Every detail is considered—from the materials we source to the craftsmanship that goes into each piece. Our commitment to quality means you get furniture that not only looks beautiful but lasts for generations.\n\nFounded over two decades ago, we started with a simple idea: design should be honest, functional, and meaningful. Today, that philosophy guides everything we do.\n\nWe work with artisans and makers from around the world who share our values. Each collaboration brings new techniques and traditions into our collection, ensuring that every piece tells a story beyond its function. Sustainability runs through our entire process—from responsibly sourced materials to packaging designed for a second life.\n\nOur showrooms are designed as places to slow down and experience the pieces in context. We want you to feel the weight of a drawer, the grain of the wood, the way light falls across a surface. These are the details that matter when you live with something every day.\n\nThank you for trusting us with your space. We are honoured to be part of the stories you build at home—the meals shared, the conversations had, the quiet moments that make a house feel like yours.'
+
+/** Three lab asymmetric variants for /lab/media-text-asymmetric — rich copy for review and QA. */
+function buildMediaTextAsymmetricLabPageSections() {
+  return [
+    {
+      _type: 'labMediaTextAsymmetric',
+      _key: 'mta-paragraphs',
+      blockTitle: 'Air fibre for real homes',
+      variant: 'paragraphs',
+      emphasis: 'ghost',
+      surfaceColour: 'primary',
+      spacingTop: 'large',
+      spacingBottom: 'large',
+      paragraphRows: [
+        {
+          _type: 'labMediaTextAsymmetricParagraphRow',
+          _key: 'p1',
+          title: 'Speed you can feel every day',
+          body: 'JioAir Fibre is built for households that stream, work, and learn at the same time. Typical evening usage—4K on the TV, video calls in the study, and a dozen smart devices in the background—should feel instant, not “good enough.” We publish expected peak-hour performance so you can compare plans on something closer to reality than a lab number.',
+          bodyTypography: 'large',
+          linkText: 'See speed tiers',
+          linkUrl: '#speed',
+        },
+        {
+          _type: 'labMediaTextAsymmetricParagraphRow',
+          _key: 'p2',
+          title: 'Installation without the drama',
+          body: 'Our field teams map your flat or bungalow before drill day: cable paths, power backup, and where the router will actually live. You get a single appointment window, SMS updates, and a walkthrough when we hand over. If something is not right in the first 30 days, we will reschedule a visit at no extra charge.',
+          bodyTypography: 'regular',
+          linkText: 'Prep checklist',
+          linkUrl: '#install',
+        },
+        {
+          _type: 'labMediaTextAsymmetricParagraphRow',
+          _key: 'p3',
+          body: 'Security is not an afterthought. The home gateway ships with sane defaults: no open admin from the WAN, automatic firmware checks, and optional guest Wi‑Fi that is isolated from your printers and NAS. For families, you can pause devices by profile—school night, dinner, or “everyone outside for an hour.”',
+          bodyTypography: 'regular',
+        },
+        {
+          _type: 'labMediaTextAsymmetricParagraphRow',
+          _key: 'p4',
+          title: 'Rural and semi-urban rollout',
+          body: 'We are expanding along high-demand corridors first, then filling in neighbourhoods block by block. Enter your PIN code in the app to see whether you are in a live zone, a waitlist zone, or a planned phase. Waitlisted addresses get notified when the local POP goes live—no need to keep checking the website.',
+          bodyTypography: 'large',
+          linkText: 'Check availability',
+          linkUrl: '#coverage',
+        },
+        {
+          _type: 'labMediaTextAsymmetricParagraphRow',
+          _key: 'p5',
+          title: 'Billing that stays predictable',
+          body: 'Plans are calendar-month with GST shown upfront. Overage, if any, is itemised in the bill PDF and in the app. You can switch tiers once per billing cycle; downgrades take effect next cycle, upgrades prorate fairly. Enterprise and society bulk pricing is handled by a separate desk with dedicated SLAs.',
+          bodyTypography: 'regular',
+        },
+      ],
+    },
+    {
+      _type: 'labMediaTextAsymmetric',
+      _key: 'mta-faq',
+      blockTitle: 'Questions before you switch',
+      variant: 'faq',
+      emphasis: 'minimal',
+      surfaceColour: 'secondary',
+      spacingTop: 'large',
+      spacingBottom: 'large',
+      items: [
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq1',
+          title: 'Do I need a new router if I already have Wi‑Fi 6?',
+          body: 'In most cases, no. If your existing router supports PPPoE or DHCP from the ONT and can handle your plan speed, you can keep it. We supply a Jio gateway by default because it is pre-provisioned and supported end-to-end. Our technician will test throughput to your primary room before closing the ticket.',
+        },
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq2',
+          title: 'What happens during a power cut?',
+          body: 'The outdoor unit and street fibre stay up; your in-home ONT and router need power. Many customers add a small UPS for the ONT/router pair (roughly 15–25 W). We can recommend compatible models during install. Mobile backup on your phone still works on the Jio network as usual.',
+        },
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq3',
+          title: 'Can I keep my old email or static IP?',
+          body: 'Consumer plans use dynamic public IPv4 with optional static IP add-ons where available. If you run a home server, ask about port-forwarding limits and CGNAT vs public IP at order time. Corporate static ranges are sold only on business SKUs with a different contract.',
+        },
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq4',
+          title: 'How long does migration from another ISP take?',
+          body: 'Porting your landline number (where supported) is 7–10 working days. Pure broadband cutover is usually same day once fibre is lit: we run the new line in parallel, you verify speed, then we help you cancel the old service. Avoid double-billing by aligning your old ISP’s billing date.',
+        },
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq5',
+          title: 'Is there a fair-use policy?',
+          body: 'Truly unlimited plans have no FUP on download volume for residential use. We may rate-limit only if automated abuse detection flags something that looks like commercial resale or constant 24/7 seeding at line rate. Normal household use—including heavy streaming—is explicitly allowed.',
+        },
+        {
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'fq6',
+          title: 'Who do I contact for billing disputes?',
+          body: 'Open a ticket in the MyJio app under Help → Broadband → Bill dispute. Attach a screenshot if something looks wrong. SLA for first human response is one business day; most incorrect tax or proration issues are fixed within three. Escalation paths to nodal officers are listed on the legal page.',
+        },
+      ],
+    },
+    {
+      _type: 'labMediaTextAsymmetric',
+      _key: 'mta-links',
+      blockTitle: 'Explore more',
+      variant: 'links',
+      emphasis: 'subtle',
+      surfaceColour: 'sparkle',
+      spacingTop: 'large',
+      spacingBottom: 'large',
+      items: [
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk1', subtitle: 'Plans and pricing', linkUrl: '#plans' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk2', subtitle: 'Speed test methodology', linkUrl: '#methodology' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk3', subtitle: 'Router and Wi‑Fi guides', linkUrl: '#wifi' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk4', subtitle: 'Business and society fibre', linkUrl: '#business' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk5', subtitle: 'Outage map and maintenance', linkUrl: '#status' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk6', subtitle: 'Refer a neighbour', linkUrl: '#refer' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk7', subtitle: 'Accessibility and support', linkUrl: '#a11y' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk8', subtitle: 'Terms and fair use', linkUrl: '#terms' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk9', subtitle: 'Open API for developers', linkUrl: '#api' },
+        { _type: 'mediaTextAsymmetricItem', _key: 'lk10', subtitle: 'Careers in field operations', linkUrl: '#careers' },
+      ],
+    },
+  ]
+}
+
 async function seed() {
   console.log('Seeding Sanity...')
 
@@ -90,7 +221,7 @@ async function seed() {
   }
 
   // Build labBlockPages: use export for existing pages, add editorial (5 blocks), replace carousel (3 carousels)
-  const SLUG_ORDER = ['top-nav', 'hero', 'media-text', 'media-text-5050', 'carousel', 'card-grid', 'editorial', 'icon-grid', 'proof-points', 'list', 'full-bleed-vertical-carousel', 'rotating-media', 'media-zoom-out-on-scroll']
+  const SLUG_ORDER = ['top-nav', 'hero', 'media-text', 'media-text-5050', 'carousel', 'card-grid', 'editorial', 'icon-grid', 'proof-points', 'media-text-asymmetric', 'full-bleed-vertical-carousel', 'rotating-media', 'media-zoom-out-on-scroll']
 
   const editorialPage = {
     _type: 'labBlockPage',
@@ -242,17 +373,29 @@ async function seed() {
   if (sanityExport?.labBlockPages?.length) {
     const published = sanityExport.labBlockPages.filter((p) => !String(p._id).startsWith('drafts.'))
     const bySlug = Object.fromEntries(published.map((p) => [p.slug, stripSanityMeta(p)]))
-    // Preserve all except editorial and carousel; add our editorial and carousel
+    // Preserve from export when available; fall back to seed defaults for editorial and carousel
     const merged = []
     for (const slug of SLUG_ORDER) {
-      if (slug === 'editorial') merged.push(editorialPage)
-      else if (slug === 'carousel') merged.push(carouselPage)
+      if (slug === 'editorial') merged.push(bySlug['editorial'] ?? editorialPage)
+      else if (slug === 'carousel') merged.push(bySlug['carousel'] ?? carouselPage)
       else if (slug === 'top-nav' && !bySlug[slug]) merged.push({ _type: 'labBlockPage', _id: 'labBlockPage-top-nav', slug: 'top-nav', title: 'Top nav (mega menu)', sections: [{ _type: 'topNavBlock', _key: 'top-nav' }] })
-      else if (bySlug[slug]) merged.push(bySlug[slug])
+      else if (slug === 'media-text-asymmetric') {
+        const page = bySlug['media-text-asymmetric']
+        merged.push({
+          _type: 'labBlockPage',
+          _id: page?._id ?? 'labBlockPage-media-text-asymmetric',
+          slug: 'media-text-asymmetric',
+          title: 'Media + Text Asymmetric',
+          sections: buildMediaTextAsymmetricLabPageSections(),
+        })
+      } else if (bySlug[slug]) {
+        merged.push(bySlug[slug])
+      }
     }
     // Add any export pages not in SLUG_ORDER
     for (const slug of Object.keys(bySlug)) {
-      if (!SLUG_ORDER.includes(slug) && slug !== 'editorial' && slug !== 'carousel') merged.push(bySlug[slug])
+      if (!SLUG_ORDER.includes(slug) && slug !== 'editorial' && slug !== 'carousel')
+        merged.push(bySlug[slug])
     }
     labBlockPages = merged
     console.log(`Merged ${labBlockPages.length} lab block pages (from export + editorial + carousel)`)
@@ -770,57 +913,10 @@ async function seed() {
     },
     {
       _type: 'labBlockPage',
-      _id: 'labBlockPage-list',
-      slug: 'list',
-      title: 'List',
-      sections: [
-        {
-          _type: 'list',
-          _key: 'list-text',
-          blockTitle: 'Features',
-          listVariant: 'textList',
-          emphasis: 'ghost',
-          surfaceColour: 'primary',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'listItem', _key: 't1', title: 'Fast delivery', body: 'Same-day shipping across major cities.', linkText: 'Track order', linkUrl: '#' },
-            { _type: 'listItem', _key: 't2', title: 'Secure payments', body: 'Encrypted checkout with multiple payment options.' },
-            { _type: 'listItem', _key: 't3', title: '24/7 support', body: 'Always here to help.', linkText: 'Contact us', linkUrl: '#' },
-          ],
-        },
-        {
-          _type: 'list',
-          _key: 'list-faq',
-          blockTitle: 'Frequently asked questions',
-          listVariant: 'faq',
-          emphasis: 'minimal',
-          surfaceColour: 'secondary',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'listItem', _key: 'f1', title: 'How do I track my order?', body: 'Log in to your account and go to Orders. You can view real-time tracking for all active shipments.' },
-            { _type: 'listItem', _key: 'f2', title: 'What is your return policy?', body: 'We offer a 30-day return window for most items. Items must be unused and in original packaging.' },
-            { _type: 'listItem', _key: 'f3', title: 'How can I contact support?', body: 'Use the in-app chat, call our helpline, or email support@example.com. We respond within 24 hours.' },
-          ],
-        },
-        {
-          _type: 'list',
-          _key: 'list-links',
-          blockTitle: 'Quick links',
-          listVariant: 'links',
-          emphasis: 'subtle',
-          surfaceColour: 'sparkle',
-          spacingTop: 'large',
-          spacingBottom: 'large',
-          items: [
-            { _type: 'listItem', _key: 'l1', subtitle: 'My Account', linkUrl: '#' },
-            { _type: 'listItem', _key: 'l2', subtitle: 'Order history', linkUrl: '#' },
-            { _type: 'listItem', _key: 'l3', subtitle: 'Help centre', linkUrl: '#' },
-            { _type: 'listItem', _key: 'l4', subtitle: 'Store locator', linkUrl: '#' },
-          ],
-        },
-      ],
+      _id: 'labBlockPage-media-text-asymmetric',
+      slug: 'media-text-asymmetric',
+      title: 'Media + Text Asymmetric',
+      sections: buildMediaTextAsymmetricLabPageSections(),
     },
     {
       _type: 'labBlockPage',
@@ -839,30 +935,44 @@ async function seed() {
 
   // Lab overview – merge from export when available, preserve existing sections
   const defaultLabOverviewItems = [
-    { _type: 'listItem', _key: 'top-nav', subtitle: 'Top nav (mega menu)', linkUrl: '/lab/top-nav' },
-    { _type: 'listItem', _key: 'hero', subtitle: 'Hero', linkUrl: '/lab/hero' },
-    { _type: 'listItem', _key: 'media-text', subtitle: 'Media + Text: Stacked', linkUrl: '/lab/media-text' },
-    { _type: 'listItem', _key: 'media-text-5050', subtitle: 'Media + Text: 50/50', linkUrl: '/lab/media-text-5050' },
-    { _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' },
-    { _type: 'listItem', _key: 'card-grid', subtitle: 'Card grid', linkUrl: '/lab/card-grid' },
-    { _type: 'listItem', _key: 'editorial', subtitle: 'Editorial', linkUrl: '/lab/editorial' },
-    { _type: 'listItem', _key: 'icon-grid', subtitle: 'Icon grid', linkUrl: '/lab/icon-grid' },
-    { _type: 'listItem', _key: 'proof-points', subtitle: 'Proof points', linkUrl: '/lab/proof-points' },
-    { _type: 'listItem', _key: 'list', subtitle: 'List', linkUrl: '/lab/list' },
-    { _type: 'listItem', _key: 'fbvc', subtitle: 'Full bleed vertical carousel', linkUrl: '/lab/full-bleed-vertical-carousel' },
-    { _type: 'listItem', _key: 'rotating-media', subtitle: 'Rotating media', linkUrl: '/lab/rotating-media' },
-    { _type: 'listItem', _key: 'media-zoom-out', subtitle: 'Media zoom out on scroll', linkUrl: '/lab/media-zoom-out-on-scroll' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'top-nav', subtitle: 'Top nav (mega menu)', linkUrl: '/lab/top-nav' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'hero', subtitle: 'Hero', linkUrl: '/lab/hero' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'media-text', subtitle: 'Media + Text: Stacked', linkUrl: '/lab/media-text' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'media-text-5050', subtitle: 'Media + Text: 50/50', linkUrl: '/lab/media-text-5050' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'card-grid', subtitle: 'Card grid', linkUrl: '/lab/card-grid' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'editorial', subtitle: 'Editorial', linkUrl: '/lab/editorial' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'icon-grid', subtitle: 'Icon grid', linkUrl: '/lab/icon-grid' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'proof-points', subtitle: 'Proof points', linkUrl: '/lab/proof-points' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'media-text-asymmetric', subtitle: 'Media + Text Asymmetric', linkUrl: '/lab/media-text-asymmetric' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'fbvc', subtitle: 'Full bleed vertical carousel', linkUrl: '/lab/full-bleed-vertical-carousel' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'rotating-media', subtitle: 'Rotating media', linkUrl: '/lab/rotating-media' },
+    { _type: 'mediaTextAsymmetricItem', _key: 'media-zoom-out', subtitle: 'Media zoom out on scroll', linkUrl: '/lab/media-zoom-out-on-scroll' },
   ]
   let labOverview
   if (sanityExport?.labOverview?.sections?.length) {
     const sections = sanityExport.labOverview.sections.map((s) => stripSanityMeta(s))
-    // Ensure editorial and carousel links exist in the first list block
-    const listBlock = sections.find((s) => s._type === 'list' && s.items)
-    if (listBlock) {
-      const hasEditorial = listBlock.items.some((i) => i.linkUrl === '/lab/editorial' || i._key === 'editorial')
-      const hasCarousel = listBlock.items.some((i) => i.linkUrl === '/lab/carousel' || i._key === 'carousel')
-      if (!hasEditorial) listBlock.items.push({ _type: 'listItem', _key: 'editorial', subtitle: 'Editorial', linkUrl: '/lab/editorial' })
-      if (!hasCarousel) listBlock.items.push({ _type: 'listItem', _key: 'carousel', subtitle: 'Carousel', linkUrl: '/lab/carousel' })
+    // Ensure editorial and carousel links exist in the first asymmetric nav block on the lab overview
+    const overviewNavBlock = sections.find(
+      (s) => (s._type === 'mediaTextAsymmetric' || s._type === 'labMediaTextAsymmetric') && s.items,
+    )
+    if (overviewNavBlock) {
+      const hasEditorial = overviewNavBlock.items.some((i) => i.linkUrl === '/lab/editorial' || i._key === 'editorial')
+      const hasCarousel = overviewNavBlock.items.some((i) => i.linkUrl === '/lab/carousel' || i._key === 'carousel')
+      if (!hasEditorial)
+        overviewNavBlock.items.push({
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'editorial',
+          subtitle: 'Editorial',
+          linkUrl: '/lab/editorial',
+        })
+      if (!hasCarousel)
+        overviewNavBlock.items.push({
+          _type: 'mediaTextAsymmetricItem',
+          _key: 'carousel',
+          subtitle: 'Carousel',
+          linkUrl: '/lab/carousel',
+        })
     }
     labOverview = { _type: 'labOverview', _id: 'labOverview', sections }
     console.log('Merged Lab overview from export')
@@ -872,10 +982,10 @@ async function seed() {
       _id: 'labOverview',
       sections: [
         {
-          _type: 'list',
+          _type: 'labMediaTextAsymmetric',
           _key: 'lab-overview-blocks',
           blockTitle: 'Blocks',
-          listVariant: 'links',
+          variant: 'links',
           emphasis: 'ghost',
           surfaceColour: 'primary',
           spacingTop: 'large',

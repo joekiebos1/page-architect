@@ -10,7 +10,8 @@ import { useRef, useState, useEffect } from 'react'
 import type { CSSProperties } from 'react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
 import { Headline, Button, Icon, IcChevronLeft, IcChevronRight } from '@marcelinodzn/ds-react'
-import { getHeadlineSize, normalizeHeadingLevel, TYPOGRAPHY } from '../../../../lib/utils/semantic-headline'
+import { getHeadlineSize, normalizeHeadingLevel } from '../../../../lib/utils/semantic-headline'
+import { LAB_TYPOGRAPHY_VARS, labHeadlineBlockTitle } from '../../../../lib/typography/block-typography'
 import { useGridBreakpoint, getBreakpointName } from '../../../../lib/utils/use-grid-breakpoint'
 import { Grid, useCell } from '../../../components/blocks/Grid'
 import { WidthCap } from '../../../blocks/WidthCap'
@@ -369,7 +370,7 @@ export function LabCarouselBlock({
   const buttonGap = isMobile ? 'var(--ds-spacing-m)' : 'var(--ds-spacing-l)'
   const navButtonSize =
     isLargeLayout && config.buttonsPlacement === 'bottom' ? 'M' : isMobile ? 'S' : 'M'
-  const titleFontSize = isMobile ? TYPOGRAPHY.h3 : TYPOGRAPHY.h2
+  const titleFontSize = isMobile ? LAB_TYPOGRAPHY_VARS.h3 : LAB_TYPOGRAPHY_VARS.h2
 
   const effectiveCardLayout =
     config.cols === 1 ? (cardSize === 'large' ? 'large' : 'medium') : config.cols === 2 ? 'medium' : 'compact'
@@ -421,9 +422,9 @@ export function LabCarouselBlock({
             <WidthCap contentWidth="L">
               <Headline
                 size={getHeadlineSize(level)}
-                weight="high"
                 as={level}
                 align="center"
+                {...labHeadlineBlockTitle}
                 style={{
                   margin: 0,
                   fontSize: titleFontSize,

@@ -7,9 +7,15 @@ import { transformJSONSchema } from '@anthropic-ai/sdk/lib/transform-json-schema
 import type { PageBrief } from '../../../jiokarna/types'
 import { PAGE_BRIEF_SCHEMA } from '../structure-schema'
 
-/** Page Architect rules — product page structure principles. Sent when proposing structure. */
-const ARCHITECT_RULES = readFileSync(
-  join(process.cwd(), 'lib', 'jiokarna', 'architect-rules-product-page.md'),
+/** Product page storytelling and structure rules. Shared with Storytelling Inspiration (Studio). */
+const PRODUCT_PAGE_RULES = readFileSync(
+  join(process.cwd(), 'lib', 'shared', 'storytelling', 'product-pages.md'),
+  'utf-8'
+)
+
+/** Jio Story storytelling rules. Editorial content, 5-act arc. */
+const JIO_STORY_RULES = readFileSync(
+  join(process.cwd(), 'lib', 'shared', 'storytelling', 'jio-stories.md'),
   'utf-8'
 )
 
@@ -100,7 +106,14 @@ Business ecosystem:
     - Technologies: AI Networks, Edge Computing, MLaaS, 5G Advanced, Network Slicing, 6G
 `
 
-const SYSTEM_PROMPT = `You are a senior digital strategist and content architect who specialises in brand websites for companies like Apple, Dyson, and Sonos — brands where storytelling, product beauty, and conversion work together. You help teams turn rough briefs into structured, narrative-led web pages.
+function buildSystemPrompt(template: string): string {
+  const isJioStory = template === 'jio-story'
+  const rules = isJioStory ? JIO_STORY_RULES : PRODUCT_PAGE_RULES
+  const narrativeRoleNote = isJioStory
+    ? 'Map: narrativeRole = act (hook | context | impact | proof | close), component = block type, blockOptions = decisions, contentSlots.headline = headline (evocative creative direction).'
+    : 'Map: narrativeRole = section (setup | engage | resolve), component = block type, blockOptions = decisions, contentSlots.headline = headline (evocative creative direction).'
+
+  let prompt = `You are a senior digital strategist and content architect who specialises in brand websites for companies like Apple, Dyson, and Sonos — brands where storytelling, product beauty, and conversion work together. You help teams turn rough briefs into structured, narrative-led web pages.
 
 You are opinionated. You push back when structure is weak. You ask precise questions. You are never vague. You know that a bad page structure wastes good content.
 
@@ -109,11 +122,14 @@ You are embedded in a tool used by designers, content editors, and storytellers.
 
 The website uses a defined component library. You must propose page structures using only the components provided.
 
-## Page Architect Rules (MUST FOLLOW)
-The following rules define how product pages must be structured. Follow them strictly when proposing structure. Map: narrativeRole = section (setup | engage | resolve), component = block type, blockOptions = decisions, contentSlots.headline = headline (evocative creative direction). The output format below overrides the simplified format in the rules — you must output the full PageBrief JSON.
+## ${isJioStory ? 'Jio Story' : 'Product Page'} Rules (MUST FOLLOW)
+The following rules define how ${isJioStory ? 'Jio Stories' : 'product pages'} must be structured. Follow them strictly when proposing structure. ${narrativeRoleNote} The output format below overrides any simplified format in the rules — you must output the full PageBrief JSON.
 
-${ARCHITECT_RULES}
+${rules}
+`
 
+  if (!isJioStory) {
+    prompt += `
 ## Product Graph
 A product graph is provided in each request representing the ecosystem of existing products on the site, organised by ecosystem (Mobile, Home, Business).
 
@@ -125,7 +141,10 @@ Rules for using the product graph:
 - Default to same ecosystem — cross-ecosystem links need a strong reason
 - Pick the destination most valuable to the user reading that section, not the most convenient for the business
 - URLs are placeholders for now — use the product name as the destination reference
+`
+  }
 
+  prompt += `
 ## Structure Proposal Output
 Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
 
@@ -149,7 +168,7 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
     {
       "order": 1,
       "sectionName": "string",
-      "component": "string (use only: hero, mediaTextBlock, mediaText5050, cardGrid, carousel, proofPoints)",
+      "component": "string (use only: hero, mediaTextBlock, mediaText5050, cardGrid, carousel, proofPoints, mediaTextAsymmetric)",
       "rationale": "string",
       "narrativeRole": "string",
       "contentSlots": {
@@ -190,16 +209,32 @@ Output ONLY valid JSON matching this exact shape. No markdown, no explanation.
 ## Hard Rules
 1. Never propose a component not in the component library provided.
 2. Every page starts with hero (or mediaTextStacked for text-only pages).
-3. Every page ends with a CTA-focused section (hero with CTAs, or mediaTextStacked with template TextOnly and CTAs) unless there is a very specific reason not to.
-4. Page length: 12–25 blocks (minimum 12, maximum 25, target 14–18). Follow architect rules.
 5. Never ask about visual design or technical implementation.
 6. Always output the structured JSON — no markdown, no explanation, JSON only.
 7. If you don't have enough information, say so and ask the specific question that unblocks you.
 8. Never make up IA paths — use placeholders like "/[parent]/[slug]".
+12. Use blockOptions to specify emphasis, surfaceColour, variant, size, template, etc. when relevant. Omit blockOptions when defaults are fine.
+`
+
+  if (isJioStory) {
+    prompt += `
+Jio Story specific:
+3. narrativeRole must be one of: hook | context | impact | proof | close.
+4. Page length: 9–17 blocks. Use hero for the opener.
+9. No CTA. No product graph. No crossLinks to products.
+10. Every Jio Story ends with a cardGrid (3 cards) for "Related stories" — use placeholder titles (Related Story 1, 2, 3) with crossLinks.destination as placeholder paths for other Jio Stories.`
+  } else {
+    prompt += `
+Product page specific:
+3. Every page ends with a CTA-focused section (hero with CTAs, or mediaTextStacked with template TextOnly and CTAs) unless there is a very specific reason not to.
+4. Page length: 12–25 blocks (minimum 12, maximum 25, target 14–18). Follow architect rules.
 9. CTA destinations must come from the product graph — never invent a product name that isn't in it.
 10. Cross-linking is a CTA decision. A section about music on a glasses page should CTA to the music product, not back to the glasses.
-11. For modules with multiple items (cardGrid, carousel, proofPoints, etc.), use crossLinks to suggest per-item destinations from the product graph. Omit crossLinks when not relevant.
-12. Use blockOptions to specify emphasis, surfaceColour, variant, size, template, etc. when relevant. Omit blockOptions when defaults are fine.`
+11. For modules with multiple items (cardGrid, carousel, proofPoints, etc.), use crossLinks to suggest per-item destinations from the product graph. Omit crossLinks when not relevant.`
+  }
+
+  return prompt
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -214,12 +249,30 @@ export async function POST(req: NextRequest) {
     }
 
     const anthropic = new Anthropic({ apiKey })
+    const template = intentData.template || 'product-page'
+    const systemPrompt = buildSystemPrompt(template)
+    const isJioStory = template === 'jio-story'
 
     const conversationSummary = conversation
       ?.map((m: { role: string; content: string }) => `${m.role}: ${m.content}`)
       .join('\n\n')
 
-    const userPrompt = `Page intent:
+    const userPrompt = isJioStory
+      ? `Jio Story intent:
+- Story title: ${intentData.product || 'Untitled'}
+- India context: ${intentData.audience || 'Not specified'}
+- Story angle: ${intentData.keyMessage || 'Not specified'}
+- Page path: ${intentData.pagePath || 'Not specified'}
+- Story details: ${intentData.intent || 'Not specified'}
+${intentData.briefContent ? `- Brief: ${intentData.briefContent}` : ''}
+
+Interview conversation:
+${conversationSummary || 'No conversation yet.'}
+
+${BLOCK_LIBRARY}
+
+Propose the page structure as JSON. Output ONLY the JSON object, no markdown.`
+      : `Page intent:
 - Product: ${intentData.product || 'Untitled'}
 - Type: ${intentData.pageType || 'other'}
 - Audience: ${intentData.audience || 'Not specified'}
@@ -244,7 +297,7 @@ Propose the page structure as JSON. Output ONLY the JSON object, no markdown.`
       response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 8192,
-        system: SYSTEM_PROMPT,
+        system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       output_config: {
         format: {
@@ -260,7 +313,7 @@ Propose the page structure as JSON. Output ONLY the JSON object, no markdown.`
         response = await anthropic.messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 8192,
-          system: SYSTEM_PROMPT,
+          system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }],
         })
       } else {
@@ -327,12 +380,14 @@ Propose the page structure as JSON. Output ONLY the JSON object, no markdown.`
     parsed.version = 1
     parsed.status = 'draft'
 
-    const id = intentData as { product?: string; pagePath?: string; audience?: string; primaryAction?: string; keyMessage?: string }
+    const id = intentData as { template?: string; product?: string; pagePath?: string; audience?: string; primaryAction?: string; keyMessage?: string }
+    parsed.meta.template = (id.template as 'product-page' | 'jio-story') || 'product-page'
     if (id.product && !parsed.meta.pageName) parsed.meta.pageName = id.product
     if (id.pagePath) parsed.meta.slug = id.pagePath.replace(/^\//, '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9/-]/g, '')
     if (id.audience && !parsed.meta.audience) parsed.meta.audience = id.audience
     if (id.primaryAction && !parsed.meta.primaryAction) parsed.meta.primaryAction = id.primaryAction
     if (id.keyMessage && !parsed.meta.keyMessage) parsed.meta.keyMessage = id.keyMessage
+    if (parsed.meta.template === 'jio-story' && !parsed.meta.primaryAction) parsed.meta.primaryAction = 'Read the story'
 
     return NextResponse.json({ brief: parsed })
   } catch (err) {

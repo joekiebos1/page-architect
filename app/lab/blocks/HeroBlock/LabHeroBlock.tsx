@@ -19,8 +19,15 @@ import { StreamImage } from '../../../components/blocks/StreamImage'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../../../lib/utils/block-surface'
 import { useGridBreakpoint, getAspectRatioForBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
 import { EDGE_TO_EDGE_BREAKOUT, useEdgeToEdgeMediaStyles } from '../../../../lib/utils/edge-to-edge'
-import { TYPOGRAPHY, HERO_BODY_STYLE } from '../../../../lib/utils/semantic-headline'
 import type { ImageSlotState } from '../../../hooks/useImageStream'
+import {
+  LAB_TYPOGRAPHY_VARS,
+  labDisplayRole,
+  labHeadlineBlockTitle,
+  labHeroHeadlineSizes,
+  labHeroProductNameStyle,
+  labHeroSubheadlineStyle,
+} from '../../../../lib/typography/block-typography'
 
 const IMAGE_ASPECT_RATIO_SIDE_BY_SIDE = '5 / 4'
 const MEDIA_OVERLAY_ASPECT_RATIO = '2 / 1'
@@ -156,21 +163,62 @@ export function LabHeroBlock({
 
   const headlineMarginBottom = subheadline ? 'var(--ds-spacing-s)' : (ctaText || cta2Text) ? 'var(--ds-spacing-xl)' : 0
   const subheadlineMarginBottom = (ctaText || cta2Text) ? 'var(--ds-spacing-xl)' : 0
-  const headlineFontSizeCentered = isMobile ? TYPOGRAPHY.h3 : isTablet ? TYPOGRAPHY.h2 : TYPOGRAPHY.h1
+  const headlineFontSizeCentered = isMobile
+    ? labHeroHeadlineSizes.mobile
+    : isTablet
+      ? labHeroHeadlineSizes.tablet
+      : labHeroHeadlineSizes.desktop
   const textContentCentered = (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
       <div style={getRevealStyle(0)}>
         <WidthCap contentWidth="L">
           <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column' }}>
-            {productName && <Text size="L" weight="high" align="center" as="span" style={{ marginBottom: 'var(--ds-spacing-m)', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, lineHeight: HERO_BODY_STYLE.lineHeight }}>{productName}</Text>}
-            {headline && <Display size="L" as="h1" align="center" style={{ lineHeight: 1.1, whiteSpace: 'pre-line', marginBottom: headlineMarginBottom, fontSize: headlineFontSizeCentered }}>{headline}</Display>}
+            {productName && (
+              <Text
+                size="L"
+                weight="low"
+                align="center"
+                as="span"
+                style={labHeroProductNameStyle(isMobile)}
+              >
+                {productName}
+              </Text>
+            )}
+            {headline && (
+              <Display
+                as="h1"
+                align="center"
+                {...labDisplayRole}
+                style={{
+                  lineHeight: 1.1,
+                  whiteSpace: 'pre-line',
+                  marginBottom: headlineMarginBottom,
+                  fontSize: headlineFontSizeCentered,
+                }}
+              >
+                {headline}
+              </Display>
+            )}
           </div>
         </WidthCap>
       </div>
       {subheadline && (
         <div style={getRevealStyle(1)}>
           <WidthCap contentWidth="XS">
-            <Text align="center" as="p" style={{ margin: 0, marginBottom: subheadlineMarginBottom, textAlign: 'center', whiteSpace: 'pre-line', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, fontWeight: HERO_BODY_STYLE.fontWeight, lineHeight: HERO_BODY_STYLE.lineHeight }}>{subheadline}</Text>
+            <Text
+              align="center"
+              as="p"
+              weight="low"
+              style={{
+                margin: 0,
+                marginBottom: subheadlineMarginBottom,
+                textAlign: 'center',
+                whiteSpace: 'pre-line',
+                ...labHeroSubheadlineStyle(isMobile),
+              }}
+            >
+              {subheadline}
+            </Text>
           </WidthCap>
         </div>
       )}
@@ -199,12 +247,48 @@ export function LabHeroBlock({
       }}
     >
       <div style={getRevealStyle(0)}>
-        {productName && <Text size="L" weight="high" align={textAlignProp(align)} as="span" style={{ marginBottom: 'var(--ds-spacing-m)', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, lineHeight: HERO_BODY_STYLE.lineHeight }}>{productName}</Text>}
-        {headline && <Headline size="L" weight="high" align={textAlignProp(align)} as="h1" style={{ lineHeight: 1.1, fontSize: headlineFontSizeCentered, whiteSpace: 'pre-line', marginBottom: headlineMarginBottom }}>{headline}</Headline>}
+        {productName && (
+          <Text
+            size="L"
+            weight="low"
+            align={textAlignProp(align)}
+            as="span"
+            style={labHeroProductNameStyle(isMobile)}
+          >
+            {productName}
+          </Text>
+        )}
+        {headline && (
+          <Headline
+            size="L"
+            align={textAlignProp(align)}
+            as="h1"
+            {...labHeadlineBlockTitle}
+            style={{
+              lineHeight: 1.1,
+              fontSize: headlineFontSizeCentered,
+              whiteSpace: 'pre-line',
+              marginBottom: headlineMarginBottom,
+            }}
+          >
+            {headline}
+          </Headline>
+        )}
       </div>
       {subheadline && (
         <div style={getRevealStyle(1)}>
-          <Text align={textAlignProp(align)} as="p" weight="low" style={{ margin: 0, marginBottom: subheadlineMarginBottom, opacity: 0.95, whiteSpace: 'pre-line', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, fontWeight: HERO_BODY_STYLE.fontWeight, lineHeight: HERO_BODY_STYLE.lineHeight }}>
+          <Text
+            align={textAlignProp(align)}
+            as="p"
+            weight="low"
+            style={{
+              margin: 0,
+              marginBottom: subheadlineMarginBottom,
+              opacity: 0.95,
+              whiteSpace: 'pre-line',
+              ...labHeroSubheadlineStyle(isMobile),
+            }}
+          >
             {subheadline}
           </Text>
         </div>
@@ -233,12 +317,48 @@ export function LabHeroBlock({
       }}
     >
       <div style={getRevealStyle(0)}>
-        {productName && <Text size="L" weight="high" as="span" style={{ marginBottom: 'var(--ds-spacing-m)', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, lineHeight: HERO_BODY_STYLE.lineHeight }}>{productName}</Text>}
-        {headline && <Headline size="L" weight="high" as="h1" style={{ lineHeight: 1.1, fontSize: isMobile ? TYPOGRAPHY.h3 : (isContained || isTablet) ? TYPOGRAPHY.h2 : TYPOGRAPHY.h1, marginBottom: 'var(--ds-spacing-s)' }}>{headline}</Headline>}
+        {productName && (
+          <Text
+            size="L"
+            weight="low"
+            as="span"
+            style={labHeroProductNameStyle(isMobile)}
+          >
+            {productName}
+          </Text>
+        )}
+        {headline && (
+          <Headline
+            size="L"
+            as="h1"
+            {...labHeadlineBlockTitle}
+            style={{
+              lineHeight: 1.1,
+              fontSize: isMobile
+                ? LAB_TYPOGRAPHY_VARS.h3
+                : isContained || isTablet
+                  ? LAB_TYPOGRAPHY_VARS.h2
+                  : LAB_TYPOGRAPHY_VARS.h1,
+              marginBottom: 'var(--ds-spacing-s)',
+            }}
+          >
+            {headline}
+          </Headline>
+        )}
       </div>
       {subheadline && (
         <div style={getRevealStyle(1)}>
-          <Text as="p" weight="low" style={{ margin: 0, marginBottom: 'var(--ds-spacing-xl)', opacity: 0.95, whiteSpace: 'pre-line', fontSize: isMobile ? 'var(--ds-typography-label-s)' : HERO_BODY_STYLE.fontSize, fontWeight: HERO_BODY_STYLE.fontWeight, lineHeight: HERO_BODY_STYLE.lineHeight }}>
+          <Text
+            as="p"
+            weight="low"
+            style={{
+              margin: 0,
+              marginBottom: 'var(--ds-spacing-xl)',
+              opacity: 0.95,
+              whiteSpace: 'pre-line',
+              ...labHeroSubheadlineStyle(isMobile),
+            }}
+          >
             {subheadline}
           </Text>
         </div>
@@ -443,7 +563,7 @@ export function LabHeroBlock({
     )
   }
 
-  const imageAspect = isStacked ? '2 / 1' : IMAGE_ASPECT_RATIO_SIDE_BY_SIDE
+  const imageAspect = isStacked ? (isMobile ? '4 / 5' : '2 / 1') : IMAGE_ASPECT_RATIO_SIDE_BY_SIDE
   const isTopToBottom = imageAnchor === 'bottom' && !isStacked
 
   const imageWrapperStyle: React.CSSProperties = {

@@ -6,7 +6,7 @@ import { getMotionDurationCSS, getMotionEasing, createTransition } from '@marcel
 import { Headline, Text, SurfaceProvider } from '@marcelinodzn/ds-react'
 import { useCarouselReveal } from '../../../../lib/utils/use-carousel-reveal'
 import { WidthCap } from '../../../blocks/WidthCap'
-
+import { labHeadlineBlockTitle, labTextBody } from '../../../../lib/typography/block-typography'
 type CarouselItem = {
   title?: string | null
   description?: string | null
@@ -246,8 +246,8 @@ export function LabFullBleedVerticalCarousel({ items }: FullBleedVerticalCarouse
                     <WidthCap contentWidth="L" style={{ marginBottom: 0 }}>
                       <Headline
                         size="L"
-                        weight="high"
                         as="h2"
+                        {...labHeadlineBlockTitle}
                         style={{
                           textShadow,
                           whiteSpace: 'pre-line',
@@ -263,13 +263,11 @@ export function LabFullBleedVerticalCarousel({ items }: FullBleedVerticalCarouse
                   {item.description && (
                     <WidthCap contentWidth="XS">
                       <Text
-                        size="M"
-                        weight="low"
                         as="p"
+                        {...labTextBody}
                         style={{
                           textShadow,
                           margin: 0,
-                          lineHeight: 1.5,
                           textAlign: 'center',
                           whiteSpace: 'pre-line',
                         }}

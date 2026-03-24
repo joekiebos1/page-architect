@@ -23,6 +23,12 @@ import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
 import { Grid, useCell } from '../../../components/blocks/Grid'
 import { WidthCap } from '../../../blocks/WidthCap'
 import type { EditorialBlockProps } from './EditorialBlock.types'
+import {
+  LAB_TYPOGRAPHY_VARS,
+  labDisplayRole,
+  labHeadlineBlockTitle,
+  labTextBody,
+} from '../../../../lib/typography/block-typography'
 
 function fromCorners(
   topLeft: { column?: number; row?: number } | null | undefined,
@@ -105,11 +111,25 @@ export function EditorialBlock({
   }
 
   const headlineComponent = headlineSize === 'display' ? (
-    <Display size="L" as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }}>{headline}</Display>
+    <Display as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }} {...labDisplayRole}>
+      {headline}
+    </Display>
   ) : headlineSize === 'headline' ? (
-    <Headline size="L" weight="high" as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }}>{headline}</Headline>
+    <Headline size="L" as="h1" align={textAlignStyle} style={{ whiteSpace: 'pre-line', margin: 0 }} {...labHeadlineBlockTitle}>
+      {headline}
+    </Headline>
   ) : (
-    <Title level={2} style={{ textAlign: textAlignStyle, whiteSpace: 'pre-line', margin: 0 }}>{headline}</Title>
+    <Title
+      level={2}
+      style={{
+        textAlign: textAlignStyle,
+        whiteSpace: 'pre-line',
+        margin: 0,
+        fontWeight: LAB_TYPOGRAPHY_VARS.weightHigh,
+      }}
+    >
+      {headline}
+    </Title>
   )
 
   const textContent = (
@@ -126,7 +146,18 @@ export function EditorialBlock({
       >
         {headline && headlineComponent}
         {body && (
-          <Text size="M" as="p" style={{ margin: 0, whiteSpace: 'pre-line', textAlign: textAlignStyle, maxWidth: '100%' }}>{body}</Text>
+          <Text
+            as="p"
+            {...labTextBody}
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-line',
+              textAlign: textAlignStyle,
+              maxWidth: '100%',
+            }}
+          >
+            {body}
+          </Text>
         )}
         {ctaText && ctaLink && (
           <Button size="M" appearance="primary" attention="high" onPress={handleCtaPress}>{ctaText}</Button>

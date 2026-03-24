@@ -1,5 +1,5 @@
 /**
- * Lab – Overview page. Content from Sanity (labOverview with List block).
+ * Lab – Overview page. Content from Sanity (labOverview with navigation links block).
  */
 
 import { draftMode } from 'next/headers'

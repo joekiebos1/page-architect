@@ -28,6 +28,7 @@ const JioKarnaContext = createContext<JioKarnaContextValue | null>(null)
 
 export function JioKarnaProvider({ children }: { children: ReactNode }) {
   const [intentData, setIntentData] = useState<IntentFormData>({
+    template: 'product-page',
     product: '',
     pageType: 'other',
     intent: '',

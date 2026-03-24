@@ -34,13 +34,30 @@ Total overview of all prompts sent to Claude. Use this to improve the prompt sys
 
 ---
 
+## 1.1 Three-layer prompt architecture (Structure API)
+
+The Structure API prompt is built from three layers. Each has a distinct role.
+
+| Layer | Role | Source | What it provides |
+|-------|------|--------|------------------|
+| **1. Storytelling logic** | Narrative arc, tone, ambition, principles. Defines what a strong page is and how the visitor should feel. | `lib/shared/storytelling/product-pages.md` | Arc (Setup→Engage→Resolve), content ambition, block rules, rhythm, what to avoid. |
+| **2. Block definitions** | What each block is, what it can do, its options and slots. The palette. | `BLOCK_LIBRARY` in `structure/route.ts` | Component list, capabilities, valid options (template, size, emphasis, etc.), content slots. Should be rich enough for Claude to make good choices. |
+| **3. Claude** | Structural decisions. Given the storytelling logic and block definitions, decides which blocks to use and how. | — | Proposes sections, assigns components, sets blockOptions, writes headlines and rationales. |
+
+**Separation of concerns:**
+- Storytelling logic = *why* and *how the journey works* — principles, not prescription.
+- Block definitions = *what's available* — capabilities, not placement rules.
+- Claude = *the designer* — applies principles to the palette and builds the page.
+
+---
+
 ## 2. File Locations
 
 | Piece | File | Lines |
 |-------|------|-------|
 | Interview system prompt | `app/api/jiokarna/interview/route.ts` | 4–13 |
 | Structure system prompt | `app/api/jiokarna/structure/route.ts` | 100–198 |
-| Architect rules (injected) | `lib/jiokarna/architect-rules-product-page.md` | full file |
+| Architect rules (injected) | `lib/shared/storytelling/product-pages.md` | full file |
 | Block library | `app/api/jiokarna/structure/route.ts` | 17–61 |
 | Product graph | `app/api/jiokarna/structure/route.ts` | 66–99 |
 | Structure user prompt | `app/api/jiokarna/structure/route.ts` | 223–239 |
@@ -103,7 +120,7 @@ The website uses a defined component library. You must propose page structures u
 ## Page Architect Rules (MUST FOLLOW)
 The following rules define how product pages must be structured. Follow them strictly when proposing structure. Map: narrativeRole = section (setup | engage | resolve), component = block type, blockOptions = decisions, contentSlots.headline = headline (evocative creative direction). The output format below overrides the simplified format in the rules — you must output the full PageBrief JSON.
 
-${ARCHITECT_RULES}   ← lib/jiokarna/architect-rules-product-page.md (full contents)
+${ARCHITECT_RULES}   ← lib/shared/storytelling/product-pages.md (full contents)
 
 ## Product Graph
 A product graph is provided in each request representing the ecosystem of existing products on the site, organised by ecosystem (Mobile, Home, Business).
@@ -216,7 +233,7 @@ See `app/api/jiokarna/structure/route.ts` lines 66–99. Full product tree for M
 
 ### 4.5 Architect rules (injected into system)
 
-See `lib/jiokarna/architect-rules-product-page.md` — full file (~275 lines). Covers:
+See `lib/shared/storytelling/product-pages.md` — full file. Covers:
 - Role, Story Arc (Setup → Engage → Resolve)
 - Content Ambition Rules
 - Block Rules (Hero, ProofPoints, MediaTextBlock, Carousel, CardGrid)

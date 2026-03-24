@@ -1,6 +1,8 @@
 /**
- * Page brief types — matches the structured JSON schema from lib/jiokarna/architect-rules-product-page.md
+ * Page brief types — matches the structured JSON schema from lib/shared/storytelling/product-pages.md
  */
+
+export type PageTemplate = 'product-page' | 'jio-story'
 
 export type PageType = 'campaign' | 'product-launch' | 'editorial' | 'category' | 'other'
 
@@ -79,6 +81,7 @@ export type PageBriefMeta = {
   audience: string
   primaryAction: string
   keyMessage: string
+  template?: PageTemplate
 }
 
 export type PageBriefIA = {
@@ -99,15 +102,16 @@ export type PageBrief = {
 }
 
 export type IntentFormData = {
-  /** Product or page name. */
+  template: PageTemplate
+  /** Product or story title. */
   product: string
   pageType: PageType
-  /** What the page should accomplish; who it's for. */
+  /** What the page should accomplish; who it's for. Or story angle + evidence for Jio Stories. */
   intent: string
   audience: string
   primaryAction: string
   keyMessage: string
-  /** URL path (e.g. /products/jiosaavn). */
+  /** URL path (e.g. /products/jiosaavn or /stories/...) */
   pagePath: string
   briefContent?: string
 }

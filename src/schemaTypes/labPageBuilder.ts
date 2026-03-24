@@ -5,7 +5,7 @@ export const labPageBuilderType = defineType({
   type: 'array',
   title: 'Lab blocks',
   description:
-    'Add blocks for the Lab page. Production blocks: Hero, Media text, Card grid, Carousel, Proof points, Icon grid. Lab: Card grid (media + text inside), Full bleed vertical carousel, Rotating media, Media zoom out on scroll.',
+    'Add blocks for the Lab page. Production blocks: Hero, Media text, Card grid, Carousel, Proof points, Icon grid. Lab: Media + Text Asymmetric (Lab), Card grid (media + text inside), Full bleed vertical carousel, Rotating media, Media zoom out on scroll.',
   of: [
     defineArrayMember({ type: 'hero' }),
     defineArrayMember({ type: 'mediaTextStacked' }),
@@ -18,6 +18,6 @@ export const labPageBuilderType = defineType({
     defineArrayMember({ type: 'mediaZoomOutOnScroll' }),
     defineArrayMember({ type: 'iconGrid' }),
     defineArrayMember({ type: 'proofPoints' }),
-    defineArrayMember({ type: 'list' }),
+    defineArrayMember({ type: 'labMediaTextAsymmetric' }),
   ],
 })

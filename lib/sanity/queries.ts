@@ -172,14 +172,44 @@ const S_ICON_GRID = `{
       spectrum
     }
   }`
-const S_LIST = `{
+const S_MEDIA_TEXT_ASYMMETRIC = `{
     spacingTop,
     spacingBottom,
     blockTitle,
-    listVariant,
+    variant,
+    longFormParagraphs[]{
+      _key,
+      text,
+      bodyTypography
+    },
     emphasis,
     minimalBackgroundStyle,
     surfaceColour,
+    items[]{
+      title,
+      body,
+      linkText,
+      linkUrl,
+      subtitle
+    }
+  }`
+
+const S_LAB_MEDIA_TEXT_ASYMMETRIC = `{
+    spacingTop,
+    spacingBottom,
+    blockTitle,
+    variant,
+    emphasis,
+    minimalBackgroundStyle,
+    surfaceColour,
+    paragraphRows[]{
+      _key,
+      title,
+      body,
+      bodyTypography,
+      linkText,
+      linkUrl
+    },
     items[]{
       title,
       body,
@@ -230,7 +260,7 @@ const PAGE_SECTIONS_PROJECTION = `{
   _type == "carousel" => ${S_CAROUSEL},
   _type == "proofPoints" => ${S_PROOF_POINTS},
   _type == "iconGrid" => ${S_ICON_GRID},
-  _type == "list" => ${S_LIST}
+  _type == "mediaTextAsymmetric" => ${S_MEDIA_TEXT_ASYMMETRIC}
 }`
 
 export const pageBySlugQuery = `*[_type == "page" && slug.current == $slug][0]{
@@ -363,7 +393,8 @@ const LAB_SECTIONS_PROJECTION = `{
   },
   _type == "iconGrid" => ${S_ICON_GRID},
   _type == "proofPoints" => ${S_PROOF_POINTS},
-  _type == "list" => ${S_LIST}
+  _type == "mediaTextAsymmetric" => ${S_MEDIA_TEXT_ASYMMETRIC},
+  _type == "labMediaTextAsymmetric" => ${S_LAB_MEDIA_TEXT_ASYMMETRIC}
 }`
 
 export const labOverviewQuery = `*[_type == "labOverview" && _id == "labOverview"][0]{
@@ -382,4 +413,11 @@ export const labBlockPageBySlugQuery = `*[_type == "labBlockPage" && slug == $sl
   slug,
   title,
   sections[]${LAB_SECTIONS_PROJECTION}
+}`
+
+export const blockInspirationCatalogueQuery = `*[_type == "blockInspirationCatalogue" && _id == "blockInspirationCatalogue"][0]{
+  entries[]{
+    blockId,
+    "thumbnail": thumbnail.asset->url
+  }
 }`

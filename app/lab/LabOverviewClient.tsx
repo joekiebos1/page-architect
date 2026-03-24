@@ -2,7 +2,7 @@
 
 /**
  * Lab overview – renders sections from Sanity (labOverview).
- * List block with links to each block page. Links open in new tab.
+ * Media + Text Asymmetric (`list`) block with links to each block page. Links open in new tab.
  */
 
 import { LabBlockRenderer } from './LabBlockRenderer'
@@ -19,7 +19,7 @@ export function LabOverviewClient({ sections }: LabOverviewClientProps) {
       <LabBlockRenderer
         blocks={blocks as { _type: string; _key?: string; [key: string]: unknown }[]}
         clean
-        listBlockOpenLinksInNewTab
+        asymmetricBlockOpenLinksInNewTab
       />
     </main>
   )

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const SYSTEM_PROMPT = `You are an expert UX researcher helping to produce a structured page brief for a brand website.
+const PRODUCT_PAGE_PROMPT = `You are an expert UX researcher helping to produce a structured page brief for a brand website.
 
 Your role: Ask clarifying questions to understand the page intent, audience, key message, and primary action. Be conversational and concise. Ask 1–3 questions at a time. When you have enough information to propose a page structure, say "READY" and the user will proceed to the structure phase.
 
@@ -11,6 +11,17 @@ Focus on:
 - What is the key message?
 - Any related pages or navigation context?
 - Tone and style preferences`
+
+const JIO_STORY_PROMPT = `You are an expert editorial researcher helping to produce a structured brief for a Jio Story — editorial content that builds trust and belief through specific, human storytelling. Jio Stories do not sell or convert. They document real impact.
+
+Your role: Ask clarifying questions to understand the story. Be conversational and concise. Ask 1–3 questions at a time. When you have enough to propose a structure, say "READY".
+
+Focus on:
+- Story angle — the specific human moment, initiative, or historical moment
+- India context — which tension or truth from Indian life (connectivity, aspiration, family, celebration)
+- Specific evidence — numbers, places, people, moments that make it believable
+- Jio's role — product, initiative, or decision; mechanism, not hero
+- What makes this story real and grounded (not vague Indian sentiment)`
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,8 +36,18 @@ export async function POST(req: NextRequest) {
     }
 
     const anthropic = new Anthropic({ apiKey })
+    const template = intentData.template || 'product-page'
+    const systemPrompt = template === 'jio-story' ? JIO_STORY_PROMPT : PRODUCT_PAGE_PROMPT
 
-    const context = `Product: ${intentData.product || 'Untitled'}
+    const context =
+      template === 'jio-story'
+        ? `Story title: ${intentData.product || 'Untitled'}
+India context: ${intentData.audience || 'Not specified'}
+Story angle: ${intentData.keyMessage || 'Not specified'}
+Page path: ${intentData.pagePath || 'Not specified'}
+Story details: ${intentData.intent || 'Not specified'}
+${intentData.briefContent ? `Additional context: ${intentData.briefContent}` : ''}`
+        : `Product: ${intentData.product || 'Untitled'}
 Type: ${intentData.pageType || 'other'}
 Audience: ${intentData.audience || 'Not specified'}
 Primary action: ${intentData.primaryAction || 'Not specified'}
@@ -53,7 +74,7 @@ ${intentData.briefContent ? `Additional context: ${intentData.briefContent}` : '
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
     })
 

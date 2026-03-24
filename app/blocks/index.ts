@@ -14,7 +14,8 @@ export { CardGridBlock } from './CardGridBlock/CardGridBlock'
 export { CarouselBlock } from './CarouselBlock'
 export { ProofPointsBlock } from './ProofPointsBlock'
 export { IconGridBlock } from './IconGridBlock/IconGridBlock'
-export { ListBlock } from './ListBlock/ListBlock'
+export { MediaTextAsymmetricBlock } from './MediaTextAsymmetricBlock/MediaTextAsymmetricBlock'
+export type { MediaTextAsymmetricBlockProps } from './MediaTextAsymmetricBlock/MediaTextAsymmetricBlock.types'
 export { WidthCap } from './WidthCap'
 export type { ContentWidth } from './WidthCap'
 export { SPACING_VAR } from './WidthCap'
@@ -30,7 +31,7 @@ export const BLOCK_REGISTRY = {
   carousel: 'CarouselBlock',
   proofPoints: 'ProofPointsBlock',
   iconGrid: 'IconGridBlock',
-  listBlock: 'ListBlock',
+  mediaTextAsymmetric: 'MediaTextAsymmetricBlock',
 } as const
 
 export type BlockType = keyof typeof BLOCK_REGISTRY

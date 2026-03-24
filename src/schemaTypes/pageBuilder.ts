@@ -51,7 +51,7 @@ export const pageBuilderType = defineType({
       },
     }),
     defineArrayMember({
-      type: 'list',
+      type: 'mediaTextAsymmetric',
       components: {
         input: BlockWithAIAssist,
       },

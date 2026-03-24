@@ -20,6 +20,7 @@ import {
 } from '@marcelinodzn/ds-react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
 import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
+import { LAB_TYPOGRAPHY_VARS } from '../../../../lib/typography/block-typography'
 import {
   L1_CONFIG,
   L2_CONFIG,
@@ -31,9 +32,9 @@ import {
 function getNavLinkStyle(transition: string | undefined): React.CSSProperties {
   return {
     color: 'var(--ds-color-text-medium)',
-    fontSize: 'var(--ds-typography-body-xs)',
+    fontSize: LAB_TYPOGRAPHY_VARS.bodyXs,
     lineHeight: 1.5,
-    fontWeight: 'var(--ds-typography-weight-low)',
+    fontWeight: LAB_TYPOGRAPHY_VARS.weightLow,
     fontFamily: 'var(--ds-font-family)',
     ...(transition && { transition }),
     cursor: 'pointer',
@@ -47,16 +48,16 @@ function getNavLinkActiveStyle(base: React.CSSProperties): React.CSSProperties {
   return {
     ...base,
     color: 'var(--ds-color-surface-secondary)',
-    fontWeight: 'var(--ds-typography-weight-medium)',
+    fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
   }
 }
 
 function getNavTextLargeStyle(transition: string | undefined): React.CSSProperties {
   return {
     fontFamily: 'var(--ds-font-family)',
-    fontSize: 'var(--ds-typography-body-xs)',
+    fontSize: LAB_TYPOGRAPHY_VARS.bodyXs,
     lineHeight: 1.5,
-    fontWeight: 'var(--ds-typography-weight-low)',
+    fontWeight: LAB_TYPOGRAPHY_VARS.weightLow,
     color: 'var(--ds-color-text-medium)',
     textDecoration: 'none',
     ...(transition && { transition }),
@@ -66,9 +67,9 @@ function getNavTextLargeStyle(transition: string | undefined): React.CSSProperti
 function getNavTextSmallStyle(transition: string | undefined): React.CSSProperties {
   return {
     fontFamily: 'var(--ds-font-family)',
-    fontSize: 'var(--ds-typography-body-xs)',
+    fontSize: LAB_TYPOGRAPHY_VARS.bodyXs,
     lineHeight: 1.5,
-    fontWeight: 'var(--ds-typography-weight-low)',
+    fontWeight: LAB_TYPOGRAPHY_VARS.weightLow,
     color: 'var(--ds-color-text-medium)',
     textDecoration: 'none',
     ...(transition && { transition }),
@@ -364,7 +365,7 @@ export function LabTopNavBlock() {
                                 style={{
                                   ...navTextLargeStyle,
                                   color: 'var(--ds-color-surface-secondary)',
-                                  fontWeight: 'var(--ds-typography-weight-medium)',
+                                  fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: 'var(--ds-spacing-s)',
@@ -513,7 +514,7 @@ export function LabTopNavBlock() {
                                   : undefined,
                               fontWeight:
                                 businessHoverL3 === l3Item.id
-                                  ? 'var(--ds-typography-weight-medium)'
+                                  ? LAB_TYPOGRAPHY_VARS.weightMedium
                                   : undefined,
                             }}
                           >
@@ -546,7 +547,7 @@ export function LabTopNavBlock() {
                     href="#"
                     style={{
                       ...navTextLargeStyle,
-                      fontWeight: 'var(--ds-typography-weight-medium)',
+                      fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
                       display: 'block',
                       paddingBottom: 'var(--ds-spacing-l)',
                       marginBottom: 0,
@@ -632,7 +633,7 @@ export function LabTopNavBlock() {
                     href="#"
                     style={{
                       ...navTextLargeStyle,
-                      fontWeight: 'var(--ds-typography-weight-medium)',
+                      fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
                       display: 'block',
                       paddingBottom: 'var(--ds-spacing-l)',
                       marginBottom: 0,

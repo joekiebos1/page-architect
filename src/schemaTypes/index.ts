@@ -1,6 +1,7 @@
 import { pageType } from './page'
 import { labBlockPageType } from './labBlockPage'
 import { labOverviewType } from './labOverview'
+import { blockInspirationCatalogueType } from './blockInspirationCatalogue'
 import { pageBuilderType } from './pageBuilder'
 import { labPageBuilderType } from './labPageBuilder'
 import { heroBlock } from './blocks/hero'
@@ -21,7 +22,15 @@ import { editorialBlock } from './blocks/editorialBlock'
 import { labCardGridBlock } from './blocks/labCardGrid'
 import { mediaZoomOutOnScrollBlock } from './blocks/mediaZoomOutOnScroll'
 import { iconGridBlock, iconGridItem } from './blocks/iconGrid'
-import { listBlock, listItem } from './blocks/listBlock'
+import {
+  mediaTextAsymmetricBlock,
+  mediaTextAsymmetricItem,
+  mediaTextAsymmetricParagraph,
+} from './blocks/mediaTextAsymmetricBlock'
+import {
+  labMediaTextAsymmetricParagraphRow,
+  labMediaTextAsymmetricBlock,
+} from './blocks/labMediaTextAsymmetricBlock'
 import {
   mediaText5050Block,
   mediaText5050Item,
@@ -33,6 +42,7 @@ export const schemaTypes = [
   labPageBuilderType,
   labBlockPageType,
   labOverviewType,
+  blockInspirationCatalogueType,
   heroBlock,
   mediaTextStackedBlock,
   cardGridItem,
@@ -53,8 +63,11 @@ export const schemaTypes = [
   mediaZoomOutOnScrollBlock,
   iconGridItem,
   iconGridBlock,
-  listItem,
-  listBlock,
+  mediaTextAsymmetricParagraph,
+  mediaTextAsymmetricItem,
+  labMediaTextAsymmetricParagraphRow,
+  labMediaTextAsymmetricBlock,
+  mediaTextAsymmetricBlock,
   mediaText5050Item,
   mediaText5050Block,
   pageBuilderType,

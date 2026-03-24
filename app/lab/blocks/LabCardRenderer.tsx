@@ -9,9 +9,9 @@ import {
   MediaCard,
   TextOnColourCardGrid,
   TextOnImageCard,
-} from '../../components/blocks/Cards'
+} from '../components/blocks/Cards'
 import type { ImageSlotState } from '../../hooks/useImageStream'
-import type { MediaCardConfig } from '../../components/blocks/Cards'
+import type { MediaCardConfig } from '../components/blocks/Cards'
 
 const CARD_TYPE_MEDIA_BELOW = 'media-description-below'
 const CARD_TYPE_MEDIA_INSIDE = 'media-description-inside'

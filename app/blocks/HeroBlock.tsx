@@ -417,7 +417,7 @@ export function HeroBlock({
     )
   }
 
-  const imageAspect = isStacked ? '2 / 1' : IMAGE_ASPECT_RATIO_SIDE_BY_SIDE
+  const imageAspect = isStacked ? (isMobile ? '4 / 5' : '2 / 1') : IMAGE_ASPECT_RATIO_SIDE_BY_SIDE
   const isTopToBottom = imageAnchor === 'bottom' && !isStacked
 
   const imageWrapperStyle: React.CSSProperties = {

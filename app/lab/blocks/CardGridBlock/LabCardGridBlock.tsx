@@ -12,7 +12,8 @@ import { WidthCap } from '../../../blocks/WidthCap'
 import { BlockReveal } from '../../../blocks/BlockReveal'
 import { LabCardRenderer } from '../LabCardRenderer'
 import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
-import { normalizeHeadingLevel, TYPOGRAPHY } from '../../../../lib/utils/semantic-headline'
+import { normalizeHeadingLevel } from '../../../../lib/utils/semantic-headline'
+import { LAB_TYPOGRAPHY_VARS, labHeadlineBlockTitle } from '../../../../lib/typography/block-typography'
 import type { LabCardItem } from '../LabCardRenderer'
 
 export type LabCardGridBlockProps = {
@@ -59,7 +60,13 @@ export function LabCardGridBlock({
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--ds-spacing-2xl)' }}>
           {title && (
             <WidthCap contentWidth="L">
-              <Headline size="S" weight="high" as={level} align="center" style={{ margin: 0, fontSize: TYPOGRAPHY.h2, whiteSpace: 'pre-line' }}>
+              <Headline
+                size="S"
+                as={level}
+                align="center"
+                {...labHeadlineBlockTitle}
+                style={{ margin: 0, fontSize: LAB_TYPOGRAPHY_VARS.h2, whiteSpace: 'pre-line' }}
+              >
                 {title}
               </Headline>
             </WidthCap>

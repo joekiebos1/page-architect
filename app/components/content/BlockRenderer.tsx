@@ -6,7 +6,7 @@ import {
   CarouselBlock,
   ProofPointsBlock,
   IconGridBlock,
-  ListBlock,
+  MediaTextAsymmetricBlock,
   BlockShell,
 } from '../../blocks'
 import type { BlockPattern } from '../../blocks/BlockShell'
@@ -53,7 +53,7 @@ function derivePattern(block: Block): BlockPattern {
   }
   const emphasis = (block.emphasis as string)?.toLowerCase?.()
   const hasBand = emphasis && !['ghost', 'none'].includes(emphasis)
-  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'cardGrid', 'proofPoints', 'iconGrid', 'list']
+  const bandTypes = ['hero', 'mediaTextStacked', 'mediaTextBlock', 'mediaText5050', 'carousel', 'cardGrid', 'proofPoints', 'iconGrid', 'mediaTextAsymmetric']
   if (hasBand && bandTypes.includes(block._type)) {
     return 'band'
   }
@@ -373,8 +373,8 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
             )
           }
             break
-          case 'list': {
-            const listItems = Array.isArray(block.items)
+          case 'mediaTextAsymmetric': {
+            const asymmetricItems = Array.isArray(block.items)
               ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map((i) => ({
                   title: i.title as string | undefined,
                   body: i.body as string | undefined,
@@ -383,12 +383,21 @@ export function BlockRenderer({ blocks, images }: BlockRendererProps) {
                   subtitle: i.subtitle as string | undefined,
                 }))
               : []
+            const longFormParagraphsRaw = block.longFormParagraphs
+            const longFormParagraphs = Array.isArray(longFormParagraphsRaw)
+              ? longFormParagraphsRaw.map((p: { _key?: string; text?: string; bodyTypography?: string }) => ({
+                  _key: p._key,
+                  text: p.text,
+                  bodyTypography: p.bodyTypography === 'large' ? ('large' as const) : ('regular' as const),
+                }))
+              : []
             content = (
-              <ListBlock
+              <MediaTextAsymmetricBlock
                 key={block._key || block._type}
                 blockTitle={block.blockTitle as string}
-                listVariant={(block.listVariant as 'textList' | 'faq' | 'links') ?? 'textList'}
-                items={listItems}
+                variant={(block.variant as 'textList' | 'faq' | 'links' | 'longForm') ?? 'textList'}
+                longFormParagraphs={longFormParagraphs}
+                items={asymmetricItems}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}

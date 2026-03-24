@@ -1,6 +1,6 @@
 # Layout Rules
 
-How blocks are laid out. Surface (emphasis, surfaceColour) is in [surface-rules.md](./surface-rules.md).
+How blocks are laid out. Surface (emphasis, surfaceColour) is in [surface-rules.md](./surface-rules.md). Typography role names and DS mapping are in [typography-roles.md](./typography-roles.md).
 
 **Principle:** Responsibilities are mutually exclusive. Each concern has exactly one owner. No overlap.
 
@@ -84,7 +84,7 @@ pattern =
 ```
 
 Band types: hero, mediaTextStacked, mediaTextBlock, mediaText5050, carousel,
-cardGrid, proofPoints, iconGrid, list.
+cardGrid, proofPoints, iconGrid, mediaTextAsymmetric.
 
 ---
 

@@ -8,6 +8,7 @@
  */
 
 import Link from 'next/link'
+import { LAB_TYPOGRAPHY_VARS } from '../../../lib/typography/block-typography'
 import { LabBlockRenderer, getBlockLayoutTitle } from '../LabBlockRenderer'
 
 type LabBlockDetailClientProps = {
@@ -27,7 +28,7 @@ export function LabBlockDetailClient({ title, blocks }: LabBlockDetailClientProp
         <Link
           href="/lab"
           style={{
-            fontSize: 'var(--ds-typography-body-xs)',
+            fontSize: LAB_TYPOGRAPHY_VARS.bodyXs,
             color: 'var(--ds-color-text-low)',
             textDecoration: 'none',
             marginBottom: 'var(--ds-spacing-m)',
@@ -38,8 +39,8 @@ export function LabBlockDetailClient({ title, blocks }: LabBlockDetailClientProp
         </Link>
         <h1
           style={{
-            fontSize: 'var(--ds-typography-h2)',
-            fontWeight: 'var(--ds-typography-weight-high)',
+            fontSize: LAB_TYPOGRAPHY_VARS.h2,
+            fontWeight: LAB_TYPOGRAPHY_VARS.weightHigh,
             marginBottom: 'var(--ds-spacing-m)',
           }}
         >
@@ -47,7 +48,7 @@ export function LabBlockDetailClient({ title, blocks }: LabBlockDetailClientProp
         </h1>
         <p
           style={{
-            fontSize: 'var(--ds-typography-body-m)',
+            fontSize: LAB_TYPOGRAPHY_VARS.bodyM,
             color: 'var(--ds-color-text-low)',
             margin: 0,
           }}

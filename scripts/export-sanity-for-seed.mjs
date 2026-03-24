@@ -53,7 +53,7 @@ async function exportForSeed() {
   output.labBlockPages = labBlockPages ?? []
   console.log(`  labBlockPages: ${output.labBlockPages.length}`)
 
-  // Lab overview (sections with list items for merge)
+  // Lab overview (asymmetric nav block items for merge)
   const labOverview = await client.fetch(
     `*[_type == "labOverview"][0]{
       _id,
@@ -62,11 +62,20 @@ async function exportForSeed() {
         _type,
         _key,
         blockTitle,
-        listVariant,
+        variant,
         emphasis,
         surfaceColour,
         spacingTop,
         spacingBottom,
+        paragraphRows[]{
+          _type,
+          _key,
+          title,
+          body,
+          bodyTypography,
+          linkText,
+          linkUrl
+        },
         items[]{
           _type,
           _key,

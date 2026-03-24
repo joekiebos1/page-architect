@@ -6,12 +6,13 @@
  * Column count (3–6) derived from item count; responsive on smaller screens.
  */
 
-import { Headline, Text, Icon } from '@marcelinodzn/ds-react'
+import { Text, Icon } from '@marcelinodzn/ds-react'
 import { Grid, useCell } from '../../../components/blocks/Grid'
 import { useGridBreakpoint } from '../../../../lib/utils/use-grid-breakpoint'
 import { getPrimaryColor } from '../../../../lib/colors/jio-colors'
 import { getIconGridIcon } from './icon-grid-icons'
 import type { IconGridItem, IconGridAccentColor, IconGridBlockProps } from './IconGridBlock.types'
+import { labTextBody, labTextSubtitle } from '../../../../lib/typography/block-typography'
 
 const ACCENT_COLOR_MAP: Record<IconGridAccentColor, string> = {
   primary: 'var(--ds-color-block-background-bold)',
@@ -84,32 +85,11 @@ function IconGridCard({ item }: { item: IconGridItem }) {
           attention="on-contrasting"
         />
       </div>
-      <Headline
-        size="XS"
-        weight="low"
-        as="h3"
-        align="center"
-        style={{
-          margin: 0,
-          fontSize: 'var(--ds-typography-label-m)',
-          color: 'var(--ds-color-text-high)',
-          whiteSpace: 'pre-line',
-        }}
-      >
+      <Text as="h3" align="center" {...labTextSubtitle} style={{ margin: 0, whiteSpace: 'pre-line' }}>
         {item.title}
-      </Headline>
+      </Text>
       {item.body && (
-        <Text
-          size="S"
-          weight="low"
-          color="low"
-          as="p"
-          align="center"
-          style={{
-            margin: 0,
-            whiteSpace: 'pre-line',
-          }}
-        >
+        <Text as="p" align="center" {...labTextBody} style={{ margin: 0, whiteSpace: 'pre-line' }}>
           {item.body}
         </Text>
       )}

@@ -20,8 +20,13 @@ import { VideoWithControls } from '../../../components/blocks/VideoWithControls'
 import { StreamImage } from '../../../components/blocks/StreamImage'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../../../lib/utils/block-surface'
 import { EDGE_TO_EDGE_BREAKOUT } from '../../../../lib/utils/edge-to-edge'
-import { MEDIA_TEXT_SUBTITLE_BODY_STYLE, TYPOGRAPHY } from '../../../../lib/utils/semantic-headline'
 import type { MediaText5050BlockProps, MediaText5050Item } from '../../../blocks/MediaText5050Block/MediaText5050Block.types'
+import {
+  LAB_TYPOGRAPHY_VARS,
+  labHeadlineBlockTitle,
+  labHeadlineBlockTitleAlt,
+  labTextBody,
+} from '../../../../lib/typography/block-typography'
 
 const ASPECT_RATIOS: Record<string, string> = {
   '5:4': '5 / 4',
@@ -88,12 +93,13 @@ function AccordionItem({
                 {item.subtitle && (
                   <Headline
                     size="S"
-                    weight="high"
                     as="h3"
+                    {...labHeadlineBlockTitleAlt}
                     style={{
                       margin: 0,
                       width: '100%',
-                      ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
+                      fontSize: LAB_TYPOGRAPHY_VARS.h5,
+                      lineHeight: 1.4,
                       whiteSpace: 'pre-line',
                     }}
                   >
@@ -139,13 +145,7 @@ function AccordionItem({
           }}
         >
           {item.body && (
-            <Text
-              size="S"
-              weight="low"
-              color="medium"
-              as="p"
-              style={{ margin: 0, whiteSpace: 'pre-line', ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.body }}
-            >
+            <Text as="p" {...labTextBody} style={{ margin: 0, whiteSpace: 'pre-line' }}>
               {item.body}
             </Text>
           )}
@@ -183,7 +183,7 @@ export function LabMediaText5050Block({
   const hasMedia = media?.src && media.src.trim() !== ''
   const mediaFirst = imagePosition === 'left'
   const surfaceProps = getSurfaceProviderProps(emphasis)
-  const { columns, isStacked } = useGridBreakpoint()
+  const { isStacked } = useGridBreakpoint()
 
   const aspectRatio = media?.aspectRatio ? ASPECT_RATIOS[media.aspectRatio] : undefined
   const isVideo = media?.type === 'video'
@@ -254,16 +254,18 @@ export function LabMediaText5050Block({
       )
     })()
 
+  /** Consistent padding between text and media for all variants. Same layout, only content differs. */
+  const SIDE_BY_SIDE_PADDING = 'var(--ds-spacing-2xl)'
   const textColumnStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: MEDIA_TEXT_SUBTITLE_BODY_STYLE.gap,
+    gap: 'var(--ds-spacing-m)',
     alignItems: 'flex-start',
     minWidth: 0,
     ...(!isStacked &&
       (mediaFirst
-        ? { paddingLeft: 'var(--ds-spacing-2xl)' }
-        : { paddingRight: 'var(--ds-spacing-2xl)' })),
+        ? { paddingLeft: SIDE_BY_SIDE_PADDING }
+        : { paddingRight: SIDE_BY_SIDE_PADDING })),
   }
 
   const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
@@ -293,19 +295,19 @@ export function LabMediaText5050Block({
 
   /** Variant 1: Paragraphs – 1 item = feature size (larger), 2+ items = editorial size (smaller, stacked). Spacing matches accordion: headline→first item = gap; between items = border + padding. */
   const isFeatureSize = items.length === 1
-  const paragraphItemGap = MEDIA_TEXT_SUBTITLE_BODY_STYLE.gap
+  const paragraphItemGap = 'var(--ds-spacing-m)'
   const headlineToBodyGap = 'var(--ds-spacing-l)'
   const paragraphsContent = (
     <div style={textColumnStyle}>
       {headline && (
         <Headline
           size="M"
-          weight="high"
           as="h2"
+          {...labHeadlineBlockTitle}
           style={{
             margin: 0,
             marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: TYPOGRAPHY.h3,
+            fontSize: LAB_TYPOGRAPHY_VARS.h3,
             whiteSpace: 'pre-line',
           }}
         >
@@ -328,11 +330,12 @@ export function LabMediaText5050Block({
           {item.subtitle && (
             <Headline
               size={isFeatureSize ? 'L' : 'S'}
-              weight="high"
               as={isFeatureSize ? 'h2' : 'h3'}
+              {...labHeadlineBlockTitleAlt}
               style={{
                 margin: 0,
-                ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
+                fontSize: LAB_TYPOGRAPHY_VARS.h5,
+                lineHeight: 1.4,
                 whiteSpace: 'pre-line',
               }}
             >
@@ -340,13 +343,7 @@ export function LabMediaText5050Block({
             </Headline>
           )}
           {item.body && (
-            <Text
-              size={isFeatureSize ? 'L' : 'S'}
-              weight="low"
-              color="medium"
-              as="p"
-              style={{ margin: 0, whiteSpace: 'pre-line', ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.body }}
-            >
+            <Text as="p" {...labTextBody} style={{ margin: 0, whiteSpace: 'pre-line' }}>
               {item.body}
             </Text>
           )}
@@ -361,12 +358,12 @@ export function LabMediaText5050Block({
       {headline && (
         <Headline
           size="M"
-          weight="high"
           as="h2"
+          {...labHeadlineBlockTitle}
           style={{
             margin: 0,
             marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: TYPOGRAPHY.h3,
+            fontSize: LAB_TYPOGRAPHY_VARS.h3,
             whiteSpace: 'pre-line',
           }}
         >
@@ -404,14 +401,18 @@ export function LabMediaText5050Block({
 
   const textContent = textContentByVariant[variant]
 
-  /** Two cells: text 6 cols, media 6 cols (12-col); or 4 cols each (8-col). */
-  const halfSpan = columns >= 12 ? 6 : 4
-  const textCellStyle = { gridColumn: `1 / span ${halfSpan}` as const }
-  const mediaCellStyle = { gridColumn: `${halfSpan + 1} / span ${halfSpan}` as const }
-
   const textOnlyCell = useCell('L')
 
-  /** Stacked: WidthCap only. Side-by-side: Grid + two Cells. */
+  /** Inner 50/50 grid – single cell in page grid, inner grid for layout control. Vertically centered. */
+  const innerGridStyle: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: SIDE_BY_SIDE_PADDING,
+    alignItems: 'center',
+    minWidth: 0,
+  }
+
+  /** Stacked: WidthCap only. Side-by-side: Grid + cell + inner 50/50 grid. */
   const stackedContent = !hasMedia ? (
     <Grid as="section">
       <div style={{ ...textOnlyCell, ...textColumnStyle }}>{textContent}</div>
@@ -439,18 +440,22 @@ export function LabMediaText5050Block({
       )}
     </section>
   ) : (
-    <Grid as="section" style={{ alignItems: 'stretch' }}>
-      {mediaFirst ? (
-        <>
-          <div style={{ ...mediaCellStyle, position: 'relative', minWidth: 0, paddingInlineEnd: 'var(--ds-spacing-2xl)' }}>{mediaContent}</div>
-          <div style={{ ...textCellStyle, ...textColumnStyle, alignSelf: 'stretch', justifyContent: 'center' }}>{textContent}</div>
-        </>
-      ) : (
-        <>
-          <div style={{ ...textCellStyle, ...textColumnStyle, alignSelf: 'stretch', justifyContent: 'center' }}>{textContent}</div>
-          <div style={{ ...mediaCellStyle, position: 'relative', minWidth: 0, paddingInlineStart: 'var(--ds-spacing-2xl)' }}>{mediaContent}</div>
-        </>
-      )}
+    <Grid as="section">
+      <div style={{ ...textOnlyCell, minWidth: 0 }}>
+        <div style={innerGridStyle}>
+          {mediaFirst ? (
+            <>
+              <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+              <div style={{ ...textColumnStyle, paddingRight: undefined, paddingLeft: SIDE_BY_SIDE_PADDING, minWidth: 0 }}>{textContent}</div>
+            </>
+          ) : (
+            <>
+              <div style={{ ...textColumnStyle, paddingRight: undefined, paddingLeft: SIDE_BY_SIDE_PADDING, minWidth: 0 }}>{textContent}</div>
+              <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+            </>
+          )}
+        </div>
+      </div>
     </Grid>
   )
 

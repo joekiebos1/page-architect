@@ -10,6 +10,8 @@ const BLOCK_DESCRIPTIONS: Record<string, string> = {
   cardGrid: 'Card grid: columns, title, items (cardStyle, title, description, image, ctaText, ctaLink, backgroundColor)',
   carousel: 'Carousel: cardSize (compact|medium|large), emphasis, title, items (title, description, image, link, ctaText, aspectRatio)',
   proofPoints: 'Proof points: title, items (title, description, icon)',
+  mediaTextAsymmetric:
+    'Media + Text Asymmetric: blockTitle, variant (textList|faq|links|longForm), items or longFormParagraphs, emphasis, surfaceColour',
 }
 
 const SYSTEM_PROMPT = `You are an expert content strategist helping to configure a block on a brand website. You see the current block state and help the user refine it.
