@@ -1,18 +1,25 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties } from 'react'
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type TransitionEvent,
+} from 'react'
 import Image from 'next/image'
 import {
   Headline,
   Text,
   Icon,
-  Button,
   IcChevronDown,
   IcChevronUp,
   SurfaceProvider,
 } from '@marcelinodzn/ds-react'
 import { createTransition } from '@marcelinodzn/ds-tokens'
-import { Collapsible } from '@base-ui/react/collapsible'
 import { Grid, useCell } from '../../components/blocks/Grid'
 import { WidthCap, type ContentWidth } from '../WidthCap'
 import { useGridBreakpoint } from '../../../lib/utils/use-grid-breakpoint'
@@ -20,6 +27,7 @@ import { VideoWithControls } from '../../components/blocks/VideoWithControls'
 import { StreamImage } from '../../components/blocks/StreamImage'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../../lib/utils/block-surface'
 import { EDGE_TO_EDGE_BREAKOUT } from '../../../lib/utils/edge-to-edge'
+import { useCarouselReveal } from '../../../lib/utils/use-carousel-reveal'
 import type {
   MediaText5050AccordionRow,
   MediaText5050BlockProps,
@@ -39,12 +47,17 @@ import {
   labBlockFramingToContentGap,
 } from '../../../lib/lab/lab-block-framing-typography'
 import { hasLabBlockFraming } from '../../../lib/lab/has-lab-block-framing'
+import accordionStyles from './MediaText5050Accordion.module.css'
 
 const ASPECT_RATIOS: Record<string, string> = {
   '5:4': '5 / 4',
   '1:1': '1 / 1',
   '4:5': '4 / 5',
-};
+}
+
+function mediaKey(m: MediaText5050Media | undefined): string {
+  return m?.src ? `${m.type}:${m.src}` : ''
+}
 
 function AccordionItem({
   item,
@@ -55,6 +68,7 @@ function AccordionItem({
   titleContentWidth,
   bodyContentWidth,
   widthCapSideStyle,
+  rowRevealStyle,
 }: {
   item: MediaText5050Item
   isLast: boolean
@@ -64,117 +78,278 @@ function AccordionItem({
   titleContentWidth: ContentWidth
   bodyContentWidth: ContentWidth
   widthCapSideStyle?: CSSProperties
+  rowRevealStyle?: CSSProperties
 }) {
+  const panelId = useId()
+  const headerId = useId()
   const motionLevel = prefersReducedMotion ? 'subtle' : 'moderate'
-  const panelTransition = prefersReducedMotion ? undefined : createTransition('height', 'l', 'transition', motionLevel)
+  /** Standard accordion motion: animate row track; content moves with the clip (no Base UI). */
+  const panelRowTransition = prefersReducedMotion
+    ? undefined
+    : createTransition('grid-template-rows', 'l', 'transition', motionLevel)
+
   return (
-    <Collapsible.Root open={open} onOpenChange={onOpenChange}>
-      <div
-        style={{
-          borderBottom: isLast ? undefined : '1px solid var(--ds-color-border-subtle)',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          width: '100%',
-        }}
-      >
+    <div
+      style={{
+        borderBottom: isLast ? undefined : '1px solid var(--ds-color-border-subtle)',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+        width: '100%',
+      }}
+    >
+      <div style={rowRevealStyle}>
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
-            gap: 'var(--ds-spacing-m)',
             padding: 'var(--ds-spacing-m) 0',
             minHeight: 'var(--ds-spacing-2xl)',
+            width: '100%',
           }}
         >
           <WidthCap
             contentWidth={titleContentWidth}
-            style={{ flex: 1, minWidth: 0, width: '100%', ...widthCapSideStyle }}
+            style={{ width: '100%', ...widthCapSideStyle }}
           >
-            <Collapsible.Trigger
-              render={(props) => (
-                <button
-                  type="button"
-                  {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-                  style={{
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    minWidth: 0,
-                    width: '100%',
-                    border: 'none',
-                    background: 'none',
-                    padding: 0,
-                    fontFamily: 'inherit',
-                    textAlign: 'left',
-                  }}
-                >
-                  {item.subtitle && (
-                    <Headline
-                      size="S"
-                      as="h3"
-                      {...labHeadlinePresets.blockAlt}
-                      style={{
-                        margin: 0,
-                        width: '100%',
-                        whiteSpace: 'pre-line',
-                        ...labStyleHeadlineAltDefault,
-                      }}
-                    >
-                      {item.subtitle}
-                    </Headline>
-                  )}
-                </button>
-              )}
-            />
+            <button
+              type="button"
+              id={headerId}
+              className={accordionStyles.trigger}
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={() => onOpenChange(!open)}
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--ds-spacing-m)',
+                width: '100%',
+                border: 'none',
+                background: 'none',
+                padding: 0,
+                fontFamily: 'inherit',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ flex: 1, minWidth: 0 }}>
+                {item.subtitle ? (
+                  <Headline
+                    size="S"
+                    as="span"
+                    {...labHeadlinePresets.blockAlt}
+                    style={{
+                      margin: 0,
+                      display: 'block',
+                      width: '100%',
+                      whiteSpace: 'pre-line',
+                      ...labStyleHeadlineAltDefault,
+                    }}
+                  >
+                    {item.subtitle}
+                  </Headline>
+                ) : null}
+              </span>
+              <Icon
+                asset={open ? <IcChevronUp /> : <IcChevronDown />}
+                size="L"
+                appearance="secondary"
+              />
+            </button>
           </WidthCap>
-          <Collapsible.Trigger
-            render={(props, state) => {
-              const { onClick, ...rest } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
-              return (
-                <Button
-                  single
-                  appearance="auto"
-                  contained={false}
-                  attention="high"
-                  size="M"
-                  aria-label={state?.open ? 'Collapse' : 'Expand'}
-                  {...rest}
-                  onPress={(e: unknown) =>
-                    onClick?.(e as React.MouseEvent<HTMLButtonElement>)
-                  }
-                  content={
-                    <Icon
-                      asset={state?.open ? <IcChevronUp /> : <IcChevronDown />}
-                      size="S"
-                      appearance="secondary"
-                    />
-                  }
-                />
-              )
-            }}
+        </div>
+      </div>
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={headerId}
+        style={{
+          display: 'grid',
+          gridTemplateRows: open ? '1fr' : '0fr',
+          transition: panelRowTransition,
+        }}
+      >
+        <div style={{ minHeight: 0, overflow: 'hidden' }}>
+          <div style={{ paddingBottom: 'var(--ds-spacing-m)' }}>
+            {item.body ? (
+              <WidthCap contentWidth={bodyContentWidth} style={widthCapSideStyle}>
+                <Text as="p" {...labTextPresets.body} style={{ margin: 0, whiteSpace: 'pre-line' }}>
+                  {item.body}
+                </Text>
+              </WidthCap>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type MediaText5050CrossfadeMediaProps = {
+  displayMedia: MediaText5050Media | undefined
+  aspectRatio: string | undefined
+  prefersReducedMotion: boolean
+  useStreamImage: boolean
+  imageSlot: string | null | undefined
+  imageState: MediaText5050BlockProps['imageState']
+}
+
+type CrossfadeSlot = 0 | 1
+
+/**
+ * Cross-fades between accordion panel media when `src` changes; instant swap when reduced motion.
+ */
+function MediaText5050CrossfadeMedia({
+  displayMedia,
+  aspectRatio,
+  prefersReducedMotion,
+  useStreamImage,
+  imageSlot,
+  imageState,
+}: MediaText5050CrossfadeMediaProps) {
+  const motionLevel = prefersReducedMotion ? 'subtle' : 'moderate'
+  const fadeTransition = prefersReducedMotion ? undefined : createTransition('opacity', 'l', 'transition', motionLevel)
+
+  const prevKeyRef = useRef(mediaKey(displayMedia))
+  const activeSlotRef = useRef<CrossfadeSlot>(0)
+  const pendingIncomingRef = useRef<CrossfadeSlot | null>(null)
+
+  const [slotMedia, setSlotMedia] = useState<
+    [MediaText5050Media | undefined, MediaText5050Media | undefined]
+  >([displayMedia, undefined])
+  const [slotOpacity, setSlotOpacity] = useState<[number, number]>([1, 0])
+
+  useLayoutEffect(() => {
+    const nextKey = mediaKey(displayMedia)
+    if (nextKey === prevKeyRef.current) return
+    prevKeyRef.current = nextKey
+
+    if (!displayMedia?.src) {
+      pendingIncomingRef.current = null
+      setSlotMedia([undefined, undefined])
+      setSlotOpacity([1, 0])
+      activeSlotRef.current = 0
+      return
+    }
+
+    if (prefersReducedMotion) {
+      pendingIncomingRef.current = null
+      setSlotMedia([displayMedia, undefined])
+      setSlotOpacity([1, 0])
+      activeSlotRef.current = 0
+      return
+    }
+
+    const idle: CrossfadeSlot = activeSlotRef.current
+    const incoming: CrossfadeSlot = idle === 0 ? 1 : 0
+    pendingIncomingRef.current = incoming
+
+    setSlotMedia((sm) => {
+      const next: [MediaText5050Media | undefined, MediaText5050Media | undefined] = [...sm]
+      next[incoming] = displayMedia
+      return next
+    })
+    setSlotOpacity((op) => {
+      const next: [number, number] = [...op]
+      next[incoming] = 0
+      next[idle] = 1
+      return next
+    })
+
+    requestAnimationFrame(() => {
+      setSlotOpacity((op) => {
+        const next: [number, number] = [...op]
+        next[incoming] = 1
+        next[idle] = 0
+        return next
+      })
+    })
+  }, [displayMedia, prefersReducedMotion])
+
+  const onOpacityTransitionEnd = (slot: CrossfadeSlot, e: TransitionEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return
+    if (e.propertyName !== 'opacity') return
+    if (pendingIncomingRef.current !== slot) return
+    pendingIncomingRef.current = null
+    activeSlotRef.current = slot
+    const other: CrossfadeSlot = slot === 0 ? 1 : 0
+    setSlotMedia((sm) => {
+      const next: [MediaText5050Media | undefined, MediaText5050Media | undefined] = [...sm]
+      next[other] = undefined
+      return next
+    })
+    setSlotOpacity(() => {
+      const next: [number, number] = [0, 0]
+      next[slot] = 1
+      return next
+    })
+  }
+
+  const renderSlot = (slot: CrossfadeSlot) => {
+    const m = slotMedia[slot]
+    const opacity = slotOpacity[slot]
+    if (!m?.src) return null
+    const isVideo = m.type === 'video'
+    const boxStyle: CSSProperties = {
+      position: 'absolute',
+      inset: 0,
+      opacity,
+      transition: fadeTransition,
+      borderRadius: 'var(--ds-radius-card-m)',
+      overflow: 'hidden',
+    }
+    if (isVideo) {
+      return (
+        <div
+          key={`${slot}-v-${m.src}`}
+          style={boxStyle}
+          onTransitionEnd={(e) => onOpacityTransitionEnd(slot, e)}
+        >
+          <div style={{ position: 'relative', width: '100%', height: '100%', aspectRatio }}>
+            <VideoWithControls src={m.src} poster={m.poster} prefersReducedMotion={prefersReducedMotion} />
+          </div>
+        </div>
+      )
+    }
+    if (useStreamImage && m.type === 'image' && imageSlot && imageState) {
+      return (
+        <div
+          key={`${slot}-s-${m.src}`}
+          style={boxStyle}
+          onTransitionEnd={(e) => onOpacityTransitionEnd(slot, e)}
+        >
+          <div style={{ position: 'relative', width: '100%', aspectRatio }}>
+            <StreamImage
+              slot={imageSlot}
+              imageState={imageState}
+              aspectRatio={aspectRatio ? aspectRatio.replace(/\s/g, '') : undefined}
+            />
+          </div>
+        </div>
+      )
+    }
+    return (
+      <div
+        key={`${slot}-i-${m.src}`}
+        style={boxStyle}
+        onTransitionEnd={(e) => onOpacityTransitionEnd(slot, e)}
+      >
+        <div style={{ position: 'relative', width: '100%', aspectRatio }}>
+          <Image
+            src={m.src}
+            alt={m.alt ?? ''}
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
-        <Collapsible.Panel
-          keepMounted={!prefersReducedMotion}
-          style={{
-            paddingBottom: 'var(--ds-spacing-m)',
-            overflow: 'hidden',
-            transition: panelTransition,
-          }}
-        >
-          {item.body ? (
-            <WidthCap contentWidth={bodyContentWidth} style={widthCapSideStyle}>
-              <Text as="p" {...labTextPresets.body} style={{ margin: 0, whiteSpace: 'pre-line' }}>
-                {item.body}
-              </Text>
-            </WidthCap>
-          ) : null}
-        </Collapsible.Panel>
       </div>
-    </Collapsible.Root>
+    )
+  }
+
+  return (
+    <div style={{ position: 'relative', width: '100%', aspectRatio }}>
+      {renderSlot(0)}
+      {renderSlot(1)}
+    </div>
   )
 }
 
@@ -200,7 +375,7 @@ export function MediaText5050Block({
   imageState,
 }: MediaText5050BlockProps) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-  /** `null` = all panels closed; media column falls back to first panel’s asset. */
+  /** `null` = all panels closed — media column uses first panel’s asset (index 0). */
   const [accordionOpenIndex, setAccordionOpenIndex] = useState<number | null>(0)
 
   useEffect(() => {
@@ -213,17 +388,19 @@ export function MediaText5050Block({
 
   const accordionRows: MediaText5050AccordionRow[] =
     variant === 'accordion' ? (accordionItems ?? []) : []
+
   const mediaIndexForAccordion =
     variant === 'accordion' && accordionRows.length > 0
       ? accordionOpenIndex !== null && accordionOpenIndex >= 0 && accordionOpenIndex < accordionRows.length
         ? accordionOpenIndex
         : 0
       : 0
+
   const rowMediaForDisplay =
     variant === 'accordion' && accordionRows.length > 0
       ? accordionRows[mediaIndexForAccordion]?.media
       : undefined
-  /** Open row’s media, else legacy block-level media for old `mediaText5050` accordion. */
+
   const displayMedia: MediaText5050Media | undefined =
     variant === 'accordion' ? (rowMediaForDisplay ?? media) : media
 
@@ -238,10 +415,76 @@ export function MediaText5050Block({
     variant === 'paragraphs' &&
     Boolean(imageState && imageSlot && displayMedia?.type === 'image' && displayMedia === media)
 
+  const useSingleParagraphColumn = variant === 'paragraphs' && paragraphColumnLayout === 'single'
+  const paragraphItemGap = 'var(--ds-spacing-m)'
+  const showBlockFraming = hasLabBlockFraming(headline, description, callToActions)
+  const framingTextAlign = blockFramingAlignment === 'center' ? 'center' : 'left'
+  const framingTitleContentWidth: ContentWidth = framingTextAlign === 'center' ? 'M' : 'L'
+  const framingBodyContentWidth: ContentWidth = framingTextAlign === 'center' ? 'XS' : 'L'
+  const framingWidthCapSideStyle: CSSProperties | undefined =
+    framingTextAlign === 'center' ? undefined : { marginInline: 0 as const }
+  const framingStackStyle: CSSProperties = {
+    ...labBlockFramingIntroStackStyle,
+    alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
+    textAlign: framingTextAlign,
+  }
+  const framingTitleStyleMerged: CSSProperties = {
+    ...labBlockFramingTitleStyle(isMobile),
+    textAlign: framingTextAlign,
+  }
+  const framingDescriptionStyleMerged: CSSProperties = {
+    ...labBlockFramingDescriptionStyle,
+    textAlign: framingTextAlign,
+  }
+  const hasFramingBodyBand = Boolean(description) || Boolean(callToActions && callToActions.length > 0)
+
+  const textStaggerCount =
+    variant === 'accordion'
+      ? accordionRows.length
+      : useSingleParagraphColumn
+        ? (singleSubtitle ? 1 : 0) + (singleBody ? 1 : 0)
+        : items.length
+
+  let slot = 0
+  const slotHeadline = showBlockFraming && headline ? slot++ : -1
+  const slotFramingBand = hasFramingBodyBand ? slot++ : -1
+  const slotMedia = hasMedia ? slot++ : -1
+  const textSlotsStart = slot
+  const rawStagger = slot + textStaggerCount
+  const revealN = Math.max(rawStagger, 1)
+  const { ref: revealRef, isVisible, prefersReducedMotion: prReveal } = useCarouselReveal(revealN)
+  const motionLevel = prReveal ? 'subtle' : 'moderate'
+  const entranceTransition = prReveal
+    ? undefined
+    : createTransition(['opacity', 'transform'], 'xl', 'entrance', motionLevel)
+
+  const getRevealStyle = (s: number): CSSProperties => {
+    if (rawStagger < 1 || prReveal) return {}
+    if (s < 0 || s >= rawStagger) return {}
+    return {
+      opacity: isVisible(s) ? 1 : 0,
+      transform: isVisible(s) ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+      transition: entranceTransition,
+    }
+  }
+
   const mediaContent =
     hasMedia &&
     displayMedia &&
     (() => {
+      if (variant === 'accordion' && !prefersReducedMotion) {
+        return (
+          <MediaText5050CrossfadeMedia
+            displayMedia={displayMedia}
+            aspectRatio={aspectRatio}
+            prefersReducedMotion={prefersReducedMotion}
+            useStreamImage={false}
+            imageSlot={imageSlot}
+            imageState={imageState}
+          />
+        )
+      }
+
       if (isVideo) {
         return (
           <div
@@ -303,19 +546,16 @@ export function MediaText5050Block({
       )
     })()
 
-  /** Side-by-side: gutter between columns matches page grid; text inset toward gutter (aligned with production). */
   const INNER_COLUMN_GAP = 'var(--ds-grid-gutter)'
   const TEXT_COLUMN_INSET = 'var(--ds-spacing-3xl)'
-  const textColumnStyle: React.CSSProperties = {
+  const textColumnStyle: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--ds-spacing-m)',
     alignItems: blockFramingAlignment === 'center' ? 'center' : 'flex-start',
     minWidth: 0,
     ...(!isStacked &&
-      (mediaFirst
-        ? { paddingLeft: TEXT_COLUMN_INSET }
-        : { paddingRight: TEXT_COLUMN_INSET })),
+      (mediaFirst ? { paddingLeft: TEXT_COLUMN_INSET } : { paddingRight: TEXT_COLUMN_INSET })),
   }
 
   const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
@@ -326,7 +566,7 @@ export function MediaText5050Block({
       : bgColor
     : undefined
 
-  const blockBgWrapper = (children: React.ReactNode) =>
+  const blockBgWrapper = (children: ReactNode) =>
     background ? (
       <div
         style={{
@@ -343,72 +583,52 @@ export function MediaText5050Block({
       children
     )
 
-  /** Paragraphs · single: flat Sanity fields; · multi: `items` list. */
-  const useSingleParagraphColumn = variant === 'paragraphs' && paragraphColumnLayout === 'single'
-  const paragraphItemGap = 'var(--ds-spacing-m)'
-  const showBlockFraming = hasLabBlockFraming(headline, description, callToActions)
-  const framingTextAlign = blockFramingAlignment === 'center' ? 'center' : 'left'
-  /** Match production MediaTextBlock: centre = M title / XS body; left = L / L (stacked with media). */
-  const framingTitleContentWidth: ContentWidth = framingTextAlign === 'center' ? 'M' : 'L'
-  const framingBodyContentWidth: ContentWidth = framingTextAlign === 'center' ? 'XS' : 'L'
-  const framingWidthCapSideStyle: React.CSSProperties | undefined =
-    framingTextAlign === 'center' ? undefined : { marginInline: 0 as const }
-  const framingStackStyle: React.CSSProperties = {
-    ...labBlockFramingIntroStackStyle,
-    alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
-    textAlign: framingTextAlign,
-  }
-  const framingTitleStyleMerged: React.CSSProperties = {
-    ...labBlockFramingTitleStyle(isMobile),
-    textAlign: framingTextAlign,
-  }
-  const framingDescriptionStyleMerged: React.CSSProperties = {
-    ...labBlockFramingDescriptionStyle,
-    textAlign: framingTextAlign,
-  }
-  const hasFramingBodyBand = Boolean(description) || Boolean(callToActions && callToActions.length > 0)
   const blockFramingIntro = showBlockFraming ? (
     <div style={framingStackStyle}>
       {headline ? (
-        <WidthCap contentWidth={framingTitleContentWidth} style={framingWidthCapSideStyle}>
-          <Headline
-            size="M"
-            as="h2"
-            {...labHeadlinePresets.block}
-            style={{ ...framingTitleStyleMerged, width: '100%' }}
-          >
-            {headline}
-          </Headline>
-        </WidthCap>
+        <div style={getRevealStyle(slotHeadline)}>
+          <WidthCap contentWidth={framingTitleContentWidth} style={framingWidthCapSideStyle}>
+            <Headline
+              size="M"
+              as="h2"
+              {...labHeadlinePresets.block}
+              style={{ ...framingTitleStyleMerged, width: '100%' }}
+            >
+              {headline}
+            </Headline>
+          </WidthCap>
+        </div>
       ) : null}
       {hasFramingBodyBand ? (
-        <WidthCap contentWidth={framingBodyContentWidth} style={framingWidthCapSideStyle}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--ds-spacing-m)',
-              alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
-              width: '100%',
-            }}
-          >
-            {description ? (
-              <Text
-                as="p"
-                {...labTextPresets.framingIntro}
-                size="S"
-                weight="low"
-                style={framingDescriptionStyleMerged}
-              >
-                {description}
-              </Text>
-            ) : null}
-            <LabBlockFramingCallToActions
-              actions={callToActions}
-              align={blockFramingAlignment === 'center' ? 'center' : 'left'}
-            />
-          </div>
-        </WidthCap>
+        <div style={getRevealStyle(slotFramingBand)}>
+          <WidthCap contentWidth={framingBodyContentWidth} style={framingWidthCapSideStyle}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--ds-spacing-m)',
+                alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
+                width: '100%',
+              }}
+            >
+              {description ? (
+                <Text
+                  as="p"
+                  {...labTextPresets.framingIntro}
+                  size="S"
+                  weight="low"
+                  style={framingDescriptionStyleMerged}
+                >
+                  {description}
+                </Text>
+              ) : null}
+              <LabBlockFramingCallToActions
+                actions={callToActions}
+                align={blockFramingAlignment === 'center' ? 'center' : 'left'}
+              />
+            </div>
+          </WidthCap>
+        </div>
       ) : null}
     </div>
   ) : null
@@ -424,28 +644,32 @@ export function MediaText5050Block({
         }}
       >
         {singleSubtitle ? (
-          <WidthCap contentWidth={framingTitleContentWidth} style={framingWidthCapSideStyle}>
-            <Headline
-              size="M"
-              as="h2"
-              {...labHeadlinePresets.blockAlt}
-            style={{
-              margin: 0,
-              width: '100%',
-              whiteSpace: 'pre-line',
-              ...labStyleHeadlineAltProminent,
-            }}
-            >
-              {singleSubtitle}
-            </Headline>
-          </WidthCap>
+          <div style={getRevealStyle(textSlotsStart)}>
+            <WidthCap contentWidth={framingTitleContentWidth} style={framingWidthCapSideStyle}>
+              <Headline
+                size="M"
+                as="h2"
+                {...labHeadlinePresets.blockAlt}
+                style={{
+                  margin: 0,
+                  width: '100%',
+                  whiteSpace: 'pre-line',
+                  ...labStyleHeadlineAltProminent,
+                }}
+              >
+                {singleSubtitle}
+              </Headline>
+            </WidthCap>
+          </div>
         ) : null}
         {singleBody ? (
-          <WidthCap contentWidth={framingBodyContentWidth} style={framingWidthCapSideStyle}>
-            <Text as="p" {...labTextPresets.bodyLead} style={{ margin: 0, whiteSpace: 'pre-line' }}>
-              {singleBody}
-            </Text>
-          </WidthCap>
+          <div style={getRevealStyle(textSlotsStart + (singleSubtitle ? 1 : 0))}>
+            <WidthCap contentWidth={framingBodyContentWidth} style={framingWidthCapSideStyle}>
+              <Text as="p" {...labTextPresets.bodyLead} style={{ margin: 0, whiteSpace: 'pre-line' }}>
+                {singleBody}
+              </Text>
+            </WidthCap>
+          </div>
         ) : null}
       </div>
     </div>
@@ -455,6 +679,7 @@ export function MediaText5050Block({
         <div
           key={i}
           style={{
+            ...getRevealStyle(textSlotsStart + i),
             display: 'flex',
             flexDirection: 'column',
             gap: paragraphItemGap,
@@ -494,7 +719,6 @@ export function MediaText5050Block({
     </div>
   )
 
-  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). */
   const accordionContent = (
     <div style={{ ...textColumnStyle, gap: 0 }}>
       <div
@@ -518,6 +742,7 @@ export function MediaText5050Block({
             titleContentWidth={framingTitleContentWidth}
             bodyContentWidth={framingBodyContentWidth}
             widthCapSideStyle={framingWidthCapSideStyle}
+            rowRevealStyle={getRevealStyle(textSlotsStart + i)}
           />
         ))}
       </div>
@@ -533,8 +758,7 @@ export function MediaText5050Block({
 
   const textOnlyCell = useCell('L')
 
-  /** Inner 50/50 grid – single cell in page grid, inner grid for layout control. Vertically centered. */
-  const innerGridStyle: React.CSSProperties = {
+  const innerGridStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: INNER_COLUMN_GAP,
@@ -542,7 +766,9 @@ export function MediaText5050Block({
     minWidth: 0,
   }
 
-  /** Stacked: WidthCap only. Side-by-side: Grid + cell + inner 50/50 grid. */
+  const mediaWrapStyle: CSSProperties =
+    slotMedia >= 0 ? { ...getRevealStyle(slotMedia), position: 'relative', minWidth: 0 } : { position: 'relative', minWidth: 0 }
+
   const stackedContent = !hasMedia ? (
     <Grid as="section">
       <div style={{ ...textOnlyCell, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
@@ -565,7 +791,7 @@ export function MediaText5050Block({
       {mediaFirst ? (
         <>
           <WidthCap contentWidth="XL">
-            <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+            <div style={mediaWrapStyle}>{mediaContent}</div>
           </WidthCap>
           <WidthCap contentWidth="L">
             <div style={textColumnStyle}>{textContent}</div>
@@ -577,7 +803,7 @@ export function MediaText5050Block({
             <div style={textColumnStyle}>{textContent}</div>
           </WidthCap>
           <WidthCap contentWidth="XL">
-            <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+            <div style={mediaWrapStyle}>{mediaContent}</div>
           </WidthCap>
         </>
       )}
@@ -591,13 +817,13 @@ export function MediaText5050Block({
         <div style={innerGridStyle}>
           {mediaFirst ? (
             <>
-              <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+              <div style={mediaWrapStyle}>{mediaContent}</div>
               <div style={{ ...textColumnStyle, minWidth: 0 }}>{textContent}</div>
             </>
           ) : (
             <>
               <div style={{ ...textColumnStyle, minWidth: 0 }}>{textContent}</div>
-              <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
+              <div style={mediaWrapStyle}>{mediaContent}</div>
             </>
           )}
         </div>
@@ -606,6 +832,10 @@ export function MediaText5050Block({
   )
 
   return blockBgWrapper(
-    <SurfaceProvider {...surfaceProps}>{stackedContent}</SurfaceProvider>
+    <SurfaceProvider {...surfaceProps}>
+      <div ref={revealRef} style={{ width: '100%' }}>
+        {stackedContent}
+      </div>
+    </SurfaceProvider>
   )
 }

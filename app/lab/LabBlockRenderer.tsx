@@ -3,7 +3,7 @@
 import React from 'react'
 /**
  * Lab block renderer – renders blocks from Sanity lab page sections.
- * Uses Lab* blocks from app/lab/blocks. Media + Text 50/50 uses the production component from app/blocks.
+ * Media + Text 50/50 re-exports the production block from app/blocks.
  */
 
 import {
@@ -19,8 +19,8 @@ import {
   LabMediaTextBlock,
   LabProofPointsBlock,
   LabMediaTextAsymmetricBlock,
+  LabMediaText5050Block,
 } from './blocks'
-import { MediaText5050Block } from '../blocks'
 import { Headline, Text } from '@marcelinodzn/ds-react'
 import { mapMediaText5050BlockProps } from '../../lib/blocks/map-media-text-blocks'
 import { labStyleHeadlineVariantRail } from '../../lib/typography/block-typography'
@@ -620,7 +620,7 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
           case 'mediaText5050':
           case 'labMediaText5050': {
             const mapped = mapMediaText5050BlockProps(block)
-            return wrapSection(<MediaText5050Block {...mapped} />, block, i)
+            return wrapSection(<LabMediaText5050Block {...mapped} />, block, i)
           }
           case 'labCardGrid': {
             const cols = block.columns as string

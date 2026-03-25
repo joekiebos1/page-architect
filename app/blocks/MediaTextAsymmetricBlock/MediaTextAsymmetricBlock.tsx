@@ -1,11 +1,14 @@
 'use client'
 
+import { useId, useState, type CSSProperties, type MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Headline, Text, Icon, IcChevronDown, IcChevronUp } from '@marcelinodzn/ds-react'
-import { Collapsible } from '@base-ui/react/collapsible'
+import { createTransition } from '@marcelinodzn/ds-tokens'
+import accordionStyles from '../MediaText5050Block/MediaText5050Accordion.module.css'
 import { Grid, useCell } from '../../components/blocks/Grid'
 import { useGridBreakpoint } from '../../../lib/utils/use-grid-breakpoint'
+import { useCarouselReveal } from '../../../lib/utils/use-carousel-reveal'
 import {
   getHeadlineSize,
   getChildLevel,
@@ -41,17 +44,24 @@ function ParagraphRow({
   itemLevel,
   router,
   openInNewTab,
+  revealStyle,
 }: {
   item: MediaTextAsymmetricTextItem
   itemLevel: HeadingLevel
   router: ReturnType<typeof useRouter>
   openInNewTab?: boolean
+  revealStyle?: CSSProperties
 }) {
   const hasLink = item.linkText && item.linkUrl
   const linkProps = hasLink
     ? openInNewTab
       ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-      : { onClick: (e: React.MouseEvent) => { e.preventDefault(); handleLinkPress(item.linkUrl!, router) } }
+      : {
+          onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+            e.preventDefault()
+            handleLinkPress(item.linkUrl!, router)
+          },
+        }
     : {}
   return (
     <div
@@ -59,6 +69,7 @@ function ParagraphRow({
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--ds-spacing-xs)',
+        ...revealStyle,
       }}
     >
       {item.title && (
@@ -109,11 +120,13 @@ function MergedParagraphRow({
   itemLevel,
   router,
   openLinksInNewTab,
+  revealStyle,
 }: {
   row: MediaTextAsymmetricParagraphRow & { body: string }
   itemLevel: HeadingLevel
   router: ReturnType<typeof useRouter>
   openLinksInNewTab?: boolean
+  revealStyle?: CSSProperties
 }) {
   const bodyTextProps =
     row.bodyTypography === 'large' ? labTextPresets.bodyLead : labTextPresets.body
@@ -121,7 +134,12 @@ function MergedParagraphRow({
   const linkProps = hasLink
     ? openLinksInNewTab
       ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-      : { onClick: (e: React.MouseEvent) => { e.preventDefault(); handleLinkPress(row.linkUrl!, router) } }
+      : {
+          onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+            e.preventDefault()
+            handleLinkPress(row.linkUrl!, router)
+          },
+        }
     : {}
   return (
     <div
@@ -129,6 +147,7 @@ function MergedParagraphRow({
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--ds-spacing-xs)',
+        ...revealStyle,
       }}
     >
       {row.title && String(row.title).trim().length > 0 && (
@@ -199,81 +218,110 @@ function MainColumnImage({
 
 function FaqItem({
   item,
-  itemLevel,
+  itemLevel: _itemLevel,
+  prefersReducedMotion,
+  open,
+  onOpenChange,
+  rowRevealStyle,
 }: {
   item: MediaTextAsymmetricFaqItem
   itemLevel: HeadingLevel
+  prefersReducedMotion: boolean
+  open: boolean
+  onOpenChange: (nextOpen: boolean) => void
+  rowRevealStyle?: CSSProperties
 }) {
+  const panelId = useId()
+  const headerId = useId()
+  const motionLevel = prefersReducedMotion ? 'subtle' : 'moderate'
+  const panelRowTransition = prefersReducedMotion
+    ? undefined
+    : createTransition('grid-template-rows', 'l', 'transition', motionLevel)
+
   return (
-    <Collapsible.Root defaultOpen={false}>
-      <div
-        style={{
-          borderBottom: '1px solid var(--ds-color-border-subtle)',
-        }}
-      >
-        <Collapsible.Trigger
-          render={(props, state) => (
-            <button
-              {...props}
-              type="button"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                gap: 'var(--ds-spacing-m)',
-                padding: 'var(--ds-spacing-m) 0',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontFamily: 'inherit',
-              }}
-            >
-              {item.title && (
-                <Text
-                  as={itemLevel}
-                  {...labTextPresets.subtitle}
-                  style={{
-                    margin: 0,
-                    whiteSpace: 'pre-line',
-                    flex: 1,
-                    fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
-                  }}
-                >
-                  {item.title}
-                </Text>
-              )}
-              <span style={{ display: 'flex', flexShrink: 0 }}>
-                <Icon
-                  asset={state?.open ? <IcChevronUp /> : <IcChevronDown />}
-                  size="L"
-                  appearance="secondary"
-                />
-              </span>
-            </button>
-          )}
-        />
-        <Collapsible.Panel
+    <div
+      style={{
+        borderBottom: '1px solid var(--ds-color-border-subtle)',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+        width: '100%',
+        ...rowRevealStyle,
+      }}
+    >
+      <div style={{ padding: 'var(--ds-spacing-m) 0' }}>
+        <button
+          type="button"
+          id={headerId}
+          className={accordionStyles.trigger}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={() => onOpenChange(!open)}
           style={{
-            paddingBottom: 'var(--ds-spacing-m)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            gap: 'var(--ds-spacing-m)',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+            padding: 0,
           }}
         >
-          {item.body && (
-            <Text
-              as="p"
-              {...labTextPresets.body}
-              style={{
-                margin: 0,
-                whiteSpace: 'pre-line',
-              }}
-            >
-              {item.body}
-            </Text>
-          )}
-        </Collapsible.Panel>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            {item.title && (
+              <Text
+                as="span"
+                {...labTextPresets.subtitle}
+                style={{
+                  margin: 0,
+                  whiteSpace: 'pre-line',
+                  display: 'block',
+                  fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
+                }}
+              >
+                {item.title}
+              </Text>
+            )}
+          </span>
+          <Icon
+            asset={open ? <IcChevronUp /> : <IcChevronDown />}
+            size="L"
+            appearance="secondary"
+          />
+        </button>
       </div>
-    </Collapsible.Root>
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={headerId}
+        style={{
+          display: 'grid',
+          gridTemplateRows: open ? '1fr' : '0fr',
+          transition: panelRowTransition,
+        }}
+      >
+        <div style={{ minHeight: 0, overflow: 'hidden' }}>
+          <div style={{ paddingBottom: 'var(--ds-spacing-m)' }}>
+            {item.body && (
+              <Text
+                as="p"
+                {...labTextPresets.body}
+                style={{
+                  margin: 0,
+                  whiteSpace: 'pre-line',
+                }}
+              >
+                {item.body}
+              </Text>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -281,17 +329,19 @@ function LinksItem({
   item,
   router,
   openInNewTab,
+  revealStyle,
 }: {
   item: MediaTextAsymmetricLinkItem
   router: ReturnType<typeof useRouter>
   openInNewTab?: boolean
+  revealStyle?: CSSProperties
 }) {
   const hasLink = item.subtitle && item.linkUrl
   if (!hasLink) return null
   const linkProps = openInNewTab
     ? { target: '_blank' as const, rel: 'noopener noreferrer' }
     : {
-        onClick: (e: React.MouseEvent) => {
+        onClick: (e: MouseEvent<HTMLAnchorElement>) => {
           e.preventDefault()
           handleLinkPress(item.linkUrl!, router)
         },
@@ -309,6 +359,7 @@ function LinksItem({
         cursor: 'pointer',
         paddingBlock: 'var(--ds-spacing-xs)',
         whiteSpace: 'pre-line',
+        ...revealStyle,
       }}
     >
       {item.subtitle}
@@ -345,6 +396,7 @@ export function MediaTextAsymmetricBlock({
   openLinksInNewTab,
 }: MediaTextAsymmetricBlockProps) {
   const router = useRouter()
+  const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null)
   const blockTitleLevel = normalizeHeadingLevel('h3')
   const itemLevel = getChildLevel(blockTitleLevel)
   const headlineSize = getHeadlineSize(blockTitleLevel)
@@ -364,6 +416,48 @@ export function MediaTextAsymmetricBlock({
   const resolvedAspect: MediaTextAsymmetricImageAspectRatio =
     imageAspectRatio === '5:4' || imageAspectRatio === '1:1' || imageAspectRatio === '4:5' ? imageAspectRatio : '4:5'
   const showTitleColumn = typeof blockTitle === 'string' && blockTitle.trim().length > 0
+
+  const linksForRender: MediaTextAsymmetricLinkItem[] =
+    contentVariant === 'links'
+      ? items_.filter((i): i is MediaTextAsymmetricLinkItem => {
+          if (i == null || !('linkUrl' in i)) return false
+          const li = i as MediaTextAsymmetricLinkItem
+          const sub = typeof li.subtitle === 'string' ? li.subtitle.trim() : ''
+          const url = typeof li.linkUrl === 'string' ? li.linkUrl.trim() : ''
+          return sub.length > 0 && url.length > 0
+        })
+      : []
+
+  let staggerCount = 0
+  if (showTitleColumn) staggerCount++
+  if (isLongForm) staggerCount += longFormParas_.length
+  if (isParagraphs) staggerCount += rows_.length
+  if (isImage && imageSrc) staggerCount++
+  if (contentVariant === 'textList') staggerCount += items_.length
+  if (contentVariant === 'faq') staggerCount += items_.length
+  if (contentVariant === 'links') staggerCount += linksForRender.length
+
+  let slot = 0
+  const titleRevealSlot = showTitleColumn ? slot++ : -1
+  const mainBaseSlot = slot
+
+  const rawStagger = staggerCount
+  const revealN = Math.max(rawStagger, 1)
+  const { ref: revealRef, isVisible, prefersReducedMotion: prReveal } = useCarouselReveal(revealN)
+  const motionLevelScroll = prReveal ? 'subtle' : 'moderate'
+  const entranceTransition = prReveal
+    ? undefined
+    : createTransition(['opacity', 'transform'], 'xl', 'entrance', motionLevelScroll)
+
+  const getRevealStyle = (s: number): CSSProperties => {
+    if (rawStagger < 1 || prReveal) return {}
+    if (s < 0 || s >= rawStagger) return {}
+    return {
+      opacity: isVisible(s) ? 1 : 0,
+      transform: isVisible(s) ? 'translateY(0)' : 'translateY(var(--ds-spacing-xl))',
+      transition: entranceTransition,
+    }
+  }
 
   if (isParagraphs && rows_.length === 0 && !showTitleColumn) return null
   if (isLongForm && longFormParas_.length === 0 && !showTitleColumn) return null
@@ -396,17 +490,18 @@ export function MediaTextAsymmetricBlock({
             : { ...labTextPresets.body, size: 'M' as const, color: 'medium' as const }
         const key = para._key != null && para._key !== '' ? para._key : `lfp-${i}`
         return (
-          <Text
-            key={key}
-            as="p"
-            {...textProps}
-            style={{
-              margin: 0,
-              whiteSpace: 'pre-line',
-            }}
-          >
-            {para.text}
-          </Text>
+          <div key={key} style={getRevealStyle(mainBaseSlot + i)}>
+            <Text
+              as="p"
+              {...textProps}
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-line',
+              }}
+            >
+              {para.text}
+            </Text>
+          </div>
         )
       })}
     </div>
@@ -427,17 +522,20 @@ export function MediaTextAsymmetricBlock({
             itemLevel={itemLevel}
             router={router}
             openLinksInNewTab={openLinksInNewTab}
+            revealStyle={getRevealStyle(mainBaseSlot + i)}
           />
         )
       })}
     </div>
   ) : isImage ? (
     imageSrc ? (
-      <MainColumnImage
-        src={imageSrc}
-        alt={(imageAlt != null && String(imageAlt).trim()) || ''}
-        aspectRatio={resolvedAspect}
-      />
+      <div style={getRevealStyle(mainBaseSlot)}>
+        <MainColumnImage
+          src={imageSrc}
+          alt={(imageAlt != null && String(imageAlt).trim()) || ''}
+          aspectRatio={resolvedAspect}
+        />
+      </div>
     ) : null
   ) : (
     <div
@@ -455,15 +553,30 @@ export function MediaTextAsymmetricBlock({
             itemLevel={itemLevel}
             router={router}
             openInNewTab={openLinksInNewTab}
+            revealStyle={getRevealStyle(mainBaseSlot + i)}
           />
         ))}
       {contentVariant === 'faq' &&
         items_.map((item, i) => (
-          <FaqItem key={i} item={item as MediaTextAsymmetricFaqItem} itemLevel={itemLevel} />
+          <FaqItem
+            key={i}
+            item={item as MediaTextAsymmetricFaqItem}
+            itemLevel={itemLevel}
+            prefersReducedMotion={prReveal}
+            open={faqOpenIndex === i}
+            onOpenChange={(nextOpen) => setFaqOpenIndex(nextOpen ? i : null)}
+            rowRevealStyle={getRevealStyle(mainBaseSlot + i)}
+          />
         ))}
       {contentVariant === 'links' &&
-        items_.map((item, i) => (
-          <LinksItem key={i} item={item as MediaTextAsymmetricLinkItem} router={router} openInNewTab={openLinksInNewTab} />
+        linksForRender.map((item, j) => (
+          <LinksItem
+            key={item.linkUrl != null ? `${item.linkUrl}-${j}` : `link-${j}`}
+            item={item}
+            router={router}
+            openInNewTab={openLinksInNewTab}
+            revealStyle={getRevealStyle(mainBaseSlot + j)}
+          />
         ))}
     </div>
   )
@@ -472,7 +585,7 @@ export function MediaTextAsymmetricBlock({
    * Inner grid — 10 tracks + DS gutter when side-by-side. Title 1–4 (optional);
    * main always 5 / span 6 with or without visible title (aligned with lab).
    */
-  const gridStyle: React.CSSProperties = {
+  const gridStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: isStacked ? '1fr' : 'repeat(10, minmax(0, 1fr))',
     columnGap: !isStacked ? 'var(--ds-grid-gutter)' : 0,
@@ -484,7 +597,7 @@ export function MediaTextAsymmetricBlock({
     boxSizing: 'border-box',
   }
 
-  const titleColumnStyle: React.CSSProperties = {
+  const titleColumnStyle: CSSProperties = {
     minWidth: 0,
     maxWidth: '100%',
     boxSizing: 'border-box',
@@ -493,7 +606,7 @@ export function MediaTextAsymmetricBlock({
       : {}),
   }
 
-  const mainColumnStyle: React.CSSProperties = {
+  const mainColumnStyle: CSSProperties = {
     minWidth: 0,
     maxWidth: '100%',
     boxSizing: 'border-box',
@@ -504,7 +617,7 @@ export function MediaTextAsymmetricBlock({
     ...(!isStacked ? { gridColumn: '5 / span 6' } : {}),
   }
 
-  const cellWrapperStyle: React.CSSProperties = {
+  const cellWrapperStyle: CSSProperties = {
     ...cell,
     minWidth: 0,
     maxWidth: '100%',
@@ -513,9 +626,11 @@ export function MediaTextAsymmetricBlock({
 
   return (
     <Grid as="section">
-      <div style={cellWrapperStyle}>
+      <div ref={revealRef} style={cellWrapperStyle}>
         <div style={gridStyle}>
-          {showTitleColumn && <div style={titleColumnStyle}>{titleContent}</div>}
+          {showTitleColumn && (
+            <div style={{ ...titleColumnStyle, ...getRevealStyle(titleRevealSlot) }}>{titleContent}</div>
+          )}
           <div style={mainColumnStyle}>{mainColumnContent}</div>
         </div>
       </div>
