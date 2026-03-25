@@ -23,10 +23,20 @@ import { EDGE_TO_EDGE_BREAKOUT } from '../../../../lib/utils/edge-to-edge'
 import type { MediaText5050BlockProps, MediaText5050Item } from '../../../blocks/MediaText5050Block/MediaText5050Block.types'
 import {
   LAB_TYPOGRAPHY_VARS,
-  labHeadlineBlockTitle,
   labHeadlineBlockTitleAlt,
   labTextBody,
+  labTextBodyLead,
 } from '../../../../lib/typography/block-typography'
+import { LabBlockFramingCallToActions } from '../../components/LabBlockFramingCallToActions'
+import {
+  labBlockFramingDescriptionStyle,
+  labBlockFramingDescriptionTextProps,
+  labBlockFramingHeadlineProps,
+  labBlockFramingIntroStackStyle,
+  labBlockFramingTitleStyle,
+  labBlockFramingToContentGap,
+} from '../../../../lib/lab/lab-block-framing-typography'
+import { hasLabBlockFraming } from '../../../../lib/lab/has-lab-block-framing'
 
 const ASPECT_RATIOS: Record<string, string> = {
   '5:4': '5 / 4',
@@ -101,6 +111,7 @@ function AccordionItem({
                       fontSize: LAB_TYPOGRAPHY_VARS.h5,
                       lineHeight: 1.4,
                       whiteSpace: 'pre-line',
+                      fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
                     }}
                   >
                     {item.subtitle}
@@ -157,6 +168,7 @@ function AccordionItem({
 
 export function LabMediaText5050Block({
   variant,
+  paragraphColumnLayout,
   imagePosition = 'right',
   emphasis,
   minimalBackgroundStyle,
@@ -164,6 +176,9 @@ export function LabMediaText5050Block({
   spacingTop: _spacingTop,
   spacingBottom: _spacingBottom,
   headline,
+  description,
+  callToActions,
+  blockFramingAlignment = 'left',
   items = [],
   media,
   imageSlot,
@@ -183,7 +198,7 @@ export function LabMediaText5050Block({
   const hasMedia = media?.src && media.src.trim() !== ''
   const mediaFirst = imagePosition === 'left'
   const surfaceProps = getSurfaceProviderProps(emphasis)
-  const { isStacked } = useGridBreakpoint()
+  const { isStacked, isMobile } = useGridBreakpoint()
 
   const aspectRatio = media?.aspectRatio ? ASPECT_RATIOS[media.aspectRatio] : undefined
   const isVideo = media?.type === 'video'
@@ -254,8 +269,9 @@ export function LabMediaText5050Block({
       )
     })()
 
-  /** Consistent padding between text and media for all variants. Same layout, only content differs. */
-  const SIDE_BY_SIDE_PADDING = 'var(--ds-spacing-2xl)'
+  /** Side-by-side: gutter between columns matches page grid; text inset toward gutter (aligned with production). */
+  const INNER_COLUMN_GAP = 'var(--ds-grid-gutter)'
+  const TEXT_COLUMN_INSET = 'var(--ds-spacing-3xl)'
   const textColumnStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -264,8 +280,8 @@ export function LabMediaText5050Block({
     minWidth: 0,
     ...(!isStacked &&
       (mediaFirst
-        ? { paddingLeft: SIDE_BY_SIDE_PADDING }
-        : { paddingRight: SIDE_BY_SIDE_PADDING })),
+        ? { paddingLeft: TEXT_COLUMN_INSET }
+        : { paddingRight: TEXT_COLUMN_INSET })),
   }
 
   const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
@@ -293,27 +309,52 @@ export function LabMediaText5050Block({
       children
     )
 
-  /** Variant 1: Paragraphs – 1 item = feature size (larger), 2+ items = editorial size (smaller, stacked). Spacing matches accordion: headline→first item = gap; between items = border + padding. */
-  const isFeatureSize = items.length === 1
+  /** Paragraphs: single layout = larger type (size only, same weight as multi). */
+  const useSingleParagraphColumn =
+    variant === 'paragraphs' &&
+    (paragraphColumnLayout === 'single' ||
+      (paragraphColumnLayout == null && items.length === 1))
   const paragraphItemGap = 'var(--ds-spacing-m)'
-  const headlineToBodyGap = 'var(--ds-spacing-l)'
-  const paragraphsContent = (
-    <div style={textColumnStyle}>
+  const showBlockFraming = hasLabBlockFraming(headline, description, callToActions)
+  const framingTextAlign = blockFramingAlignment === 'center' ? 'center' : 'left'
+  const framingStackStyle: React.CSSProperties = {
+    ...labBlockFramingIntroStackStyle,
+    alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
+    textAlign: framingTextAlign,
+  }
+  const framingTitleStyleMerged: React.CSSProperties = {
+    ...labBlockFramingTitleStyle(isMobile),
+    textAlign: framingTextAlign,
+  }
+  const framingDescriptionStyleMerged: React.CSSProperties = {
+    ...labBlockFramingDescriptionStyle,
+    textAlign: framingTextAlign,
+  }
+  const blockFramingIntro = showBlockFraming ? (
+    <div style={framingStackStyle}>
       {headline && (
-        <Headline
-          size="M"
-          as="h2"
-          {...labHeadlineBlockTitle}
-          style={{
-            margin: 0,
-            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: LAB_TYPOGRAPHY_VARS.h3,
-            whiteSpace: 'pre-line',
-          }}
-        >
+        <Headline size="M" as="h2" {...labBlockFramingHeadlineProps} style={framingTitleStyleMerged}>
           {headline}
         </Headline>
       )}
+      {description && (
+        <Text
+          as="p"
+          {...labBlockFramingDescriptionTextProps}
+          style={framingDescriptionStyleMerged}
+        >
+          {description}
+        </Text>
+      )}
+      <LabBlockFramingCallToActions
+        actions={callToActions}
+        align={blockFramingAlignment === 'center' ? 'center' : 'left'}
+      />
+    </div>
+  ) : null
+
+  const paragraphsContent = (
+    <div style={textColumnStyle}>
       {items.map((item, i) => (
         <div
           key={i}
@@ -329,21 +370,26 @@ export function LabMediaText5050Block({
         >
           {item.subtitle && (
             <Headline
-              size={isFeatureSize ? 'L' : 'S'}
-              as={isFeatureSize ? 'h2' : 'h3'}
+              size="M"
+              as={useSingleParagraphColumn ? 'h2' : 'h3'}
               {...labHeadlineBlockTitleAlt}
               style={{
                 margin: 0,
-                fontSize: LAB_TYPOGRAPHY_VARS.h5,
+                fontSize: useSingleParagraphColumn ? LAB_TYPOGRAPHY_VARS.h4 : LAB_TYPOGRAPHY_VARS.h5,
                 lineHeight: 1.4,
                 whiteSpace: 'pre-line',
+                fontWeight: LAB_TYPOGRAPHY_VARS.weightMedium,
               }}
             >
               {item.subtitle}
             </Headline>
           )}
           {item.body && (
-            <Text as="p" {...labTextBody} style={{ margin: 0, whiteSpace: 'pre-line' }}>
+            <Text
+              as="p"
+              {...(useSingleParagraphColumn ? labTextBodyLead : labTextBody)}
+              style={{ margin: 0, whiteSpace: 'pre-line' }}
+            >
               {item.body}
             </Text>
           )}
@@ -352,24 +398,9 @@ export function LabMediaText5050Block({
     </div>
   )
 
-  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). Same text container structure as paragraphs. */
+  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). */
   const accordionContent = (
     <div style={{ ...textColumnStyle, gap: 0 }}>
-      {headline && (
-        <Headline
-          size="M"
-          as="h2"
-          {...labHeadlineBlockTitle}
-          style={{
-            margin: 0,
-            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: LAB_TYPOGRAPHY_VARS.h3,
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {headline}
-        </Headline>
-      )}
       <div
         style={{
           display: 'flex',
@@ -407,7 +438,7 @@ export function LabMediaText5050Block({
   const innerGridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: SIDE_BY_SIDE_PADDING,
+    gap: INNER_COLUMN_GAP,
     alignItems: 'center',
     minWidth: 0,
   }
@@ -415,10 +446,20 @@ export function LabMediaText5050Block({
   /** Stacked: WidthCap only. Side-by-side: Grid + cell + inner 50/50 grid. */
   const stackedContent = !hasMedia ? (
     <Grid as="section">
-      <div style={{ ...textOnlyCell, ...textColumnStyle }}>{textContent}</div>
+      <div style={{ ...textOnlyCell, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+        {blockFramingIntro != null ? (
+          <div style={{ marginBottom: labBlockFramingToContentGap, width: '100%' }}>{blockFramingIntro}</div>
+        ) : null}
+        {textContent}
+      </div>
     </Grid>
   ) : isStacked ? (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-3xl)' }}>
+      {blockFramingIntro != null ? (
+        <WidthCap contentWidth="L">
+          <div style={{ width: '100%' }}>{blockFramingIntro}</div>
+        </WidthCap>
+      ) : null}
       {mediaFirst ? (
         <>
           <WidthCap contentWidth="XL">
@@ -442,15 +483,18 @@ export function LabMediaText5050Block({
   ) : (
     <Grid as="section">
       <div style={{ ...textOnlyCell, minWidth: 0 }}>
+        {blockFramingIntro != null ? (
+          <div style={{ marginBottom: labBlockFramingToContentGap, width: '100%' }}>{blockFramingIntro}</div>
+        ) : null}
         <div style={innerGridStyle}>
           {mediaFirst ? (
             <>
               <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
-              <div style={{ ...textColumnStyle, paddingRight: undefined, paddingLeft: SIDE_BY_SIDE_PADDING, minWidth: 0 }}>{textContent}</div>
+              <div style={{ ...textColumnStyle, minWidth: 0 }}>{textContent}</div>
             </>
           ) : (
             <>
-              <div style={{ ...textColumnStyle, paddingRight: undefined, paddingLeft: SIDE_BY_SIDE_PADDING, minWidth: 0 }}>{textContent}</div>
+              <div style={{ ...textColumnStyle, minWidth: 0 }}>{textContent}</div>
               <div style={{ position: 'relative', minWidth: 0 }}>{mediaContent}</div>
             </>
           )}

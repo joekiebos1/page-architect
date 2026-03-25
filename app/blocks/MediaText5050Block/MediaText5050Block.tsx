@@ -20,6 +20,16 @@ import { StreamImage } from '../../components/blocks/StreamImage'
 import { getSurfaceProviderProps, useBlockBackgroundColor } from '../../../lib/utils/block-surface'
 import { EDGE_TO_EDGE_BREAKOUT, useEdgeToEdgeMediaStyles } from '../../../lib/utils/edge-to-edge'
 import { MEDIA_TEXT_SUBTITLE_BODY_STYLE, TYPOGRAPHY } from '../../../lib/utils/semantic-headline'
+import {
+  labBlockFramingDescriptionStyle,
+  labBlockFramingDescriptionTextProps,
+  labBlockFramingHeadlineProps,
+  labBlockFramingIntroStackStyle,
+  labBlockFramingTitleStyle,
+  labBlockFramingToContentGap,
+} from '../../../lib/lab/lab-block-framing-typography'
+import { hasLabBlockFraming } from '../../../lib/lab/has-lab-block-framing'
+import { LabBlockFramingCallToActions } from '../../lab/components/LabBlockFramingCallToActions'
 import type { MediaText5050BlockProps, MediaText5050Item } from './MediaText5050Block.types'
 
 const ASPECT_RATIOS: Record<string, string> = {
@@ -87,13 +97,14 @@ function AccordionItem({
                 {item.subtitle && (
                   <Headline
                     size="S"
-                    weight="high"
+                    weight="medium"
                     as="h3"
                     style={{
                       margin: 0,
                       width: '100%',
                       ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
                       whiteSpace: 'pre-line',
+                      fontWeight: 'var(--ds-typography-weight-medium)',
                     }}
                   >
                     {item.subtitle}
@@ -156,6 +167,7 @@ function AccordionItem({
 
 export function MediaText5050Block({
   variant,
+  paragraphColumnLayout,
   imagePosition = 'right',
   emphasis,
   minimalBackgroundStyle,
@@ -163,6 +175,9 @@ export function MediaText5050Block({
   spacingTop: _spacingTop,
   spacingBottom: _spacingBottom,
   headline,
+  description,
+  callToActions,
+  blockFramingAlignment = 'left',
   items = [],
   media,
   imageSlot,
@@ -183,7 +198,7 @@ export function MediaText5050Block({
   const mediaFirst = imagePosition === 'left'
   const surfaceProps = getSurfaceProviderProps(emphasis)
   const cell = useCell('L')
-  const { isStacked } = useGridBreakpoint()
+  const { isStacked, isMobile } = useGridBreakpoint()
 
   const aspectRatio = media?.aspectRatio ? ASPECT_RATIOS[media.aspectRatio] : undefined
   const isVideo = media?.type === 'video'
@@ -254,15 +269,16 @@ export function MediaText5050Block({
       )
     })()
 
-  /** 50/50 grid: 10 cols, 5 each side. Stack on mobile. */
+  /** 50/50 grid: 10 cols, 5 each side. Stack on mobile. Gutter matches page grid; text inset inside text column. */
   const SIDE_BY_SIDE_COLS = 10
   const HALF_COLS = 5
-  const COL_GAP = 'var(--ds-spacing-2xl)'
+  const INNER_COLUMN_GAP = 'var(--ds-grid-gutter)'
+  const TEXT_COLUMN_INSET = 'var(--ds-spacing-3xl)'
 
   const gridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: isStacked ? '1fr' : `repeat(${SIDE_BY_SIDE_COLS}, 1fr)`,
-    gap: isStacked ? 'var(--ds-spacing-3xl)' : COL_GAP,
+    gap: isStacked ? 'var(--ds-spacing-3xl)' : INNER_COLUMN_GAP,
     alignItems: 'start',
   }
 
@@ -274,8 +290,8 @@ export function MediaText5050Block({
     minWidth: 0,
     ...(!isStacked &&
       (mediaFirst
-        ? { paddingLeft: 'var(--ds-spacing-2xl)' }
-        : { paddingRight: 'var(--ds-spacing-2xl)' })),
+        ? { paddingLeft: TEXT_COLUMN_INSET }
+        : { paddingRight: TEXT_COLUMN_INSET })),
   }
 
   const bgColor = useBlockBackgroundColor(emphasis, surfaceColour)
@@ -306,26 +322,50 @@ export function MediaText5050Block({
       children
     )
 
-  /** Variant 1: Paragraphs – 1 item = feature size (larger), 2+ items = editorial size (smaller, stacked) */
-  const isFeatureSize = items.length === 1
-  const headlineToBodyGap = 'var(--ds-spacing-l)'
-  const paragraphsContent = (
-    <div style={{ ...textColumnStyle, gap: 0 }}>
+  const useSingleParagraphColumn =
+    variant === 'paragraphs' &&
+    (paragraphColumnLayout === 'single' ||
+      (paragraphColumnLayout == null && items.length === 1))
+  const showBlockFraming = hasLabBlockFraming(headline, description, callToActions)
+  const framingTextAlign = blockFramingAlignment === 'center' ? 'center' : 'left'
+  const framingStackStyle: React.CSSProperties = {
+    ...labBlockFramingIntroStackStyle,
+    alignItems: framingTextAlign === 'center' ? 'center' : 'flex-start',
+    textAlign: framingTextAlign,
+  }
+  const framingTitleStyleMerged: React.CSSProperties = {
+    ...labBlockFramingTitleStyle(isMobile),
+    textAlign: framingTextAlign,
+  }
+  const framingDescriptionStyleMerged: React.CSSProperties = {
+    ...labBlockFramingDescriptionStyle,
+    textAlign: framingTextAlign,
+  }
+  const blockFramingIntro = showBlockFraming ? (
+    <div style={framingStackStyle}>
       {headline && (
-        <Headline
-          size="M"
-          weight="high"
-          as="h2"
-          style={{
-            margin: 0,
-            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: TYPOGRAPHY.h3,
-            whiteSpace: 'pre-line',
-          }}
-        >
+        <Headline size="M" as="h2" {...labBlockFramingHeadlineProps} style={framingTitleStyleMerged}>
           {headline}
         </Headline>
       )}
+      {description && (
+        <Text
+          as="p"
+          {...labBlockFramingDescriptionTextProps}
+          style={framingDescriptionStyleMerged}
+        >
+          {description}
+        </Text>
+      )}
+      <LabBlockFramingCallToActions
+        actions={callToActions}
+        align={blockFramingAlignment === 'center' ? 'center' : 'left'}
+      />
+    </div>
+  ) : null
+
+  const paragraphsContent = (
+    <div style={{ ...textColumnStyle, gap: 0 }}>
       <div
         style={{
           display: 'flex',
@@ -346,13 +386,15 @@ export function MediaText5050Block({
         >
           {item.subtitle && (
             <Headline
-              size={isFeatureSize ? 'L' : 'S'}
-              weight="high"
-              as={isFeatureSize ? 'h2' : 'h3'}
+              size="M"
+              weight="medium"
+              as={useSingleParagraphColumn ? 'h2' : 'h3'}
               style={{
                 margin: 0,
                 ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.subtitle,
+                fontSize: useSingleParagraphColumn ? TYPOGRAPHY.h4 : TYPOGRAPHY.h5,
                 whiteSpace: 'pre-line',
+                fontWeight: 'var(--ds-typography-weight-medium)',
               }}
             >
               {item.subtitle}
@@ -360,11 +402,16 @@ export function MediaText5050Block({
           )}
           {item.body && (
             <Text
-              size={isFeatureSize ? 'L' : 'S'}
+              size={useSingleParagraphColumn ? 'L' : 'S'}
               weight="low"
               color="medium"
               as="p"
-              style={{ margin: 0, whiteSpace: 'pre-line', ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.body }}
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-line',
+                ...MEDIA_TEXT_SUBTITLE_BODY_STYLE.body,
+                fontSize: useSingleParagraphColumn ? TYPOGRAPHY.labelM : MEDIA_TEXT_SUBTITLE_BODY_STYLE.body.fontSize,
+              }}
             >
               {item.body}
             </Text>
@@ -375,24 +422,9 @@ export function MediaText5050Block({
     </div>
   )
 
-  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). Same text container structure as paragraphs. */
+  /** Variant 2: Accordion – items as collapsible (subtitle = header, body = content). */
   const accordionContent = (
     <div style={{ ...textColumnStyle, gap: 0 }}>
-      {headline && (
-        <Headline
-          size="M"
-          weight="high"
-          as="h2"
-          style={{
-            margin: 0,
-            marginBottom: items.length > 0 ? headlineToBodyGap : undefined,
-            fontSize: TYPOGRAPHY.h3,
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {headline}
-        </Headline>
-      )}
       <div
         style={{
           display: 'flex',
@@ -446,6 +478,9 @@ export function MediaText5050Block({
   const gridContent = (
     <Grid as="section">
       <div style={{ ...cell, position: 'relative' }}>
+        {blockFramingIntro != null ? (
+          <div style={{ marginBottom: labBlockFramingToContentGap, width: '100%' }}>{blockFramingIntro}</div>
+        ) : null}
         <div style={gridStyle}>
           {mediaFirst ? (
             <>
@@ -467,6 +502,9 @@ export function MediaText5050Block({
   const stackedContent = !hasMedia ? (
     <Grid as="section">
       <div style={{ ...cell, ...textColumnStyle }}>
+        {blockFramingIntro != null ? (
+          <div style={{ marginBottom: labBlockFramingToContentGap, width: '100%' }}>{blockFramingIntro}</div>
+        ) : null}
         {textContent}
       </div>
     </Grid>

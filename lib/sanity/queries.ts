@@ -57,12 +57,22 @@ const S_MEDIA_TEXT_STACKED = `{
     minimalBackgroundStyle,
     surfaceColour
   }`
+const S_LAB_CALL_TO_ACTIONS = `callToActions[]{
+    _key,
+    label,
+    link,
+    style
+  }`
 const S_MEDIA_TEXT_5050 = `{
     spacingTop,
     spacingBottom,
     headline,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     variant,
+    paragraphColumnLayout,
     imagePosition,
+    blockFramingAlignment,
     items[]{
       subtitle,
       body
@@ -125,6 +135,8 @@ const S_CAROUSEL = `{
     spacingBottom,
     spacing,
     title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     cardSize,
     emphasis,
     minimalBackgroundStyle,
@@ -146,6 +158,8 @@ const S_PROOF_POINTS = `{
     spacingBottom,
     spacing,
     title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     variant,
     emphasis,
     minimalBackgroundStyle,
@@ -160,6 +174,9 @@ const S_ICON_GRID = `{
     spacingTop,
     spacingBottom,
     spacing,
+    title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     emphasis,
     surfaceColour,
     minimalBackgroundStyle,
@@ -176,7 +193,11 @@ const S_MEDIA_TEXT_ASYMMETRIC = `{
     spacingTop,
     spacingBottom,
     blockTitle,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     variant,
+    paragraphLayout,
+    singleColumnBody,
     longFormParagraphs[]{
       _key,
       text,
@@ -185,23 +206,10 @@ const S_MEDIA_TEXT_ASYMMETRIC = `{
     emphasis,
     minimalBackgroundStyle,
     surfaceColour,
-    items[]{
-      title,
-      body,
-      linkText,
-      linkUrl,
-      subtitle
-    }
-  }`
-
-const S_LAB_MEDIA_TEXT_ASYMMETRIC = `{
-    spacingTop,
-    spacingBottom,
-    blockTitle,
-    variant,
-    emphasis,
-    minimalBackgroundStyle,
-    surfaceColour,
+    imageAspectRatio,
+    imageAlt,
+    "image": coalesce(imageUrl, image.asset->url),
+    imageUrl,
     paragraphRows[]{
       _key,
       title,
@@ -241,7 +249,7 @@ const PAGE_SECTIONS_PROJECTION = `{
     cta2Text,
     cta2Link,
     "image": coalesce(imageUrl, image.asset->url),
-    videoUrl
+    "videoUrl": coalesce(videoUrl, video.asset->url)
   },
   _type == "cardGrid" => {
     spacingTop,
@@ -306,6 +314,8 @@ const LAB_SECTIONS_PROJECTION = `{
     spacing,
     columns,
     title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     emphasis,
     minimalBackgroundStyle,
     surfaceColour,
@@ -316,6 +326,8 @@ const LAB_SECTIONS_PROJECTION = `{
     spacingBottom,
     spacing,
     title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     cardSize,
     emphasis,
     minimalBackgroundStyle,
@@ -334,6 +346,8 @@ const LAB_SECTIONS_PROJECTION = `{
     textVerticalAlign,
     textInFront,
     headline,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     body,
     ctaText,
     ctaLink,
@@ -356,7 +370,7 @@ const LAB_SECTIONS_PROJECTION = `{
     cta2Text,
     cta2Link,
     "image": coalesce(imageUrl, image.asset->url),
-    videoUrl,
+    "videoUrl": coalesce(videoUrl, video.asset->url),
     contentLayout,
     containerLayout,
     imageAnchor,
@@ -365,9 +379,14 @@ const LAB_SECTIONS_PROJECTION = `{
     surfaceColour
   },
   _type == "fullBleedVerticalCarousel" => {
+    spacingTop,
+    spacingBottom,
     emphasis,
     surfaceColour,
     minimalBackgroundStyle,
+    title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     items[]{
       title,
       description,
@@ -376,10 +395,15 @@ const LAB_SECTIONS_PROJECTION = `{
     }
   },
   _type == "rotatingMedia" => {
+    spacingTop,
+    spacingBottom,
     variant,
     emphasis,
     surfaceColour,
     minimalBackgroundStyle,
+    title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     items[]{
       "image": coalesce(imageUrl, image.asset->url),
       title,
@@ -387,6 +411,11 @@ const LAB_SECTIONS_PROJECTION = `{
     }
   },
   _type == "mediaZoomOutOnScroll" => {
+    spacingTop,
+    spacingBottom,
+    title,
+    description,
+    ${S_LAB_CALL_TO_ACTIONS},
     "image": coalesce(imageUrl, image.asset->url),
     videoUrl,
     alt
@@ -394,9 +423,10 @@ const LAB_SECTIONS_PROJECTION = `{
   _type == "iconGrid" => ${S_ICON_GRID},
   _type == "proofPoints" => ${S_PROOF_POINTS},
   _type == "mediaTextAsymmetric" => ${S_MEDIA_TEXT_ASYMMETRIC},
-  _type == "labMediaTextAsymmetric" => ${S_LAB_MEDIA_TEXT_ASYMMETRIC}
+  _type == "labMediaTextAsymmetric" => ${S_MEDIA_TEXT_ASYMMETRIC}
 }`
 
+/** Lab overview singleton — id must not contain `/` (Sanity structure constraint). */
 export const labOverviewQuery = `*[_type == "labOverview" && _id == "labOverview"][0]{
   _id,
   sections[]${LAB_SECTIONS_PROJECTION}
@@ -415,9 +445,3 @@ export const labBlockPageBySlugQuery = `*[_type == "labBlockPage" && slug == $sl
   sections[]${LAB_SECTIONS_PROJECTION}
 }`
 
-export const blockInspirationCatalogueQuery = `*[_type == "blockInspirationCatalogue" && _id == "blockInspirationCatalogue"][0]{
-  entries[]{
-    blockId,
-    "thumbnail": thumbnail.asset->url
-  }
-}`

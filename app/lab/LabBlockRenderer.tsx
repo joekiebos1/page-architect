@@ -3,7 +3,8 @@
 import React from 'react'
 /**
  * Lab block renderer – renders blocks from Sanity lab page sections.
- * Hero, FullBleedVerticalCarousel, RotatingMedia, MediaZoomOutOnScroll.
+ * Uses Lab* block components only (app/lab/blocks). Production blocks in app/blocks/
+ * are not imported here; promote experiments one-way into production when ready.
  */
 
 import {
@@ -36,15 +37,34 @@ type LabBlock = {
   [key: string]: unknown
 }
 
-/** Map legacy production `mediaTextAsymmetric` (e.g. textList / longForm) to lab merged shape. */
+function mapLabParagraphRowsFromBlock(block: LabBlock) {
+  const raw = block.paragraphRows
+  if (!Array.isArray(raw)) return []
+  return (
+    raw as {
+      _key?: string
+      title?: string
+      body?: string
+      linkText?: string
+      linkUrl?: string
+    }[]
+  ).map((p) => ({
+    _key: p._key,
+    title: p.title,
+    body: p.body,
+    linkText: p.linkText,
+    linkUrl: p.linkUrl,
+  }))
+}
+
+/** Map production `mediaTextAsymmetric` document shape → lab asymmetric props (legacy / mixed lab data). */
 function normalizeLegacyProductionAsymmetricForLab(block: LabBlock): {
   blockTitle: string | null
-  variant: 'paragraphs' | 'faq' | 'links'
+  variant: 'paragraphs' | 'faq' | 'links' | 'image'
   paragraphRows?: Array<{
     _key?: string
     title?: string | null
     body?: string | null
-    bodyTypography: 'regular' | 'large'
     linkText?: string | null
     linkUrl?: string | null
   }>
@@ -55,9 +75,51 @@ function normalizeLegacyProductionAsymmetricForLab(block: LabBlock): {
     linkUrl?: string | null
     subtitle?: string | null
   }>
+  mainImageSrc?: string
+  imageAspectRatio?: '5:4' | '1:1' | '4:5'
+  imageAlt?: string | null
 } {
   const rawVariant = (block.variant as string) ?? 'textList'
   const blockTitle = (block.blockTitle as string | null) ?? null
+
+  if (rawVariant === 'paragraphs') {
+    return { blockTitle, variant: 'paragraphs', paragraphRows: mapLabParagraphRowsFromBlock(block) }
+  }
+
+  if (rawVariant === 'faq' || rawVariant === 'links') {
+    const items = Array.isArray(block.items)
+      ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map(
+          (i) => ({
+            title: i.title,
+            body: i.body,
+            linkText: i.linkText,
+            linkUrl: i.linkUrl,
+            subtitle: i.subtitle,
+          }),
+        )
+      : []
+    return { blockTitle, variant: rawVariant, items }
+  }
+
+  if (rawVariant === 'image') {
+    const mainImageRaw = block.image as string | undefined
+    const mainImageSrc =
+      typeof mainImageRaw === 'string' && mainImageRaw.trim().length > 0
+        ? mainImageRaw.trim()
+        : typeof block.imageUrl === 'string' && block.imageUrl.trim().length > 0
+          ? (block.imageUrl as string).trim()
+          : ''
+    const ar = block.imageAspectRatio as string | undefined
+    const imageAspectRatio =
+      ar === '5:4' || ar === '1:1' || ar === '4:5' ? (ar as '5:4' | '1:1' | '4:5') : undefined
+    return {
+      blockTitle,
+      variant: 'image',
+      mainImageSrc,
+      imageAspectRatio,
+      imageAlt: (block.imageAlt as string | null) ?? null,
+    }
+  }
 
   if (rawVariant === 'textList' || rawVariant === 'longForm') {
     const paragraphRows =
@@ -74,35 +136,18 @@ function normalizeLegacyProductionAsymmetricForLab(block: LabBlock): {
               _key: row._key ?? `legacy-tl-${i}`,
               title: row.title,
               body: row.body,
-              bodyTypography: 'regular' as const,
               linkText: row.linkText,
               linkUrl: row.linkUrl,
             }
           })
         : (Array.isArray(block.longFormParagraphs) ? block.longFormParagraphs : []).map(
-            (p: { _key?: string; text?: string | null; bodyTypography?: string | null }, i) => ({
+            (p: { _key?: string; text?: string | null }, i) => ({
               _key: p._key ?? `legacy-lf-${i}`,
               title: undefined as string | undefined,
               body: p.text,
-              bodyTypography: p.bodyTypography === 'large' ? ('large' as const) : ('regular' as const),
             }),
           )
     return { blockTitle, variant: 'paragraphs', paragraphRows }
-  }
-
-  if (rawVariant === 'faq' || rawVariant === 'links') {
-    const items = Array.isArray(block.items)
-      ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map(
-          (i) => ({
-            title: i.title,
-            body: i.body,
-            linkText: i.linkText,
-            linkUrl: i.linkUrl,
-            subtitle: i.subtitle,
-          }),
-        )
-      : []
-    return { blockTitle, variant: rawVariant, items }
   }
 
   return { blockTitle, variant: 'paragraphs', paragraphRows: [] }
@@ -205,7 +250,9 @@ export function getBlockLayoutTitle(block: LabBlock): string {
       const v = (block.variant as string) ?? 'paragraphs'
       if (v === 'faq') return 'FAQ'
       if (v === 'links') return 'Links'
-      return 'Paragraphs'
+      if (v === 'image') return 'Image'
+      if (v === 'paragraphs' && (block.paragraphLayout as string) === 'single') return 'Paragraphs · Single column'
+      return 'Paragraphs · Sections'
     }
     case 'topNavBlock':
       return 'Mega menu'
@@ -259,15 +306,23 @@ export function getBlockOtherSettings(block: LabBlock): string {
     }
     case 'labMediaTextAsymmetric': {
       const v = (block.variant as string) ?? 'paragraphs'
+      if (v === 'image') {
+        const ar = (block.imageAspectRatio as string) ?? '4:5'
+        return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${ar} image`
+      }
+      const isSinglePara = v === 'paragraphs' && (block.paragraphLayout as string) === 'single'
       const n =
         v === 'paragraphs'
-          ? Array.isArray(block.paragraphRows)
-            ? block.paragraphRows.length
-            : 0
+          ? isSinglePara
+            ? 1
+            : Array.isArray(block.paragraphRows)
+              ? block.paragraphRows.length
+              : 0
           : Array.isArray(block.items)
             ? block.items.length
             : 0
-      const label = v === 'paragraphs' ? 'paragraph(s)' : 'item(s)'
+      const label =
+        v === 'paragraphs' ? (isSinglePara ? 'column' : 'section(s)') : 'item(s)'
       return `Emphasis: ${block.emphasis ?? ''} · Surface colour: ${block.surfaceColour ?? ''} · ${n} ${label}`
     }
     case 'topNavBlock':
@@ -457,16 +512,33 @@ function mapMediaText5050Block(block: LabBlock): MediaText5050BlockProps {
   const rawVariant = block.variant as string
   const variant: MediaText5050BlockProps['variant'] =
     rawVariant === 'accordion' ? 'accordion' : 'paragraphs'
+  const items5050 = mapMediaText5050Items(block)
+  const rawFramingAlign = block.blockFramingAlignment as string | undefined
+  const blockFramingAlignment: MediaText5050BlockProps['blockFramingAlignment'] =
+    rawFramingAlign === 'center' ? 'center' : 'left'
+  const rawLayout = block.paragraphColumnLayout as string | undefined
+  const paragraphColumnLayout: MediaText5050BlockProps['paragraphColumnLayout'] | undefined =
+    variant === 'paragraphs'
+      ? rawLayout === 'single' || rawLayout === 'multi'
+        ? rawLayout
+        : items5050.length === 1
+          ? 'single'
+          : 'multi'
+      : undefined
   return {
     variant,
+    paragraphColumnLayout,
     imagePosition: (block.imagePosition as 'left' | 'right') ?? 'right',
+    blockFramingAlignment,
     emphasis: block.emphasis as MediaText5050BlockProps['emphasis'],
     minimalBackgroundStyle: (block.minimalBackgroundStyle as 'block' | 'gradient') ?? 'block',
     surfaceColour: block.surfaceColour as MediaText5050BlockProps['surfaceColour'],
     spacingTop: block.spacingTop ? (normalizeSpacing(block.spacingTop) as MediaText5050BlockProps['spacingTop']) : undefined,
     spacingBottom: block.spacingBottom ? (normalizeSpacing(block.spacingBottom) as MediaText5050BlockProps['spacingBottom']) : undefined,
     headline: block.headline as string | undefined,
-    items: mapMediaText5050Items(block),
+    description: block.description as string | null | undefined,
+    callToActions: block.callToActions as MediaText5050BlockProps['callToActions'],
+    items: items5050,
     media,
   }
 }
@@ -593,6 +665,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
               <LabCardGridBlock
                 columns={parseInt(cols, 10) as 2 | 3 | 4}
                 title={block.title as string}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
                 surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
@@ -620,6 +694,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
             return wrapSection(
               <LabCarouselBlock
                 title={block.title as string}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 cardSize={(block.cardSize as 'compact' | 'medium' | 'large') ?? 'medium'}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
@@ -633,6 +709,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
           case 'fullBleedVerticalCarousel': {
             return wrapSection(
               <LabFullBleedVerticalCarousel
+                title={block.title as string | null | undefined}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
                 items={block.items as { title?: string; description?: string; image?: string; video?: string }[]}
@@ -644,6 +723,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
           case 'rotatingMedia': {
             return wrapSection(
               <LabRotatingMediaBlock
+                title={block.title as string | null | undefined}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 variant={(block.variant as 'small' | 'large' | 'combined') ?? 'small'}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 surfaceColour={block.surfaceColour as 'primary' | 'secondary' | 'sparkle' | 'neutral'}
@@ -670,6 +752,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
               : []
             return wrapSection(
               <LabIconGridBlock
+                title={block.title as string | null | undefined}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 items={items}
                 columns={(block.columns as 3 | 4 | 5 | 6) ?? undefined}
                 emphasis={block.emphasis as 'ghost' | 'minimal' | 'subtle' | 'bold'}
@@ -688,6 +773,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
             return wrapSection(
               <LabProofPointsBlock
                 title={block.title as string | null}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 variant={ppVariant}
                 emphasis={ppSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
@@ -701,6 +788,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
           case 'mediaZoomOutOnScroll': {
             return wrapSection(
               <LabMediaZoomOutOnScroll
+                title={block.title as string | null | undefined}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 image={(block.image as string) || '/placeholder-preview.svg'}
                 videoUrl={block.videoUrl as string | null}
                 alt={block.alt as string | null}
@@ -718,6 +808,8 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
             return wrapSection(
               <EditorialBlock
                 headline={block.headline as string | null}
+                description={block.description as string | null | undefined}
+                callToActions={block.callToActions as import('../../lib/lab/lab-block-framing-typography').LabBlockCallToAction[] | undefined}
                 body={block.body as string | null}
                 backgroundImage={block.backgroundImage as string | null}
                 backgroundImagePositionX={block.backgroundImagePositionX as number | null}
@@ -744,25 +836,9 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
             )
           }
           case 'labMediaTextAsymmetric': {
-            const paragraphRows = Array.isArray(block.paragraphRows)
-              ? (
-                  block.paragraphRows as {
-                    _key?: string
-                    title?: string
-                    body?: string
-                    bodyTypography?: string
-                    linkText?: string
-                    linkUrl?: string
-                  }[]
-                ).map((p) => ({
-                  _key: p._key,
-                  title: p.title,
-                  body: p.body,
-                  bodyTypography: p.bodyTypography === 'large' ? ('large' as const) : ('regular' as const),
-                  linkText: p.linkText,
-                  linkUrl: p.linkUrl,
-                }))
-              : []
+            const paragraphRows = mapLabParagraphRowsFromBlock(block)
+            const paragraphLayout =
+              (block.paragraphLayout as string) === 'single' ? ('single' as const) : ('multi' as const)
             const asymmetricItems = Array.isArray(block.items)
               ? (block.items as { title?: string; body?: string; linkText?: string; linkUrl?: string; subtitle?: string }[]).map((j) => ({
                   title: j.title,
@@ -776,12 +852,27 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
             const asymmetricSurfValid = asymmetricSurf && ['ghost', 'minimal', 'subtle', 'bold'].includes(asymmetricSurf) ? asymmetricSurf : undefined
             const asymmetricAcc = String(block.surfaceColour ?? '').toLowerCase()
             const asymmetricAccValid = asymmetricAcc && ['primary', 'secondary', 'sparkle', 'neutral'].includes(asymmetricAcc) ? asymmetricAcc : undefined
+            const mainImageRaw = block.image as string | null | undefined
+            const mainImageSrc =
+              typeof mainImageRaw === 'string' && mainImageRaw.trim().length > 0
+                ? mainImageRaw.trim()
+                : typeof block.imageUrl === 'string' && block.imageUrl.trim().length > 0
+                  ? block.imageUrl.trim()
+                  : ''
+            const ar = block.imageAspectRatio as string | undefined
+            const imageAspectRatio =
+              ar === '5:4' || ar === '1:1' || ar === '4:5' ? (ar as '5:4' | '1:1' | '4:5') : undefined
             return wrapSection(
               <LabMediaTextAsymmetricBlock
                 blockTitle={block.blockTitle as string | null}
-                variant={(block.variant as 'paragraphs' | 'faq' | 'links') ?? 'paragraphs'}
+                variant={(block.variant as 'paragraphs' | 'faq' | 'links' | 'image') ?? 'paragraphs'}
+                paragraphLayout={paragraphLayout}
+                singleColumnBody={(block.singleColumnBody as string | null) ?? null}
                 paragraphRows={paragraphRows}
                 items={asymmetricItems}
+                mainImageSrc={mainImageSrc}
+                imageAspectRatio={imageAspectRatio}
+                imageAlt={(block.imageAlt as string | null) ?? null}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
                 emphasis={asymmetricSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
@@ -802,8 +893,13 @@ export function LabBlockRenderer({ blocks, variantLabels, clean, asymmetricBlock
               <LabMediaTextAsymmetricBlock
                 blockTitle={normalized.blockTitle}
                 variant={normalized.variant}
+                paragraphLayout="multi"
+                singleColumnBody={null}
                 paragraphRows={normalized.paragraphRows}
                 items={normalized.items}
+                mainImageSrc={normalized.mainImageSrc}
+                imageAspectRatio={normalized.imageAspectRatio}
+                imageAlt={normalized.imageAlt}
                 size={(block.size as 'hero' | 'feature' | 'editorial') ?? 'feature'}
                 emphasis={asymmetricSurfValid as 'ghost' | 'minimal' | 'subtle' | 'bold'}
                 minimalBackgroundStyle={(block.minimalBackgroundStyle as string)?.toLowerCase?.() === 'gradient' ? 'gradient' : 'block'}
