@@ -4,18 +4,18 @@ import type {
   MediaTextAsymmetricLinkItem,
   MediaTextAsymmetricSize,
   MediaTextAsymmetricSurfaceColour,
-} from '../../../blocks/MediaTextAsymmetricBlock/MediaTextAsymmetricBlock.types'
+} from '../../../../lib/blocks/media-text-asymmetric-shared.types'
+/** Lab-only `_type` is `labMediaTextAsymmetric`; `variant` selects pattern. */
+export type LabMediaTextAsymmetricVariant = 'paragraphs' | 'faq' | 'links' | 'image'
 
-/** Lab-only `_type` is `labMediaTextAsymmetric`; `variant` selects pattern (merged paragraphs + long-form). */
-export type LabMediaTextAsymmetricVariant = 'paragraphs' | 'faq' | 'links'
+export type LabMediaTextAsymmetricImageAspectRatio = '5:4' | '1:1' | '4:5'
 
-export type LabMediaTextAsymmetricBodyTypography = 'regular' | 'large'
+export type LabMediaTextAsymmetricParagraphLayout = 'single' | 'multi'
 
 export type LabMediaTextAsymmetricParagraphRow = {
   _key?: string
   title?: string | null
   body?: string | null
-  bodyTypography?: LabMediaTextAsymmetricBodyTypography
   linkText?: string | null
   linkUrl?: string | null
 }
@@ -25,8 +25,14 @@ export type LabMediaTextAsymmetricItem = MediaTextAsymmetricFaqItem | MediaTextA
 export type LabMediaTextAsymmetricBlockProps = {
   blockTitle?: string | null
   variant?: LabMediaTextAsymmetricVariant
+  /** Lab paragraphs only. Omitted or `multi` uses section rows; production legacy maps here as multi. */
+  paragraphLayout?: LabMediaTextAsymmetricParagraphLayout | null
+  singleColumnBody?: string | null
   paragraphRows?: LabMediaTextAsymmetricParagraphRow[] | null
   items?: LabMediaTextAsymmetricItem[] | null
+  mainImageSrc?: string | null
+  imageAspectRatio?: LabMediaTextAsymmetricImageAspectRatio | null
+  imageAlt?: string | null
   size?: MediaTextAsymmetricSize
   emphasis?: MediaTextAsymmetricEmphasis
   minimalBackgroundStyle?: 'block' | 'gradient' | null
